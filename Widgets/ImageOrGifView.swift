@@ -13,17 +13,16 @@ struct weatherOptionInfo : Hashable {
     var systemImage : String;
 }
 
+protocol TriggerOption {
+    var body: any View { get }
+}
 
 struct ImageOrGifView : View {
-    @State private var weatherSelection =  weatherOptionInfo(title: "sunny", systemImage: "sun.min.fill")
-    @State private var timeSelection = "seconds"
-    @State private var frequency = 0
-    @State private var frequencyStartDate = Date()
-    @State private var triggerSelection =
-    ["Always" : false,
-     "Weather" : false,
-     "Frequency" : false,
-     "Location" : false]
+    @State var weatherSelection =  weatherOptionInfo(title: "sunny", systemImage: "sun.min.fill")
+    @State var frequencyTime = "seconds"
+    @State var frequency = 0
+    @State var frequencyStartDate = Date()
+    @State var triggerSelection = "Always";
     
     var weatherOptions = [
         weatherOptionInfo(title: "sunny", systemImage: "sun.min.fill"),
@@ -35,6 +34,10 @@ struct ImageOrGifView : View {
     
     var timeOptions = ["milliseconds", "seconds", "minutes", "hours", "days", "weeks", "months", "years"]
     
+    func makeTriggerOption(title : String, view : some View) -> some View {
+        return view.tag(title).disabled(triggerSelection != title)
+    }
+   
     var body : some View {
         VStack(alignment: .leading) {
             TitleText(text : "Image/Gif")
@@ -52,40 +55,54 @@ struct ImageOrGifView : View {
                         Text("*When should the widget be triggered?*").font(.title3)
                     }
                     VStack(alignment: .leading) {
-                        HStack {
-                            TriggerCategoryText(text: "Always")
-                        }
-                        HStack {
-                            TriggerCategoryText(text: "Weather")
-                            Picker("", selection: $weatherSelection) {
-                                ForEach(weatherOptions, id: \.self) { item in
-                                    HStack {
-                                        Text("Whenever it is " + item.title)
-                                        Image(systemName: item.systemImage)
-                                    }
-                                }
-                            }.pickerStyle(.menu)
-                        }
-                        HStack {
-                            TriggerCategoryText(text: "Frequency")
-                            Text("Every").font(.title2)
-                            TextField("Enter the time value", value: $frequency, format: .number)
-                                           .textFieldStyle(.roundedBorder)
-                            Picker("", selection: $timeSelection) {
-                                ForEach(timeOptions, id: \.self) { item in
-                                    Text(item)
-                                }
-                            }
-                            Text("starting from").font(.title2)
-                            DatePicker(
-                                    "",
-                                    selection: $frequencyStartDate,
-                                    displayedComponents: [.date, .hourAndMinute]
-                                )
-                        }
-                        HStack {
-                            TriggerCategoryText(text: "Location")
-                        }
+                        Picker(selection: $triggerSelection, label: Text("")) {
+                            makeTriggerOption(
+                                title: "Always",
+                                view: HStack {
+                                    TriggerCategoryText(text: "Always")
+                            })
+                            
+                            makeTriggerOption(
+                                title: "Weather",
+                                view: HStack {
+                                    TriggerCategoryText(text: "Weather")
+                                    Picker("", selection: $weatherSelection) {
+                                        ForEach(weatherOptions, id: \.self) { item in
+                                            HStack {
+                                                Text("Whenever it is " + item.title)
+                                                Image(systemName: item.systemImage)
+                                            }
+                                        }
+                                    }.pickerStyle(.menu)
+                            })
+                            
+                            makeTriggerOption(
+                                title: "Frequency",
+                                view: HStack {
+                                    TriggerCategoryText(text: "Frequency")
+                                    Text("Every").font(.title2)
+                                    TextField("Enter the time value", value: $frequency, format: .number)
+                                                   .textFieldStyle(.roundedBorder)
+                                    Picker("", selection: $frequencyTime) {
+                                        ForEach(timeOptions, id: \.self) { item in
+                                            Text(item)
+                                        }
+                                    }.pickerStyle(MenuPickerStyle())
+                                    Text("starting from").font(.title2)
+                                    DatePicker(
+                                            "",
+                                            selection: $frequencyStartDate,
+                                            displayedComponents: [.date, .hourAndMinute]
+                                        )
+                            })
+                            
+                            makeTriggerOption(
+                                title: "Location",
+                                view: HStack {
+                                    TriggerCategoryText(text: "Location")
+                            })
+                            
+                        }.pickerStyle(RadioGroupPickerStyle())
                     }.padding([.leading, .trailing])
                     HStack {
                         Text("Time Frame").font(.title).padding()

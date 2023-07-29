@@ -48,3 +48,5 @@ func TriggerCategoryText(text : String) -> some View {
                 .frame(width: 100, alignment: .leading)
                 .padding(5)
 }
+
+
