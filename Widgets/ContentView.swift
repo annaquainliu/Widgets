@@ -17,7 +17,7 @@ struct ContentView: View {
             VStack(alignment : .center) {
                 TitleText(text: "Widgets")
                 Text("Make your own widgets appear based on **triggers**!").padding([.bottom, .leading], 20)
-                Spacer().frame(minHeight: 10)
+                Spacer().frame(maxHeight: 10)
                 VStack {
                     HStack {
                         MenuButton(title: "Image/GIF", ImageName: "photo.fill", parent:self)
@@ -50,13 +50,13 @@ struct MenuButton : View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 32.0, height: 32.0)
-        }.contentShape(Rectangle())
-         .frame(width: 150, height: 150)
+        }.frame(width: 150, height: 150)
          .overlay(RoundedRectangle(cornerRadius: 16)
          .stroke(.white, lineWidth: 2))
-         .onTapGesture {
+         .contentShape(Rectangle())
+          .onTapGesture {
              parent.tab = title
-         }
+          }
     }
 }
 

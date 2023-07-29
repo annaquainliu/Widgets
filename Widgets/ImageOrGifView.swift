@@ -29,6 +29,10 @@ struct ImageOrGifView : View {
     @State private var duration = 0
     @State private var durationMeasurement = "seconds"
     
+    @State private var timeFrameSelection = "Always"
+    @State private var timeFrameStart = Date()
+    @State private var timeFrameEnd = Date()
+    
     var weatherOptions = [
         weatherOptionInfo(title: "sunny", systemImage: "sun.min.fill"),
         weatherOptionInfo(title: "cloudy", systemImage: "cloud.fill"),
@@ -39,8 +43,8 @@ struct ImageOrGifView : View {
     
     var timeOptions = ["milliseconds", "seconds", "minutes", "hours", "days", "weeks", "months", "years"]
     
-    func makeTriggerOption(title : String, view : some View) -> some View {
-        return view.tag(title).disabled(triggerSelection != title)
+    func makeRadioOption(title : String, view : some View, selection : String) -> some View {
+        return view.tag(title).disabled(selection != title)
     }
     
     func makeTimeMeasurementMenu(selection : Binding<String>) -> some View {
@@ -65,12 +69,12 @@ struct ImageOrGifView : View {
                     }
                     VStack(alignment: .leading) {
                         Picker(selection: $triggerSelection, label: Text("")) {
-                            makeTriggerOption(
+                            makeRadioOption(
                                 title: "Always",
                                 view: HStack {
-                                    TriggerCategoryText(text: "Always")
-                            })
-                            makeTriggerOption(
+                                    TriggerCategoryText(text: "Always")},
+                                selection: triggerSelection)
+                            makeRadioOption(
                                 title: "Weather",
                                 view: HStack {
                                     TriggerCategoryText(text: "Weather")
@@ -81,9 +85,9 @@ struct ImageOrGifView : View {
                                                 Image(systemName: item.systemImage)
                                             }
                                         }
-                                    }.pickerStyle(.menu)
-                            })
-                            makeTriggerOption(
+                                    }.pickerStyle(.menu)},
+                                selection: triggerSelection)
+                            makeRadioOption(
                                 title: "Frequency",
                                 view: HStack {
                                     TriggerCategoryText(text: "Frequency")
@@ -96,14 +100,13 @@ struct ImageOrGifView : View {
                                             "",
                                             selection: $frequencyStartDate,
                                             displayedComponents: [.date, .hourAndMinute]
-                                        )
-                            })
-                            makeTriggerOption(
+                                    )},
+                                selection: triggerSelection)
+                            makeRadioOption(
                                 title: "Location",
                                 view: HStack {
                                     TriggerCategoryText(text: "Location")
-                            })
-                            
+                            }, selection: triggerSelection)
                         }.pickerStyle(RadioGroupPickerStyle())
                     }.padding([.leading, .trailing])
                     HStack {
@@ -122,6 +125,29 @@ struct ImageOrGifView : View {
                         Text("Time Frame").font(.title).padding()
                         Text("*When should the widget be triggerable?*").font(.title3)
                     }
+                    VStack {
+                        Picker(selection: $timeFrameSelection, label: Text("")) {
+                            makeRadioOption(
+                                title: "Always",
+                                view: Text("Always").font(.title2),
+                                selection: timeFrameSelection)
+                            makeRadioOption(
+                                title: "timeFrame",
+                                view: HStack {
+                                    DatePicker(
+                                        "From:",
+                                        selection: $timeFrameStart,
+                                        displayedComponents: [.date]
+                                    )
+                                    DatePicker(
+                                        "End:",
+                                        selection: $timeFrameEnd,
+                                        displayedComponents: [.date]
+                                    )
+                                },
+                                selection: timeFrameSelection)
+                        }.pickerStyle(RadioGroupPickerStyle())
+                    }.padding([.leading, .trailing])
                 }
             }.padding()
         }.padding()
