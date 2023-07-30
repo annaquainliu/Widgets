@@ -28,74 +28,26 @@ struct TimeOptions {
     }
 }
 
-struct WeatherTrigger : View {
-    
-    struct weatherOptionInfo : Hashable {
-        var title : String;
-        var systemImage : String;
-    }
-    
-    @State private var weatherSelection =  weatherOptionInfo(title: "sunny", systemImage: "sun.min.fill")
-    
-    var weatherOptions = [
-        weatherOptionInfo(title: "sunny", systemImage: "sun.min.fill"),
-        weatherOptionInfo(title: "cloudy", systemImage: "cloud.fill"),
-        weatherOptionInfo(title: "raining", systemImage:  "cloud.heavyrain.fill"),
-        weatherOptionInfo(title: "windy", systemImage: "wind.circle"),
-        weatherOptionInfo(title: "snowing", systemImage: "cloud.snow.fill"),
-        weatherOptionInfo(title: "thundering", systemImage: "cloud.bolt.rain")]
-    
-    var body : some View {
-        HStack {
-            TriggerCategoryText(text: "Weather")
-            Picker("", selection: $weatherSelection) {
-                ForEach(weatherOptions, id: \.self) { item in
-                    HStack {
-                        Text("Whenever it is " + item.title)
-                        Image(systemName: item.systemImage)
-                    }
-                }
-            }.pickerStyle(.menu)
-        }
-    }
-    
-    func getWeather() -> weatherOptionInfo {
-        return weatherSelection;
-    }
-
+struct WeatherOptionInfo : Hashable {
+    var title : String;
+    var systemImage : String;
+    static var sunny = "sunny"
+    static var cloudy = "cloudy"
+    static var raining = "raining"
+    static var windy = "windy"
+    static var snowing = "snowing"
+    static var thunder = "thundering"
 }
 
-struct FrequencyTrigger : View {
-    struct FrequencyInfo {
-        var freqMeasurement : String
-        var frequency : Int
-        var frequencyStartDate : Date
-    }
+struct WeatherTrigger {
     
-    @State private var freqMeasurement = TimeOptions.s
-    @State private var frequency = 0
-    @State private var frequencyStartDate = Date()
-    
-    var body : some View {
-        HStack {
-            TriggerCategoryText(text: Triggers.freq)
-            Text("Every").font(.title2)
-            TextField("Enter the time value", value: $frequency, format: .number)
-                           .textFieldStyle(.roundedBorder)
-            TimeOptions.makeTimeMeasurementMenu(selection: $freqMeasurement)
-            Text("starting from").font(.title2)
-            DatePicker(
-                    "",
-                    selection: $frequencyStartDate,
-                    displayedComponents: [.date, .hourAndMinute]
-        )}
-    }
-    
-    func getFrequencyInfo() -> FrequencyInfo {
-        return FrequencyInfo(freqMeasurement: freqMeasurement,
-                             frequency: frequency,
-                             frequencyStartDate: frequencyStartDate)
-    }
+    static var weatherOptions = [
+        WeatherOptionInfo(title: WeatherOptionInfo.sunny, systemImage: "sun.min.fill"),
+        WeatherOptionInfo(title: WeatherOptionInfo.cloudy, systemImage: "cloud.fill"),
+        WeatherOptionInfo(title: WeatherOptionInfo.raining, systemImage:  "cloud.heavyrain.fill"),
+        WeatherOptionInfo(title: WeatherOptionInfo.windy, systemImage: "wind.circle"),
+        WeatherOptionInfo(title: WeatherOptionInfo.snowing, systemImage: "cloud.snow.fill"),
+        WeatherOptionInfo(title: WeatherOptionInfo.thunder, systemImage: "cloud.bolt.rain")]
 }
 
 struct Triggers {
@@ -115,56 +67,15 @@ struct Triggers {
 struct Duration {
     static var untilDeactivate = "UntilDeactivated"
     static var duration  = "duration"
+    
+    var durationSelection : String
+    var durationMeasurement : String
+    var duration : Int
 }
 
-struct TimeFrame : View {
-    struct TimeFrameInfo {
-        var timeFrameSelection : String
-        var timeFrame : [Date]
-    }
-
-    @State private var timeFrameSelection = "Always"
-    @State private var timeFrameStart = Date()
-    @State private var timeFrameEnd = Date()
-    
+struct TimeFrame {
+    var selection : String
+    var timeRange : [Date]
     static var always = "Always"
     static var frame = "timeFrame"
-    
-    var body : some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("Time Frame").font(.title).padding()
-                Text("*When should the widget be triggerable?*").font(.title3)
-            }
-            VStack {
-                Picker(selection: $timeFrameSelection, label: Text("")) {
-                    makeRadioOption(
-                        title: TimeFrame.always,
-                        view: Text("Always").font(.title2),
-                        selection: timeFrameSelection)
-                    makeRadioOption(
-                        title: TimeFrame.frame,
-                        view: HStack {
-                            DatePicker(
-                                "From:",
-                                selection: $timeFrameStart,
-                                displayedComponents: [.date]
-                            )
-                            DatePicker(
-                                "End:",
-                                selection: $timeFrameEnd,
-                                displayedComponents: [.date]
-                            )
-                        },
-                        selection: timeFrameSelection)
-                }.pickerStyle(RadioGroupPickerStyle())
-            }.padding([.leading, .trailing])
-        }
-    }
-    
-    func getTimeFrameInfo() -> TimeFrameInfo {
-        return TimeFrameInfo(timeFrameSelection: timeFrameSelection,
-                             timeFrame: [timeFrameStart, timeFrameEnd])
-    }
-    
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		30B14F332A73777F007A1672 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B14F322A73777F007A1672 /* Utilities.swift */; };
+		30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */; };
 		30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */; };
 		30BDD92C2A71CD2E007E5F3B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30BDD92B2A71CD2E007E5F3B /* Assets.xcassets */; };
 		30BDD92F2A71CD2E007E5F3B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30BDD92E2A71CD2E007E5F3B /* Preview Assets.xcassets */; };
@@ -39,6 +40,7 @@
 
 /* Begin PBXFileReference section */
 		30B14F322A73777F007A1672 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetViewModel.swift; sourceTree = "<group>"; };
 		30BDD9242A71CD2D007E5F3B /* Widgets.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Widgets.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsApp.swift; sourceTree = "<group>"; };
 		30BDD92B2A71CD2E007E5F3B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				30B14F322A73777F007A1672 /* Utilities.swift */,
 				30F4E6CD2A75BD0700EBA9CD /* Triggers.swift */,
 				30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */,
+				30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */,
 				30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */,
 				30B14F332A73777F007A1672 /* Utilities.swift in Sources */,
+				30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */,
 				30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */,
 				30F4E6CE2A75BD0700EBA9CD /* Triggers.swift in Sources */,
 			);

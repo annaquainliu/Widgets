@@ -13,6 +13,13 @@ struct WidgetMenu : View {
     @State private var duration = 0
     @State private var durationMeasurement = TimeOptions.s
     @State private var durationSelection = Duration.untilDeactivate
+    @State var weatherSelection =  WeatherOptionInfo(title: WeatherOptionInfo.sunny, systemImage: "sun.min.fill")
+    @State private var freqMeasurement = TimeOptions.s
+    @State private var frequency = 0
+    @State private var frequencyStartDate = Date()
+    @State private var timeFrameSelection = TimeFrame.always
+    @State private var timeFrameStart = Date()
+    @State private var timeFrameEnd = Date()
     
     func makeDurationView() -> some View {
         return HStack {
@@ -34,11 +41,32 @@ struct WidgetMenu : View {
                         selection: triggerSelection)
                     makeRadioOption(
                         title: Triggers.weather,
-                        view: WeatherTrigger(),
+                        view: HStack {
+                            TriggerCategoryText(text: "Weather")
+                            Picker("", selection: $weatherSelection) {
+                                ForEach(WeatherTrigger.weatherOptions, id: \.self) { item in
+                                    HStack {
+                                        Text("Whenever it is " + item.title)
+                                        Image(systemName: item.systemImage)
+                                    }
+                                }
+                            }.pickerStyle(.menu)
+                        },
                         selection: triggerSelection)
                     makeRadioOption(
                         title: Triggers.freq,
-                        view: FrequencyTrigger(),
+                        view: HStack {
+                            TriggerCategoryText(text: Triggers.freq)
+                            Text("Every").font(.title2)
+                            TextField("Enter the time value", value: $frequency, format: .number)
+                                           .textFieldStyle(.roundedBorder)
+                            TimeOptions.makeTimeMeasurementMenu(selection: $freqMeasurement)
+                            Text("starting from").font(.title2)
+                            DatePicker(
+                                    "",
+                                    selection: $frequencyStartDate,
+                                    displayedComponents: [.date, .hourAndMinute]
+                        )},
                         selection: triggerSelection)
                     makeRadioOption(
                         title: Triggers.loc,
@@ -68,7 +96,52 @@ struct WidgetMenu : View {
                 }
             }.padding([.leading, .trailing])
              .disabled(triggerSelection == "Always")
-            TimeFrame()
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("Time Frame").font(.title).padding()
+                    Text("*When should the widget be triggerable?*").font(.title3)
+                }
+                VStack {
+                    Picker(selection: $timeFrameSelection, label: Text("")) {
+                        makeRadioOption(
+                            title: TimeFrame.always,
+                            view: Text("Always").font(.title2),
+                            selection: timeFrameSelection)
+                        makeRadioOption(
+                            title: TimeFrame.frame,
+                            view: HStack {
+                                DatePicker(
+                                    "From:",
+                                    selection: $timeFrameStart,
+                                    displayedComponents: [.date]
+                                )
+                                DatePicker(
+                                    "End:",
+                                    selection: $timeFrameEnd,
+                                    displayedComponents: [.date]
+                                )
+                            },
+                            selection: timeFrameSelection)
+                    }.pickerStyle(RadioGroupPickerStyle())
+                }.padding([.leading, .trailing])
+            }
+            VStack {
+                Spacer().frame(height: 4)
+                HStack {
+                    Spacer()
+                    Button("Make Widget!") {
+                       
+                    }
+                   .scaleEffect(1.5)
+                   .padding(40)
+                }
+            }
         }
+    }
+}
+
+struct WidgetMenu_Providers: PreviewProvider {
+    static var previews: some View {
+        WidgetMenu().frame(width: 1000)
     }
 }
