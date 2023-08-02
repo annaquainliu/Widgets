@@ -132,7 +132,7 @@ struct WidgetMenu : View {
                     Spacer()
                     Button("Create Widget") {
                         Task {
-                            _ = await WidgetViewModel(
+                            _ = WidgetViewModel(
                                 triggerType: triggerSelection,
                                 duration: Duration(
                                     durationSelection: durationSelection,

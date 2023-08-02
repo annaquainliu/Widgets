@@ -41,7 +41,7 @@ class WidgetNSWindow : NSWindow {
     private var store = WidgetStore()
     private var widgetInfo : WidgetInfo
     
-    init(name : String, widgetInfo: WidgetInfo) async {
+    init(name : String, widgetInfo: WidgetInfo) {
         let image = NSImage(named: name)!
         self.imageSize = image.size
         self.widgetInfo = widgetInfo
@@ -50,7 +50,7 @@ class WidgetNSWindow : NSWindow {
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
         self.contentView = NSImageView(image: image)
-        self.contentView?.addSubview(await makeButton())
+        self.contentView?.addSubview(makeButton())
         adjustWidgetWindow()
     }
     
@@ -71,7 +71,7 @@ class WidgetNSWindow : NSWindow {
         self.hasShadow = false
     }
     
-    private func makeButton() async -> NSButton {
+    private func makeButton() -> NSButton {
         let button = NSButton(frame: NSRect(x: 30, y: 30, width: 40, height: 40))
         button.isBordered = false
         button.wantsLayer = true
@@ -83,19 +83,18 @@ class WidgetNSWindow : NSWindow {
         return button
     }
     
-    @objc func saveWidget() async {
+    @objc func saveWidget() {
         self.close()
         self.widgetInfo.initCoordsAndSize(xCoord: self.frame.minX, yCoord: self.frame.minY,
-                                     size: NSSize(width: self.frame.width, height: self.frame.height))
-        do {
-            try await store.load()
-//            try await store.save(newWidgets: [])
-//            try await store.load()
-//            var widgets = store.widgets
-//            widgets.append(self.widgetInfo)
-//            try await store.save(newWidgets: widgets)
-        } catch {
-            fatalError(error.localizedDescription)
+                                          size: NSSize(width: self.frame.width, height: self.frame.height))
+        Task {
+            do {
+                try await store.load()
+                store.widgets.append(self.widgetInfo)
+                try await store.save(newWidgets: store.widgets)
+            } catch {
+                fatalError(error.localizedDescription)
+            }
         }
     }
     
@@ -119,9 +118,27 @@ class WidgetNSWindow : NSWindow {
    
 }
 
+class DesktopWidgetWindow : NSWindow {
+    
+    private var widgetInfo : WidgetInfo
+    init(widgetInfo: WidgetInfo) {
+        self.widgetInfo = widgetInfo
+        super.init(contentRect: NSRect(x: widgetInfo.xCoord,
+                                       y: widgetInfo.yCoord,
+                                       width: widgetInfo.widgetSize.width,
+                                       height: widgetInfo.widgetSize.height),
+                   styleMask: [.resizable, .fullSizeContentView],
+                   backing: NSWindow.BackingStoreType.buffered,
+                   defer: true)
+        self.contentView = NSImageView(image: NSImage(named: widgetInfo.imageName)!)
+        self.aspectRatio = widgetInfo.widgetSize
+        self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
+    }
+}
+
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
-    init(image_name : String, widgetInfo: WidgetInfo) async {
-        super.init(window: await WidgetNSWindow(name: image_name, widgetInfo: widgetInfo))
+    init(image_name : String, widgetInfo: WidgetInfo) {
+        super.init(window: WidgetNSWindow(name: image_name, widgetInfo: widgetInfo))
         window?.makeKeyAndOrderFront(self)
     }
     
