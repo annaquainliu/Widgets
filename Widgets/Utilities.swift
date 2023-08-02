@@ -26,7 +26,7 @@ func ImportPhoto() -> some View {
     }.contentShape(Rectangle())
      .frame(width: 150, height: 150)
      .overlay(RoundedRectangle(cornerRadius: 16)
-     .stroke(.white, lineWidth: 2))
+        .stroke(.white, lineWidth: 2))
 }
 
 func ImportMultiplePhotos() -> some View {
@@ -39,7 +39,7 @@ func ImportMultiplePhotos() -> some View {
     }.contentShape(Rectangle())
      .frame(width: 150, height: 150)
      .overlay(RoundedRectangle(cornerRadius: 16)
-     .stroke(.white, lineWidth: 2))
+        .stroke(.white, lineWidth: 2))
 }
 
 func TriggerCategoryText(text : String) -> some View {

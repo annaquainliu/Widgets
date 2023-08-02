@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct WidgetMenu : View {
-    @State private var triggerSelection = "Always"
+    @State private var triggerSelection = Triggers.always
     @State private var duration = 0
     @State private var durationMeasurement = TimeOptions.s
     @State private var durationSelection = Duration.untilDeactivate
@@ -20,6 +20,7 @@ struct WidgetMenu : View {
     @State private var timeFrameSelection = TimeFrame.always
     @State private var timeFrameStart = Date()
     @State private var timeFrameEnd = Date()
+    @State private var alertInstructions = false
     
     func makeDurationView() -> some View {
         return HStack {
@@ -129,11 +130,28 @@ struct WidgetMenu : View {
                 Spacer().frame(height: 4)
                 HStack {
                     Spacer()
-                    Button("Make Widget!") {
-                       
+                    Button("Create Widget") {
+                        Task {
+                            _ = await WidgetViewModel(
+                                triggerType: triggerSelection,
+                                duration: Duration(
+                                    durationSelection: durationSelection,
+                                    durationMeasurement: durationMeasurement,
+                                    duration: duration),
+                                timeFrame: TimeFrame(selection: timeFrameSelection,
+                                                     timeRange: [timeFrameStart, timeFrameEnd]),
+                                weather: weatherSelection.title,
+                                freq: Frequency(
+                                    measurement: freqMeasurement,
+                                    frequency: frequency,
+                                    startDate: frequencyStartDate))
+                        }
+                        alertInstructions = true
                     }
-                   .scaleEffect(1.5)
-                   .padding(40)
+                    .padding(40)
+                    .alert("You can click on the widget to drag it or resize it. \n\n To delete the widget, press the x mark on the top left. \n\n To save changes, press the 'Save Changes' button.", isPresented: $alertInstructions) {
+                        Button("OK", role: .cancel) { }
+                    }
                 }
             }
         }

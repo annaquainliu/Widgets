@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305EC7F02A772527009A24F8 /* NSWindow.swift */; };
+		305EC7F52A77364A009A24F8 /* autumn_leaf.png in Resources */ = {isa = PBXBuildFile; fileRef = 305EC7F42A77364A009A24F8 /* autumn_leaf.png */; };
 		30B14F332A73777F007A1672 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B14F322A73777F007A1672 /* Utilities.swift */; };
 		30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */; };
 		30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */; };
@@ -15,6 +17,9 @@
 		30BDD93A2A71CD2E007E5F3B /* WidgetsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9392A71CD2E007E5F3B /* WidgetsTests.swift */; };
 		30BDD9442A71CD2E007E5F3B /* WidgetsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9432A71CD2E007E5F3B /* WidgetsUITests.swift */; };
 		30BDD9462A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9452A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift */; };
+		30C3E5782A78C34F00C3F2F8 /* outside.gif in Resources */ = {isa = PBXBuildFile; fileRef = 30C3E5772A78C34F00C3F2F8 /* outside.gif */; };
+		30CD4C6C2A79D74B008B830B /* WidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CD4C6B2A79D74B008B830B /* WidgetStore.swift */; };
+		30CD4C6E2A7A31DA008B830B /* dog.png in Resources */ = {isa = PBXBuildFile; fileRef = 30CD4C6D2A7A31DA008B830B /* dog.png */; };
 		30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */; };
 		30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1D12A7362A500A1F2BE /* ContentView.swift */; };
 		30F4E6CE2A75BD0700EBA9CD /* Triggers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4E6CD2A75BD0700EBA9CD /* Triggers.swift */; };
@@ -38,9 +43,25 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		30B79BCF2A771BF2002C79E7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		305EC7F02A772527009A24F8 /* NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
+		305EC7F42A77364A009A24F8 /* autumn_leaf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = autumn_leaf.png; path = ../../../personalCS/desktop/images/autumn_leaf.png; sourceTree = "<group>"; };
 		30B14F322A73777F007A1672 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetViewModel.swift; sourceTree = "<group>"; };
+		30B79BBD2A771BF0002C79E7 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		30BDD9242A71CD2D007E5F3B /* Widgets.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Widgets.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsApp.swift; sourceTree = "<group>"; };
 		30BDD92B2A71CD2E007E5F3B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -51,6 +72,9 @@
 		30BDD93F2A71CD2E007E5F3B /* WidgetsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WidgetsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		30BDD9432A71CD2E007E5F3B /* WidgetsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsUITests.swift; sourceTree = "<group>"; };
 		30BDD9452A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		30C3E5772A78C34F00C3F2F8 /* outside.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = outside.gif; path = ../../../personalCS/desktop/gifs/christmas/day/outside.gif; sourceTree = "<group>"; };
+		30CD4C6B2A79D74B008B830B /* WidgetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetStore.swift; sourceTree = "<group>"; };
+		30CD4C6D2A7A31DA008B830B /* dog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dog.png; path = ../../../../Downloads/dog.png; sourceTree = "<group>"; };
 		30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOrGifView.swift; sourceTree = "<group>"; };
 		30F1B1D12A7362A500A1F2BE /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		30F4E6CD2A75BD0700EBA9CD /* Triggers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Triggers.swift; sourceTree = "<group>"; };
@@ -82,12 +106,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		305EC7F32A7735FF009A24F8 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				30C3E5772A78C34F00C3F2F8 /* outside.gif */,
+				305EC7F42A77364A009A24F8 /* autumn_leaf.png */,
+				30CD4C6D2A7A31DA008B830B /* dog.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		30B79BBA2A771BF0002C79E7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				30B79BBD2A771BF0002C79E7 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		30BDD91B2A71CD2D007E5F3B = {
 			isa = PBXGroup;
 			children = (
+				305EC7F32A7735FF009A24F8 /* Images */,
 				30BDD9262A71CD2D007E5F3B /* Widgets */,
 				30BDD9382A71CD2E007E5F3B /* WidgetsTests */,
 				30BDD9422A71CD2E007E5F3B /* WidgetsUITests */,
+				30B79BBA2A771BF0002C79E7 /* Frameworks */,
 				30BDD9252A71CD2D007E5F3B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,6 +159,8 @@
 				30F4E6CD2A75BD0700EBA9CD /* Triggers.swift */,
 				30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */,
 				30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */,
+				305EC7F02A772527009A24F8 /* NSWindow.swift */,
+				30CD4C6B2A79D74B008B830B /* WidgetStore.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -154,6 +200,7 @@
 				30BDD9202A71CD2D007E5F3B /* Sources */,
 				30BDD9212A71CD2D007E5F3B /* Frameworks */,
 				30BDD9222A71CD2D007E5F3B /* Resources */,
+				30B79BCF2A771BF2002C79E7 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -248,8 +295,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30C3E5782A78C34F00C3F2F8 /* outside.gif in Resources */,
 				30BDD92F2A71CD2E007E5F3B /* Preview Assets.xcassets in Resources */,
+				30CD4C6E2A7A31DA008B830B /* dog.png in Resources */,
 				30BDD92C2A71CD2E007E5F3B /* Assets.xcassets in Resources */,
+				305EC7F52A77364A009A24F8 /* autumn_leaf.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,8 +324,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30CD4C6C2A79D74B008B830B /* WidgetStore.swift in Sources */,
 				30F4E6D02A76035700EBA9CD /* WidgetMenu.swift in Sources */,
 				30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */,
+				305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */,
 				30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */,
 				30B14F332A73777F007A1672 /* Utilities.swift in Sources */,
 				30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */,

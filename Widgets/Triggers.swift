@@ -37,6 +37,10 @@ struct WeatherOptionInfo : Hashable {
     static var windy = "windy"
     static var snowing = "snowing"
     static var thunder = "thundering"
+    
+    static func none() -> String {
+        return ""
+    }
 }
 
 struct WeatherTrigger {
@@ -64,18 +68,36 @@ struct Triggers {
     }
 }
 
-struct Duration {
+struct Frequency : Codable {
+    var measurement : String
+    var frequency : Int
+    var startDate : Date
+    
+    static func none() -> Frequency {
+        return Frequency(measurement: "", frequency: 0, startDate: Date())
+    }
+}
+
+struct Duration : Codable {
     static var untilDeactivate = "UntilDeactivated"
     static var duration  = "duration"
     
     var durationSelection : String
     var durationMeasurement : String
     var duration : Int
+    
+    static func none() -> Duration {
+        return Duration(durationSelection: "", durationMeasurement: "", duration: 0)
+    }
 }
 
-struct TimeFrame {
+struct TimeFrame : Codable {
     var selection : String
     var timeRange : [Date]
     static var always = "Always"
     static var frame = "timeFrame"
+    
+    static func none() -> TimeFrame {
+        return TimeFrame(selection: "", timeRange: [Date()])
+    }
 }
