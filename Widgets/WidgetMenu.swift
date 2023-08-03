@@ -22,6 +22,8 @@ struct WidgetMenu : View {
     @State private var timeFrameEnd = Date()
     @State private var alertInstructions = false
     
+    var store : WidgetStore
+    
     func makeDurationView() -> some View {
         return HStack {
             TextField("Enter the time value", value: $duration, format: .number)
@@ -131,21 +133,20 @@ struct WidgetMenu : View {
                 HStack {
                     Spacer()
                     Button("Create Widget") {
-                        Task {
-                            _ = WidgetViewModel(
-                                triggerType: triggerSelection,
-                                duration: Duration(
-                                    durationSelection: durationSelection,
-                                    durationMeasurement: durationMeasurement,
-                                    duration: duration),
-                                timeFrame: TimeFrame(selection: timeFrameSelection,
-                                                     timeRange: [timeFrameStart, timeFrameEnd]),
-                                weather: weatherSelection.title,
-                                freq: Frequency(
-                                    measurement: freqMeasurement,
-                                    frequency: frequency,
-                                    startDate: frequencyStartDate))
-                        }
+                        _ = WidgetViewModel(
+                            triggerType: triggerSelection,
+                            duration: Duration(
+                                durationSelection: durationSelection,
+                                durationMeasurement: durationMeasurement,
+                                duration: duration),
+                            timeFrame: TimeFrame(selection: timeFrameSelection,
+                                                 timeRange: [timeFrameStart, timeFrameEnd]),
+                            weather: weatherSelection.title,
+                            freq: Frequency(
+                                measurement: freqMeasurement,
+                                frequency: frequency,
+                                startDate: frequencyStartDate),
+                            store: store)
                         alertInstructions = true
                     }
                     .padding(40)
@@ -160,6 +161,6 @@ struct WidgetMenu : View {
 
 struct WidgetMenu_Providers: PreviewProvider {
     static var previews: some View {
-        WidgetMenu().frame(width: 1000)
+        WidgetMenu(store: WidgetStore()).frame(width: 1000)
     }
 }

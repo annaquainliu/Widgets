@@ -19,16 +19,16 @@ class WidgetStore: ObservableObject {
     }
     
     func load() async throws {
-       let task = Task<[WidgetInfo], Error> {
-           let fileURL = try Self.fileURL()
-           guard let data = try? Data(contentsOf: fileURL) else {
-               return []
-           }
-           let dailyWidgets = try JSONDecoder().decode([WidgetInfo].self, from: data)
-           return dailyWidgets
-       }
-       let widgets = try await task.value
-       self.widgets = widgets
+        let task = Task<[WidgetInfo], Error> {
+            let fileURL = try Self.fileURL()
+            guard let data = try? Data(contentsOf: fileURL) else {
+                return []
+            }
+            let dailyWidgets = try JSONDecoder().decode([WidgetInfo].self, from: data)
+            return dailyWidgets
+        }
+        let widgets = try await task.value
+        self.widgets = widgets
     }
     
     func save(newWidgets: [WidgetInfo]) async throws {
@@ -41,8 +41,7 @@ class WidgetStore: ObservableObject {
         _ = try await task.value
     }
     
-    @objc func deleteWidget(sender: Timer) {
-        let id = sender.userInfo as? UUID
+    func deleteWidget(id : UUID) {
         var newWidgets : [WidgetInfo] = []
         for widget in widgets {
             if widget.getID() != id {
@@ -50,5 +49,29 @@ class WidgetStore: ObservableObject {
             }
         }
         self.widgets = newWidgets
+    }
+    
+    func addWidget(widget : WidgetInfo) async {
+        do {
+            if self.widgets.count == 0 {
+                try await self.load()
+            }
+            self.widgets.append(widget)
+            try await self.save(newWidgets: self.widgets)
+        }
+        catch {
+            fatalError(error.localizedDescription)
+        }
+    }
+    
+    func getWidgets() async -> [WidgetInfo] {
+        do {
+            if self.widgets.count == 0 {
+                try await self.load()
+            }
+            return self.widgets
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }
 }

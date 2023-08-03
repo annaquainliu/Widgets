@@ -38,13 +38,14 @@ class WidgetNSWindow : NSWindow {
     
     private var desktopEditMode = false
     private var imageSize : NSSize
-    private var store = WidgetStore()
-    private var widgetInfo : WidgetInfo
+    private var store : WidgetStore
+    var widgetInfo : WidgetInfo
     
-    init(widgetInfo: WidgetInfo) {
+    init(widgetInfo: WidgetInfo, widgetStore: WidgetStore) {
         let image = NSImage(named: widgetInfo.imageName)!
         self.imageSize = image.size
         self.widgetInfo = widgetInfo
+        self.store = widgetStore
         super.init(contentRect: NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height),
                    styleMask: [.resizable, .titled, .closable, .fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
@@ -62,22 +63,22 @@ class WidgetNSWindow : NSWindow {
         self.maxSize = self.imageSize
         self.aspectRatio = self.imageSize
         self.display()
-        self.center()
         self.isMovable = true
         self.isMovableByWindowBackground = true
         self.titlebarAppearsTransparent = true
         self.titleVisibility = .hidden
         self.titlebarSeparatorStyle = .none
         self.hasShadow = false
+        self.center()
     }
     
     private func makeButton() -> NSButton {
-        let button = NSButton(frame: NSRect(x: 30, y: 30, width: 40, height: 40))
+        let button = NSButton(frame: NSRect(x: 10, y: 10, width: 20, height: 20))
         button.isBordered = false
         button.wantsLayer = true
         button.layer?.backgroundColor = CGColor.black
         button.layer!.masksToBounds = true
-        button.layer!.cornerRadius = 20
+        button.layer!.cornerRadius = 10
         button.image = NSImage(systemSymbolName: "checkmark", accessibilityDescription: "Save Changes")
         button.action = #selector(saveWidget)
         return button
@@ -85,16 +86,12 @@ class WidgetNSWindow : NSWindow {
     
     @objc func saveWidget() {
         self.close()
-        self.widgetInfo.initCoordsAndSize(xCoord: self.frame.minX, yCoord: self.frame.minY,
-                                          size: NSSize(width: self.frame.width, height: self.frame.height))
+        self.widgetInfo.initCoordsAndSize(xCoord: self.frame.minX,
+                                          yCoord: self.frame.minY,
+                                          size: NSSize(width: self.frame.width,
+                                                       height: self.frame.height))
         Task {
-            do {
-                try await store.load()
-                store.widgets.append(self.widgetInfo)
-                try await store.save(newWidgets: store.widgets)
-            } catch {
-                fatalError(error.localizedDescription)
-            }
+            await store.addWidget(widget: self.widgetInfo)
         }
     }
     
@@ -131,9 +128,14 @@ class DesktopWidgetWindow : NSWindow {
                    styleMask: [.resizable, .fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
+        self.backgroundColor = NSColor.clear
         self.contentView = NSImageView(image: NSImage(named: widgetInfo.imageName)!)
         self.aspectRatio = widgetInfo.widgetSize
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
+    }
+    
+    override var canBecomeKey: Bool {
+        return true
     }
 }
 

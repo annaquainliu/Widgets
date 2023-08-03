@@ -10,9 +10,11 @@ import SwiftUI
 @main
 struct WidgetsApp: App {
     
+    @StateObject private var store = WidgetStore()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(store: store)
         }
     }
 }

@@ -10,6 +10,8 @@ import SwiftUI
 
 struct ImageOrGifView : View {
     
+    var store : WidgetStore
+    
     var body : some View {
         VStack(alignment: .leading) {
             TitleText(text : "Image/Gif")
@@ -17,7 +19,7 @@ struct ImageOrGifView : View {
             HStack {
                 ImportPhoto()
                 Spacer(minLength: 40)
-                WidgetMenu()
+                WidgetMenu(store: store)
             }.padding()
         }.padding()
          .frame(width: 1000, height: 700)
@@ -26,6 +28,6 @@ struct ImageOrGifView : View {
 
 struct ImageOrGifView_Providers: PreviewProvider {
     static var previews: some View {
-        ImageOrGifView()
+        ImageOrGifView(store: WidgetStore())
     }
 }

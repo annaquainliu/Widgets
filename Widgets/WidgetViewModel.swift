@@ -49,12 +49,12 @@ class WidgetViewModel : ObservableObject {
     private var widgetInfo : WidgetInfo
     private var windowController : ScreenWindowController
     
-    init(triggerType: String, duration: Duration, timeFrame: TimeFrame, weather: String, freq: Frequency) {
+    init(triggerType: String, duration: Duration, timeFrame: TimeFrame, weather: String, freq: Frequency, store: WidgetStore) {
         let imageName = "autumn_leaf"
         self.widgetInfo = WidgetInfo(triggerType: triggerType, weather: weather,
                                      duration: duration, timeFrame: timeFrame,
                                      freq: freq, imageName: imageName)
-        self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo))
+        self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo, widgetStore: store))
     }
     
     // todo: make verification functions that verify if the inputs are correct
