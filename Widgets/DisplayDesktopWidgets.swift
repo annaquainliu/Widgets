@@ -31,19 +31,32 @@ class DisplayDesktopWidgets {
         }
     }
     
+    func loadWidget(widget: WidgetInfo) async {
+        displayWidget(widget: widget)
+    }
+    
     func displayWidget(widget: WidgetInfo) {
         switch widget.triggerType {
             case Triggers.always:
                 displayAlwaysWidget(widget: widget)
             default:
-                print("sds")
+                print("default")
         }
     }
     
     func displayAlwaysWidget(widget: WidgetInfo)  {
         if widget.timeFrame.selection == TimeFrame.always ||
             (widget.timeFrame.timeRange[0] ... widget.timeFrame.timeRange[1]).contains(Date()) {
+            _ = ScreenWindowController(window: DesktopWidgetWindow(widgetInfo: widget))
             
+            if (widget.timeFrame.selection != TimeFrame.always) {
+//                _ = Timer(fireAt: widget.timeFrame.timeRange[1],
+//                      interval: 0,
+//                      target: self,
+//                      selector: #selector(),
+//                      userInfo: widget.getID(),
+//                      repeats: false)
+            }
         }
     }
     

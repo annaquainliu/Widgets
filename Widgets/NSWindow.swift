@@ -121,6 +121,7 @@ class WidgetNSWindow : NSWindow {
 class DesktopWidgetWindow : NSWindow {
     
     private var widgetInfo : WidgetInfo
+    
     init(widgetInfo: WidgetInfo) {
         self.widgetInfo = widgetInfo
         super.init(contentRect: NSRect(x: widgetInfo.xCoord,

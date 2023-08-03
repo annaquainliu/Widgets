@@ -18,8 +18,9 @@ class WidgetInfo : Codable {
     var yCoord : Double = 0
     var widgetSize : NSSize
     var imageName : String
+    private var id = UUID()
     
-    init(triggerType: String, weather: String, duration: Duration, timeFrame: TimeFrame, freq: Frequency, imageName : String) {
+    init(triggerType: String, weather: String, duration: Duration, timeFrame: TimeFrame, freq: Frequency, imageName: String) {
         self.triggerType = triggerType
         self.weather = weather
         self.duration = duration
@@ -38,15 +39,21 @@ class WidgetInfo : Codable {
         self.yCoord = yCoord
         self.widgetSize = size
     }
+    
+    func getID() -> UUID {
+        return self.id
+    }
 }
 
 class WidgetViewModel : ObservableObject {
     private var widgetInfo : WidgetInfo
     private var windowController : ScreenWindowController
     
-    init(triggerType : String, duration : Duration, timeFrame : TimeFrame, weather : String, freq : Frequency) {
+    init(triggerType: String, duration: Duration, timeFrame: TimeFrame, weather: String, freq: Frequency) {
         let imageName = "autumn_leaf"
-        self.widgetInfo = WidgetInfo(triggerType: triggerType, weather: weather, duration: duration, timeFrame: timeFrame, freq: freq, imageName: imageName)
+        self.widgetInfo = WidgetInfo(triggerType: triggerType, weather: weather,
+                                     duration: duration, timeFrame: timeFrame,
+                                     freq: freq, imageName: imageName)
         self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo))
     }
     

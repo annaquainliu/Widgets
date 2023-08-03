@@ -40,4 +40,15 @@ class WidgetStore: ObservableObject {
         }
         _ = try await task.value
     }
+    
+    @objc func deleteWidget(sender: Timer) {
+        let id = sender.userInfo as? UUID
+        var newWidgets : [WidgetInfo] = []
+        for widget in widgets {
+            if widget.getID() != id {
+                newWidgets.append(widget)
+            }
+        }
+        self.widgets = newWidgets
+    }
 }
