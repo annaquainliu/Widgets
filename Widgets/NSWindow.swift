@@ -41,8 +41,8 @@ class WidgetNSWindow : NSWindow {
     private var store = WidgetStore()
     private var widgetInfo : WidgetInfo
     
-    init(name : String, widgetInfo: WidgetInfo) {
-        let image = NSImage(named: name)!
+    init(widgetInfo: WidgetInfo) {
+        let image = NSImage(named: widgetInfo.imageName)!
         self.imageSize = image.size
         self.widgetInfo = widgetInfo
         super.init(contentRect: NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height),
@@ -137,9 +137,9 @@ class DesktopWidgetWindow : NSWindow {
 }
 
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
-    init(image_name : String, widgetInfo: WidgetInfo) {
-        super.init(window: WidgetNSWindow(name: image_name, widgetInfo: widgetInfo))
-        window?.makeKeyAndOrderFront(self)
+    init(window : NSWindow) {
+        super.init(window: window)
+        self.window?.makeKeyAndOrderFront(self)
     }
     
     required init?(coder: NSCoder) {

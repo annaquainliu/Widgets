@@ -9,11 +9,11 @@ import Foundation
 import AppKit
 
 class WidgetInfo : Codable {
-    private var triggerType : String
-    private var weather : String
-    private var duration : Duration
-    private var timeFrame : TimeFrame
-    private var freq : Frequency
+    var triggerType : String
+    var weather : String
+    var duration : Duration
+    var timeFrame : TimeFrame
+    var freq : Frequency
     var xCoord : Double = 0
     var yCoord : Double = 0
     var widgetSize : NSSize
@@ -47,7 +47,7 @@ class WidgetViewModel : ObservableObject {
     init(triggerType : String, duration : Duration, timeFrame : TimeFrame, weather : String, freq : Frequency) {
         let imageName = "autumn_leaf"
         self.widgetInfo = WidgetInfo(triggerType: triggerType, weather: weather, duration: duration, timeFrame: timeFrame, freq: freq, imageName: imageName)
-        self.windowController = ScreenWindowController(image_name: imageName, widgetInfo: widgetInfo)
+        self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo))
     }
     
     // todo: make verification functions that verify if the inputs are correct
