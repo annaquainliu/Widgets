@@ -14,7 +14,14 @@ struct WidgetsApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(store: store)
+            ContentView(store: store).task {
+                DisplayDesktopWidgets.loadWidgets(store: store)
+                do {
+                    try await store.load()
+                } catch {
+                    fatalError(error.localizedDescription)
+                }
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ class WidgetStore: ObservableObject {
         _ = try await task.value
     }
     
-    func deleteWidget(id : UUID) {
+    func deleteWidget(id : UUID) async {
         var newWidgets : [WidgetInfo] = []
         for widget in widgets {
             if widget.getID() != id {
@@ -53,24 +53,10 @@ class WidgetStore: ObservableObject {
     
     func addWidget(widget : WidgetInfo) async {
         do {
-            if self.widgets.count == 0 {
-                try await self.load()
-            }
             self.widgets.append(widget)
             try await self.save(newWidgets: self.widgets)
         }
         catch {
-            fatalError(error.localizedDescription)
-        }
-    }
-    
-    func getWidgets() async -> [WidgetInfo] {
-        do {
-            if self.widgets.count == 0 {
-                try await self.load()
-            }
-            return self.widgets
-        } catch {
             fatalError(error.localizedDescription)
         }
     }

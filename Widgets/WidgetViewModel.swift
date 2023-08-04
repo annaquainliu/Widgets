@@ -59,3 +59,58 @@ class WidgetViewModel : ObservableObject {
     
     // todo: make verification functions that verify if the inputs are correct
 }
+
+class DisplayDesktopWidgets {
+    
+    static func loadWidgets(store: WidgetStore) {
+        for widget in store.widgets {
+            displayWidget(widget: widget, store: store)
+        }
+    }
+    
+    static func displayWidget(widget: WidgetInfo, store: WidgetStore) {
+        switch widget.triggerType {
+            case Triggers.always:
+            displayAlwaysWidget(widget: widget, store: store)
+            default:
+                print("default")
+        }
+    }
+    
+    @objc func removeWidgetFromDesktop(sender: Timer) {
+        let map = sender.userInfo as? [String: Any]
+        let controller = map!["controller"] as? ScreenWindowController
+        let store = map!["store"] as? WidgetStore
+        controller!.window?.close()
+        let window = controller!.window as? WidgetNSWindow
+        let id = (window?.widgetInfo.getID())!
+        Task {
+            await store!.deleteWidget(id: id)
+        }
+    }
+    
+    // Logic to display widget with trigger "Always"
+    // Time frame can be also "Always", other option is within two dates
+    static func displayAlwaysWidget(widget: WidgetInfo, store: WidgetStore) {
+        if widget.timeFrame.selection == TimeFrame.always ||
+            (widget.timeFrame.timeRange[0] ... widget.timeFrame.timeRange[1]).contains(Date()) {
+            print("going to display")
+            let controller = ScreenWindowController(window: DesktopWidgetWindow(widgetInfo: widget))
+            
+            if (widget.timeFrame.selection != TimeFrame.always) {
+                //delete widget from storage
+                _ = Timer(fireAt: Date.now.addingTimeInterval(20),
+                      interval: 0,
+                      target: self,
+                      selector: #selector(removeWidgetFromDesktop(sender:)),
+                      userInfo: ["controller": controller, "store": store] as [String : Any],
+                      repeats: false)
+            }
+        }
+    }
+    
+    func displayFrequencyWidget() {
+        
+    }
+}
+
