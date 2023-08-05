@@ -8,7 +8,7 @@
 import Foundation
 
 class WidgetStore: ObservableObject {
-    @Published var widgets: [WidgetInfo] = []
+    var widgets: [WidgetInfo] = []
     
     private static func fileURL() throws -> URL {
         try FileManager.default.url(for: .documentDirectory,
@@ -49,6 +49,11 @@ class WidgetStore: ObservableObject {
             }
         }
         self.widgets = newWidgets
+        do {
+            try await self.save(newWidgets: self.widgets)
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }
     
     func addWidget(widget : WidgetInfo) async {

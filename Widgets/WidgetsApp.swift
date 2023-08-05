@@ -10,18 +10,21 @@ import SwiftUI
 @main
 struct WidgetsApp: App {
     
-    @StateObject private var store = WidgetStore()
+    @StateObject var store = WidgetStore()
+    @StateObject var displayDesktopWidget = DisplayDesktopWidgets()
     
     var body: some Scene {
         WindowGroup {
-            ContentView(store: store).task {
-                DisplayDesktopWidgets.loadWidgets(store: store)
+            ContentView().task {
                 do {
                     try await store.load()
+                    displayDesktopWidget.store = store
+                    displayDesktopWidget.loadWidgets()
                 } catch {
                     fatalError(error.localizedDescription)
                 }
-            }
+            }.environmentObject(store)
+             .environmentObject(displayDesktopWidget)
         }
     }
 }

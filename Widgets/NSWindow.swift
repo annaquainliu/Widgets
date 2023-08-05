@@ -39,13 +39,15 @@ class WidgetNSWindow : NSWindow {
     private var desktopEditMode = false
     private var imageSize : NSSize
     private var store : WidgetStore
+    private var displayDesktop : DisplayDesktopWidgets
     var widgetInfo : WidgetInfo
     
-    init(widgetInfo: WidgetInfo, widgetStore: WidgetStore) {
+    init(widgetInfo: WidgetInfo, widgetStore: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
         let image = NSImage(named: widgetInfo.imageName)!
         self.imageSize = image.size
         self.widgetInfo = widgetInfo
         self.store = widgetStore
+        self.displayDesktop = displayDesktop
         super.init(contentRect: NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height),
                    styleMask: [.resizable, .titled, .closable, .fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
@@ -93,6 +95,7 @@ class WidgetNSWindow : NSWindow {
         Task {
             await store.addWidget(widget: self.widgetInfo)
         }
+        displayDesktop.displayWidget(widget: self.widgetInfo)
     }
     
     override public func mouseDown(with event: NSEvent) {
@@ -125,7 +128,7 @@ class DesktopWidgetWindow : NSWindow {
                                        y: widgetInfo.yCoord,
                                        width: widgetInfo.widgetSize.width,
                                        height: widgetInfo.widgetSize.height),
-                   styleMask: [.resizable, .fullSizeContentView],
+                   styleMask: [.fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
         self.backgroundColor = NSColor.clear
@@ -144,7 +147,7 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
         super.init(window: window)
         self.window?.makeKeyAndOrderFront(self)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

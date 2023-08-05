@@ -46,65 +46,74 @@ class WidgetInfo : Codable {
 }
 
 class WidgetViewModel : ObservableObject {
+    private var store: WidgetStore
     private var widgetInfo : WidgetInfo
     private var windowController : ScreenWindowController
+    private var displayDesktop: DisplayDesktopWidgets
     
-    init(triggerType: String, duration: Duration, timeFrame: TimeFrame, weather: String, freq: Frequency, store: WidgetStore) {
+    init(triggerType: String, duration: Duration, timeFrame: TimeFrame, weather: String, freq: Frequency, store: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
         let imageName = "autumn_leaf"
+        self.store = store
+        self.displayDesktop = displayDesktop
         self.widgetInfo = WidgetInfo(triggerType: triggerType, weather: weather,
                                      duration: duration, timeFrame: timeFrame,
                                      freq: freq, imageName: imageName)
-        self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo, widgetStore: store))
+        self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo, widgetStore: store, displayDesktop: displayDesktop))
     }
     
     // todo: make verification functions that verify if the inputs are correct
 }
 
-class DisplayDesktopWidgets {
+class DisplayDesktopWidgets: ObservableObject {
     
-    static func loadWidgets(store: WidgetStore) {
-        for widget in store.widgets {
-            displayWidget(widget: widget, store: store)
+    var store : WidgetStore?
+    private var currentWidgets : [UUID : ScreenWindowController]
+    
+    init() {
+        self.store = nil
+        self.currentWidgets = [:]
+    }
+    
+    func loadWidgets() {
+        for widget in store!.widgets {
+            displayWidget(widget: widget)
         }
     }
     
-    static func displayWidget(widget: WidgetInfo, store: WidgetStore) {
+    func displayWidget(widget: WidgetInfo) {
         switch widget.triggerType {
             case Triggers.always:
-            displayAlwaysWidget(widget: widget, store: store)
+            displayAlwaysWidget(widget: widget)
             default:
                 print("default")
         }
     }
     
     @objc func removeWidgetFromDesktop(sender: Timer) {
-        let map = sender.userInfo as? [String: Any]
-        let controller = map!["controller"] as? ScreenWindowController
-        let store = map!["store"] as? WidgetStore
-        controller!.window?.close()
-        let window = controller!.window as? WidgetNSWindow
-        let id = (window?.widgetInfo.getID())!
+        let id = sender.userInfo as? UUID
+        let controller = self.currentWidgets[id!]!
+        controller.window?.close()
         Task {
-            await store!.deleteWidget(id: id)
+            await store!.deleteWidget(id: id!)
         }
+        self.currentWidgets.removeValue(forKey: id!)
     }
     
     // Logic to display widget with trigger "Always"
     // Time frame can be also "Always", other option is within two dates
-    static func displayAlwaysWidget(widget: WidgetInfo, store: WidgetStore) {
+    func displayAlwaysWidget(widget: WidgetInfo) {
         if widget.timeFrame.selection == TimeFrame.always ||
             (widget.timeFrame.timeRange[0] ... widget.timeFrame.timeRange[1]).contains(Date()) {
-            print("going to display")
             let controller = ScreenWindowController(window: DesktopWidgetWindow(widgetInfo: widget))
-            
+            self.currentWidgets[widget.getID()] = controller
             if (widget.timeFrame.selection != TimeFrame.always) {
-                //delete widget from storage
-                _ = Timer(fireAt: Date.now.addingTimeInterval(20),
-                      interval: 0,
-                      target: self,
-                      selector: #selector(removeWidgetFromDesktop(sender:)),
-                      userInfo: ["controller": controller, "store": store] as [String : Any],
-                      repeats: false)
+                let timer = Timer(fireAt: widget.timeFrame.timeRange[1],
+                                  interval: 0,
+                                  target: self,
+                                  selector: #selector(removeWidgetFromDesktop(sender:)),
+                                  userInfo: widget.getID(),
+                                  repeats: false)
+                RunLoop.main.add(timer, forMode: .common)
             }
         }
     }
@@ -113,4 +122,3 @@ class DisplayDesktopWidgets {
         
     }
 }
-

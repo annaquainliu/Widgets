@@ -9,8 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
     @State var tab: String = "Menu"
-    var store : WidgetStore
-
+    @EnvironmentObject var store : WidgetStore
+    let map = ["Image/GIF" : ImageOrGifView()]
+    
     var body: some View {
         if tab == "Menu" {
             VStack(alignment : .center) {
@@ -31,7 +32,6 @@ struct ContentView: View {
                 }.padding(30)
             }.padding([.top, .bottom], 30)
         } else {
-            let map = ["Image/GIF" : ImageOrGifView(store: store)]
             map[tab]
         }
     }
@@ -61,7 +61,8 @@ struct MenuButton : View {
 }
 
 struct ContentView_Previews: PreviewProvider {
+    
     static var previews: some View {
-        ContentView(store: WidgetStore())
+        ContentView()
     }
 }

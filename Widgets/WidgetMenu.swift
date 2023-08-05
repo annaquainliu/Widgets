@@ -22,7 +22,8 @@ struct WidgetMenu : View {
     @State private var timeFrameEnd = Date()
     @State private var alertInstructions = false
     
-    var store : WidgetStore
+    @EnvironmentObject var store : WidgetStore
+    @EnvironmentObject var displayDesktop: DisplayDesktopWidgets
     
     func makeDurationView() -> some View {
         return HStack {
@@ -146,7 +147,8 @@ struct WidgetMenu : View {
                                 measurement: freqMeasurement,
                                 frequency: frequency,
                                 startDate: frequencyStartDate),
-                            store: store)
+                            store: store,
+                            displayDesktop: displayDesktop)
                         alertInstructions = true
                     }
                     .padding(40)
@@ -161,6 +163,6 @@ struct WidgetMenu : View {
 
 struct WidgetMenu_Providers: PreviewProvider {
     static var previews: some View {
-        WidgetMenu(store: WidgetStore()).frame(width: 1000)
+        WidgetMenu().frame(width: 1000)
     }
 }
