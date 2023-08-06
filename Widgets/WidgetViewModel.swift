@@ -7,6 +7,7 @@
 
 import Foundation
 import AppKit
+import CoreLocation
 
 class WidgetInfo : Codable {
     var triggerType : String
@@ -44,7 +45,7 @@ class WidgetViewModel : ObservableObject {
     private var displayDesktop: DisplayDesktopWidgets
     
     init(triggerType: String, timeFrame: TimeFrame, weather: String, store: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
-        let imageName = "autumn_leaf"
+        let imageName = "outside"
         self.store = store
         self.displayDesktop = displayDesktop
         self.widgetInfo = WidgetInfo(triggerType: triggerType,
@@ -62,10 +63,12 @@ class DisplayDesktopWidgets: ObservableObject {
     
     var store : WidgetStore?
     private var currentWidgets : [UUID : ScreenWindowController]
+//    private var locationManager = LocationManager()
     
     init() {
         self.store = nil
         self.currentWidgets = [:]
+//        locationManager.startUpdating()
     }
     
     func loadWidgets() {
@@ -112,32 +115,31 @@ class DisplayDesktopWidgets: ObservableObject {
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
         // the only condition for always trigger widgets is the time frame
-        if TimeFrame.timeWithinRange(widget: widget) {
-            makeWindowController(widget: widget)
-                let timer = Timer(fireAt: widget.timeFrame.timeRange[1],
-                                  interval: 0,
-                                  target: self,
-                                  selector: #selector(removeWidgetSelector(sender:)),
-                                  userInfo: widget.getID(),
-                                  repeats: false)
-                RunLoop.main.add(timer, forMode: .common)
-        } else {
-            if (Date.now < widget.timeFrame.timeRange[0]) {
-                    let timer = Timer(fireAt: widget.timeFrame.timeRange[0],
-                                      interval: 0,
-                                      target: self,
-                                      selector: #selector(makeWindowControllerSelector(sender:)),
-                                      userInfo: widget,
-                                      repeats: false)
-                    RunLoop.main.add(timer, forMode: .common)
-            } //if the current date is passed the time range
-            else if (Date.now > widget.timeFrame.timeRange[1]) {
-                Task {
-                    print("widget id: \(widget.getID())")
-                    await store!.deleteWidget(id: widget.getID())
-                }
-            }
-        }
+//        if TimeFrame.timeWithinRange(widget: widget) {
+//            makeWindowController(widget: widget)
+//                let timer = Timer(fireAt: widget.timeFrame.timeRange[1],
+//                                  interval: 0,
+//                                  target: self,
+//                                  selector: #selector(removeWidgetSelector(sender:)),
+//                                  userInfo: widget.getID(),
+//                                  repeats: false)
+//                RunLoop.main.add(timer, forMode: .common)
+//        } else {
+//            if (Date.now < widget.timeFrame.timeRange[0]) {
+//                    let timer = Timer(fireAt: widget.timeFrame.timeRange[0],
+//                                      interval: 0,
+//                                      target: self,
+//                                      selector: #selector(makeWindowControllerSelector(sender:)),
+//                                      userInfo: widget,
+//                                      repeats: false)
+//                    RunLoop.main.add(timer, forMode: .common)
+//            } //if the current date is passed the time range
+//            else if (Date.now > widget.timeFrame.timeRange[1]) {
+//                Task {
+//                    await store!.deleteWidget(id: widget.getID())
+//                }
+//            }
+//        }
     }
 
 }

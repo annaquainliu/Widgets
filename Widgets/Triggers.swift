@@ -8,26 +8,6 @@
 import Foundation
 import SwiftUI
 
-struct TimeOptions {
-    static var s = "seconds"
-    static var ms = "milliseconds"
-    static var min = "minutes"
-    static var hr = "hours"
-    static var day = "days"
-    static var week = "weeks"
-    static var month = "months"
-    static var year = "years"
-    static var timeMeasurements = [TimeOptions.ms, TimeOptions.s, TimeOptions.min, TimeOptions.hr, TimeOptions.day, TimeOptions.week, TimeOptions.month, TimeOptions.year]
-    
-    static func makeTimeMeasurementMenu(selection : Binding<String>) -> some View {
-        return Picker("", selection: selection) {
-            ForEach(TimeOptions.timeMeasurements, id: \.self) { item in
-                Text(item)
-            }
-        }.pickerStyle(MenuPickerStyle())
-    }
-}
-
 struct WeatherOptionInfo : Hashable {
     var title : String;
     var systemImage : String;
@@ -59,6 +39,7 @@ struct Triggers {
     static var weather = "Weather"
     static var loc = "Location"
     static var timeFrame = "TimeFrame"
+    static var freq = "Frequency"
     
     static func triggerDescription() -> some View {
         return HStack {
@@ -90,19 +71,43 @@ struct Duration : Codable {
         return Duration(durationSelection: "", durationMeasurement: "", duration: 0)
     }
 }
-
+//between specific times
 struct TimeFrame : Codable {
     var timeRange : [Date]
-  
-    static func none() -> TimeFrame {
-        return TimeFrame(timeRange: [Date()])
+    // add repeat, type, String time range
+}
+
+struct TimeFrameSelection : Hashable {
+    var doRepeat : Bool = false
+    var stringTimeStart : String = ""
+    var stringTimeEnd : String = ""
+    var dateTimeStart : Date = Date.now
+    var dateTimeEnd : Date = Date.now
+    var selected : Bool = false
+    var type : String
+    
+    init(type : String) {
+        self.type = type
+        switch type {
+            case TimeFrameList.month:
+                stringTimeStart = TimeFrameList.months[0]
+                stringTimeEnd = TimeFrameList.months[0]
+            case TimeFrameList.dayOfTheWeek:
+                stringTimeStart = TimeFrameList.weekdays[0]
+                stringTimeEnd = TimeFrameList.weekdays[0]
+            default:
+                stringTimeStart = ""
+                stringTimeEnd = ""
+        }
     }
-    static func timeWithinRange(widget: WidgetInfo) -> Bool {
-        return (widget.timeFrame.timeRange[0] ... widget.timeFrame.timeRange[1]).contains(Date())
-    }
-    static func timeWithinADay(time: Date) -> Bool {
-        let diffs = time < Date.now ? Calendar.current.dateComponents([.hour], from: time, to: Date.now)
-                                    : Calendar.current.dateComponents([.hour], from: Date.now, to: time)
-        return diffs.hour! <= 24
-    }
+}
+
+class TimeFrameList {
+    static var hour = "hour" // e.g. between 3pm and 6pm, option to repeat every day
+    static var dayOfTheWeek = "day" // e.g .monday - tuesday, option to repeat every week
+    static var dayOfTheMonth = "date" // e.g. 23rd-25th, option to repeat every month
+    static var month = "month" // e.g. between november and december, option to repeat every year
+    static var measurements : [String] = [TimeFrameList.hour, TimeFrameList.dayOfTheWeek, TimeFrameList.dayOfTheMonth, TimeFrameList.month]
+    static var months = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    static var weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 }

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305EC7F02A772527009A24F8 /* NSWindow.swift */; };
 		305EC7F52A77364A009A24F8 /* autumn_leaf.png in Resources */ = {isa = PBXBuildFile; fileRef = 305EC7F42A77364A009A24F8 /* autumn_leaf.png */; };
+		30AEC6162A7F486700592B7C /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AEC6152A7F486700592B7C /* LocationManager.swift */; };
 		30B14F332A73777F007A1672 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B14F322A73777F007A1672 /* Utilities.swift */; };
 		30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */; };
 		30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */; };
@@ -59,6 +60,7 @@
 /* Begin PBXFileReference section */
 		305EC7F02A772527009A24F8 /* NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
 		305EC7F42A77364A009A24F8 /* autumn_leaf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = autumn_leaf.png; path = ../../../personalCS/desktop/images/autumn_leaf.png; sourceTree = "<group>"; };
+		30AEC6152A7F486700592B7C /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		30B14F322A73777F007A1672 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetViewModel.swift; sourceTree = "<group>"; };
 		30B79BBD2A771BF0002C79E7 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -127,6 +129,7 @@
 		30BDD91B2A71CD2D007E5F3B = {
 			isa = PBXGroup;
 			children = (
+				30AEC6152A7F486700592B7C /* LocationManager.swift */,
 				305EC7F32A7735FF009A24F8 /* Images */,
 				30BDD9262A71CD2D007E5F3B /* Widgets */,
 				30BDD9382A71CD2E007E5F3B /* WidgetsTests */,
@@ -207,6 +210,8 @@
 			dependencies = (
 			);
 			name = Widgets;
+			packageProductDependencies = (
+			);
 			productName = Widgets;
 			productReference = 30BDD9242A71CD2D007E5F3B /* Widgets.app */;
 			productType = "com.apple.product-type.application";
@@ -279,6 +284,9 @@
 				Base,
 			);
 			mainGroup = 30BDD91B2A71CD2D007E5F3B;
+			packageReferences = (
+				30AEC6172A7F505E00592B7C /* XCRemoteSwiftPackageReference "MapItemPicker" */,
+			);
 			productRefGroup = 30BDD9252A71CD2D007E5F3B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -326,6 +334,7 @@
 			files = (
 				30CD4C6C2A79D74B008B830B /* WidgetStore.swift in Sources */,
 				30F4E6D02A76035700EBA9CD /* WidgetMenu.swift in Sources */,
+				30AEC6162A7F486700592B7C /* LocationManager.swift in Sources */,
 				30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */,
 				305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */,
 				30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */,
@@ -640,6 +649,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		30AEC6172A7F505E00592B7C /* XCRemoteSwiftPackageReference "MapItemPicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Quintschaf/MapItemPicker.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 30BDD91C2A71CD2D007E5F3B /* Project object */;
 }
