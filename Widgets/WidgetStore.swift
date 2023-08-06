@@ -39,11 +39,12 @@ class WidgetStore: ObservableObject {
             try data.write(to: outfile)
         }
         _ = try await task.value
+        self.widgets = newWidgets
     }
     
     func deleteWidget(id : UUID) async {
         var newWidgets : [WidgetInfo] = []
-        for widget in widgets {
+        for widget in self.widgets {
             if widget.getID() != id {
                 newWidgets.append(widget)
             }

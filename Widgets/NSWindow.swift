@@ -94,8 +94,8 @@ class WidgetNSWindow : NSWindow {
                                                        height: self.frame.height))
         Task {
             await store.addWidget(widget: self.widgetInfo)
+            displayDesktop.displayWidget(widget: self.widgetInfo)
         }
-        displayDesktop.displayWidget(widget: self.widgetInfo)
     }
     
     override public func mouseDown(with event: NSEvent) {

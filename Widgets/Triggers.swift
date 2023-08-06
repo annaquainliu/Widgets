@@ -57,8 +57,8 @@ struct WeatherTrigger {
 struct Triggers {
     static var always = "Always"
     static var weather = "Weather"
-    static var freq = "Frequency"
     static var loc = "Location"
+    static var timeFrame = "TimeFrame"
     
     static func triggerDescription() -> some View {
         return HStack {
@@ -92,12 +92,17 @@ struct Duration : Codable {
 }
 
 struct TimeFrame : Codable {
-    var selection : String
     var timeRange : [Date]
-    static var always = "Always"
-    static var frame = "timeFrame"
-    
+  
     static func none() -> TimeFrame {
-        return TimeFrame(selection: "", timeRange: [Date()])
+        return TimeFrame(timeRange: [Date()])
+    }
+    static func timeWithinRange(widget: WidgetInfo) -> Bool {
+        return (widget.timeFrame.timeRange[0] ... widget.timeFrame.timeRange[1]).contains(Date())
+    }
+    static func timeWithinADay(time: Date) -> Bool {
+        let diffs = time < Date.now ? Calendar.current.dateComponents([.hour], from: time, to: Date.now)
+                                    : Calendar.current.dateComponents([.hour], from: Date.now, to: time)
+        return diffs.hour! <= 24
     }
 }
