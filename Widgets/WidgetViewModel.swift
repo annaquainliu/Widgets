@@ -12,14 +12,14 @@ import CoreLocation
 class WidgetInfo : Codable {
     var triggerType : String
     var weather : String
-    var timeFrame : [TimeFrameInfo]
+    var timeFrame : TimeFrameInfo
     var xCoord : Double = 0
     var yCoord : Double = 0
     var widgetSize : NSSize
     var imageName : String
     private var id = UUID()
     
-    init(triggerType: String, weather: String, timeFrame: [TimeFrameInfo], imageName: String) {
+    init(triggerType: String, weather: String, timeFrame: TimeFrameInfo, imageName: String) {
         self.triggerType = triggerType
         self.weather = weather
         self.timeFrame = timeFrame
@@ -44,7 +44,7 @@ class WidgetViewModel : ObservableObject {
     private var windowController : ScreenWindowController
     private var displayDesktop: DisplayDesktopWidgets
     
-    init(triggerType: String, timeFrame: [TimeFrameInfo], weather: String, store: WidgetStore,
+    init(triggerType: String, timeFrame: TimeFrameInfo, weather: String, store: WidgetStore,
          displayDesktop: DisplayDesktopWidgets) {
         let imageName = "autumn_leaf"
         self.store = store
@@ -123,20 +123,16 @@ class DisplayDesktopWidgets: ObservableObject {
 //                RunLoop.main.add(timer, forMode: .common)
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
-        
-        var validTimeFrame = true
+//        var validTimeFrame = true
+//        var dateComponents = DateComponents()
         // the time frame must be valid for all widgets
-        for timeFrame in widget.timeFrame {
-            if !timeFrame.nowWithinTimeRange() {
-                validTimeFrame = false
-                break
-            }
-        }
-        if validTimeFrame {
-            makeWindowController(widget: widget)
-            // set timer for it to close
-        } else {
+        
+//        if validTimeFrame {
+//            makeWindowController(widget: widget)
             
-        }
+            // set timer for it to close
+//        } else {
+            // set timer to recursively call displayTimeFrameWidget
+//        }
     }
 }

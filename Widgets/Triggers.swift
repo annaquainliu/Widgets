@@ -89,44 +89,56 @@ struct TimeFrame {
     }
 }
 
-struct TimeFrameInfo : Codable {
+struct HourTimeFrame : Codable {
     var selected : Bool = false
-    var type : String
-    var intTimeStart : Int = 0
-    var intTimeEnd : Int = 0
-    var stringTimeStart : String
-    var stringTimeEnd : String
-    var dateTimeStart : Date = Date()
-    var dateTimeEnd : Date = Date()
+    var timeStart : Date = Date.now
+    var timeEnd : Date = Date.now
+}
+
+struct WeekdayTimeFrame : Codable {
+    var selected : Bool = false
+    var timeStart : String = TimeFrame.weekdays[0]
+    var timeEnd : String = TimeFrame.weekdays[0]
+}
+
+struct DateTimeFrame : Codable {
+    var selected : Bool = false
+    var timeStart : Int = 0
+    var timeEnd : Int = 0
+}
+
+struct MonthTimeFrame : Codable {
+    var selected : Bool = false
+    var timeStart : String = TimeFrame.months[0]
+    var timeEnd : String = TimeFrame.months[0]
+}
+
+struct TimeFrameInfo : Codable {
+    var Hour : HourTimeFrame?
+    var Weekday : WeekdayTimeFrame?
+    var Date : DateTimeFrame?
+    var Month : MonthTimeFrame?
     
-    init(type : String) {
-        self.type = type
-        
-        switch type {
-            case TimeFrame.dayOfTheWeek:
-                stringTimeStart = TimeFrame.weekdays[0]
-                stringTimeEnd = TimeFrame.weekdays[0]
-            case TimeFrame.month:
-                stringTimeStart = TimeFrame.months[0]
-                stringTimeEnd = TimeFrame.months[0]
-            default:
-                stringTimeStart = ""
-                stringTimeEnd = ""
-        }
+    init(Hour: HourTimeFrame? = nil, Weekday: WeekdayTimeFrame? = nil, Date: DateTimeFrame? = nil, Month: MonthTimeFrame? = nil) {
+        self.Hour = Hour
+        self.Weekday = Weekday
+        self.Date = Date
+        self.Month = Month
     }
+//
+//    func nowWithinTimeRange() -> Bool {
+//        switch type {
+//            case TimeFrame.hour:
+//                return Date().get(.hour) >= dateTimeStart.get(.hour) && Date().get(.hour) <= dateTimeEnd.get(.hour)
+//            case TimeFrame.dayOfTheWeek:
+//                return Date().get(.weekday) >= TimeFrame.getWeekdayIndex(weekday: stringTimeStart)
+//                        && Date().get(.weekday) <= TimeFrame.getWeekdayIndex(weekday: stringTimeEnd)
+//            case TimeFrame.dayOfTheMonth:
+//                return Date().get(.day) >= intTimeStart && Date().get(.day) <= intTimeEnd
+//            default:
+//                return Date().get(.month) >= TimeFrame.getMonthIndex(month: stringTimeStart)
+//                && Date().get(.month) <= TimeFrame.getMonthIndex(month: stringTimeEnd)
+//        }
+//    }
     
-    func nowWithinTimeRange() -> Bool {
-        switch type {
-            case TimeFrame.hour:
-                return Date().get(.hour) >= dateTimeStart.get(.hour) && Date().get(.hour) <= dateTimeEnd.get(.hour)
-            case TimeFrame.dayOfTheWeek:
-                return Date().get(.weekday) >= TimeFrame.getWeekdayIndex(weekday: stringTimeStart)
-                        && Date().get(.weekday) <= TimeFrame.getWeekdayIndex(weekday: stringTimeEnd)
-            case TimeFrame.dayOfTheMonth:
-                return Date().get(.day) >= intTimeStart && Date().get(.day) <= intTimeEnd
-            default:
-                return Date().get(.month) >= TimeFrame.getMonthIndex(month: stringTimeStart)
-                && Date().get(.month) <= TimeFrame.getMonthIndex(month: stringTimeEnd)
-        }
-    }
 }
