@@ -71,16 +71,13 @@ struct Duration : Codable {
         return Duration(durationSelection: "", durationMeasurement: "", duration: 0)
     }
 }
-//between specific times
-struct TimeFrame : Codable {
-    var timeRange : [Date]
-    // add repeat, type, String time range
-}
 
-struct TimeFrameSelection : Hashable {
+struct TimeFrame : Hashable, Codable {
     var doRepeat : Bool = false
     var stringTimeStart : String = ""
     var stringTimeEnd : String = ""
+    var intTimeStart : Int = 0
+    var intTimeEnd : Int = 0
     var dateTimeStart : Date = Date.now
     var dateTimeEnd : Date = Date.now
     var selected : Bool = false

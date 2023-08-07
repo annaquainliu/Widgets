@@ -12,14 +12,14 @@ import CoreLocation
 class WidgetInfo : Codable {
     var triggerType : String
     var weather : String
-    var timeFrame : TimeFrame
+    var timeFrame : [TimeFrame]
     var xCoord : Double = 0
     var yCoord : Double = 0
     var widgetSize : NSSize
     var imageName : String
     private var id = UUID()
     
-    init(triggerType: String, weather: String,timeFrame: TimeFrame, imageName: String) {
+    init(triggerType: String, weather: String, timeFrame: [TimeFrame], imageName: String) {
         self.triggerType = triggerType
         self.weather = weather
         self.timeFrame = timeFrame
@@ -44,7 +44,7 @@ class WidgetViewModel : ObservableObject {
     private var windowController : ScreenWindowController
     private var displayDesktop: DisplayDesktopWidgets
     
-    init(triggerType: String, timeFrame: TimeFrame, weather: String, store: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
+    init(triggerType: String, timeFrame: [TimeFrame], weather: String, store: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
         let imageName = "outside"
         self.store = store
         self.displayDesktop = displayDesktop
@@ -52,7 +52,7 @@ class WidgetViewModel : ObservableObject {
                                      weather: weather,
                                      timeFrame: timeFrame,
                                      imageName: imageName)
-        print("making widget! id is: \(widgetInfo.getID())")
+        print(timeFrame)
         self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo, widgetStore: store, displayDesktop: displayDesktop))
     }
     

@@ -12,11 +12,11 @@ struct WidgetMenu : View {
     @State private var triggerSelection = Triggers.always
     @State var weatherSelection =  WeatherOptionInfo(title: WeatherOptionInfo.sunny, systemImage: "sun.min.fill")
     @State private var alertInstructions = false
-    @State var selection = Set<String>()
-    @State var hourSelection = TimeFrameSelection(type: TimeFrameList.hour)
-    @State var daySelection = TimeFrameSelection(type: TimeFrameList.dayOfTheWeek)
-    @State var dateSelection = TimeFrameSelection(type: TimeFrameList.dayOfTheMonth)
-    @State var monthSelection = TimeFrameSelection(type: TimeFrameList.month)
+    @State var timeFrameSelection = Set<String>()
+    @State var hourSelection = TimeFrame(type: TimeFrameList.hour)
+    @State var daySelection = TimeFrame(type: TimeFrameList.dayOfTheWeek)
+    @State var dateSelection = TimeFrame(type: TimeFrameList.dayOfTheMonth)
+    @State var monthSelection = TimeFrame(type: TimeFrameList.month)
     
     @EnvironmentObject var store : WidgetStore
     @EnvironmentObject var displayDesktop: DisplayDesktopWidgets
@@ -25,11 +25,11 @@ struct WidgetMenu : View {
         return Button {
             selected.wrappedValue = !selected.wrappedValue
             if selected.wrappedValue {
-                selection.insert(tag)
+                timeFrameSelection.insert(tag)
             } else {
-                selection.remove(tag)
+                timeFrameSelection.remove(tag)
             }
-            print(selection)
+            print(timeFrameSelection)
         } label: {
             if selected.wrappedValue {
                 Image(systemName: "checkmark")
@@ -98,6 +98,23 @@ struct WidgetMenu : View {
                                     }.disabled(!daySelection.selected)
                                 }
                                 HStack {
+                                    makeToggle(selected: $dateSelection.selected, tag: TimeFrameList.dayOfTheMonth)
+                                    HStack {
+                                        Text("Day Of the Month").padding()
+                                        Picker("From", selection: $dateSelection.intTimeStart) {
+                                            ForEach(1..<32) { date in
+                                                Text("\(date)")
+                                            }
+                                        }.pickerStyle(.menu)
+                                        Picker("To", selection: $dateSelection.intTimeEnd) {
+                                            ForEach(1..<32) { date in
+                                                Text("\(date)")
+                                            }
+                                        }.pickerStyle(.menu)
+                                        Toggle("Repeat", isOn: $dateSelection.doRepeat)
+                                    }.disabled(!dateSelection.selected)
+                                }
+                                HStack {
                                     makeToggle(selected: $monthSelection.selected, tag: TimeFrameList.month)
                                     HStack {
                                         Text("Month").padding()
@@ -114,15 +131,6 @@ struct WidgetMenu : View {
                                         Toggle("Repeat", isOn: $monthSelection.doRepeat)
                                     }.disabled(!monthSelection.selected)
                                 }
-                                HStack {
-                                    makeToggle(selected: $dateSelection.selected, tag: TimeFrameList.dayOfTheMonth)
-                                    HStack {
-                                        Text("Date").padding()
-                                        DatePicker("From", selection: $dateSelection.dateTimeStart, displayedComponents: [.date])
-                                        DatePicker("To", selection: $dateSelection.dateTimeEnd, displayedComponents: [.date])
-                                        Toggle("Repeat", isOn: $dateSelection.doRepeat)
-                                    }.disabled(!dateSelection.selected)
-                                }
                             }
                         },
                         selection: triggerSelection)
@@ -133,12 +141,21 @@ struct WidgetMenu : View {
                 HStack {
                     Spacer()
                     Button("Create Widget") {
-//                        _ = WidgetViewModel(
-//                            triggerType: triggerSelection,
-//                            timeFrame: TimeFrame(timeRange: [timeFrameStart, timeFrameEnd]),
-//                            weather: weatherSelection.title,
-//                            store: store,
-//                            displayDesktop: displayDesktop)
+                        let map = [
+                            TimeFrameList.hour : hourSelection,
+                            TimeFrameList.dayOfTheWeek: daySelection,
+                            TimeFrameList.dayOfTheMonth: dateSelection,
+                            TimeFrameList.month: monthSelection]
+                        var timeFrames : [TimeFrame] = []
+                        for selection in timeFrameSelection {
+                            timeFrames.append(map[selection]!)
+                        }
+                        _ = WidgetViewModel(
+                            triggerType: triggerSelection,
+                            timeFrame: timeFrames,
+                            weather: weatherSelection.title,
+                            store: store,
+                            displayDesktop: displayDesktop)
                         alertInstructions = true
                     }
                     .padding(40)
