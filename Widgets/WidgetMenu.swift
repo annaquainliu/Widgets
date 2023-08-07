@@ -13,10 +13,10 @@ struct WidgetMenu : View {
     @State var weatherSelection =  WeatherOptionInfo(title: WeatherOptionInfo.sunny, systemImage: "sun.min.fill")
     @State private var alertInstructions = false
     @State var timeFrameSelection = Set<String>()
-    @StateObject var hourSelection = HourTimeFrameState()
-    @StateObject var daySelection = WeekdayTimeFrameState()
-    @StateObject var dateSelection = DateTimeFrameState()
-    @StateObject var monthSelection = MonthTimeFrameState()
+    @State var hourSelection = TimeFrameInfo(type: TimeFrame.hour)
+    @State var daySelection = TimeFrameInfo(type: TimeFrame.dayOfTheWeek)
+    @State var dateSelection = TimeFrameInfo(type: TimeFrame.dayOfTheMonth)
+    @State var monthSelection = TimeFrameInfo(type: TimeFrame.month)
     
     @EnvironmentObject var store : WidgetStore
     @EnvironmentObject var displayDesktop: DisplayDesktopWidgets
@@ -32,9 +32,7 @@ struct WidgetMenu : View {
             print(timeFrameSelection)
         } label: {
             if selected.wrappedValue {
-                Text("poo")
-            } else {
-                Text("hi")
+                Image(systemName: "checkmark.square")
             }
         }
     }
@@ -77,20 +75,20 @@ struct WidgetMenu : View {
                                     makeToggle(selected: $hourSelection.selected, tag: TimeFrame.hour)
                                     HStack {
                                         Text("Hour").padding()
-                                        DatePicker("From", selection: $hourSelection.timeStart, displayedComponents: [.hourAndMinute])
-                                        DatePicker("To", selection: $hourSelection.timeEnd, displayedComponents: [.hourAndMinute])
+                                        DatePicker("From", selection: $hourSelection.dateTimeStart, displayedComponents: [.hourAndMinute])
+                                        DatePicker("To", selection: $hourSelection.dateTimeEnd, displayedComponents: [.hourAndMinute])
                                     }.disabled(!hourSelection.selected)
                                 }
                                 HStack {
                                     makeToggle(selected: $daySelection.selected, tag: TimeFrame.dayOfTheWeek)
                                     HStack {
                                         Text("Day").padding()
-                                        Picker("From", selection: $daySelection.timeStart) {
+                                        Picker("From", selection: $daySelection.stringTimeStart) {
                                             ForEach(TimeFrame.weekdays, id: \.self) {item in
                                                 Text(item)
                                             }
                                         }.pickerStyle(.menu)
-                                        Picker("To", selection: $daySelection.timeEnd) {
+                                        Picker("To", selection: $daySelection.stringTimeEnd) {
                                             ForEach(TimeFrame.weekdays, id: \.self) {item in
                                                 Text(item)
                                             }
@@ -102,12 +100,12 @@ struct WidgetMenu : View {
                                     makeToggle(selected: $dateSelection.selected, tag: TimeFrame.dayOfTheMonth)
                                     HStack {
                                         Text("Day Of the Month").padding()
-                                        Picker("From", selection: $dateSelection.timeStart) {
+                                        Picker("From", selection: $dateSelection.intTimeStart) {
                                             ForEach(1..<32) { date in
                                                 Text("\(date)")
                                             }
                                         }.pickerStyle(.menu)
-                                        Picker("To", selection: $dateSelection.timeEnd) {
+                                        Picker("To", selection: $dateSelection.intTimeEnd) {
                                             ForEach(1..<32) { date in
                                                 Text("\(date)")
                                             }
@@ -119,12 +117,12 @@ struct WidgetMenu : View {
                                     makeToggle(selected: $monthSelection.selected, tag: TimeFrame.month)
                                     HStack {
                                         Text("Month").padding()
-                                        Picker("From", selection: $monthSelection.timeStart) {
+                                        Picker("From", selection: $monthSelection.stringTimeStart) {
                                             ForEach(TimeFrame.months, id: \.self) {item in
                                                 Text(item)
                                             }
                                         }.pickerStyle(.menu)
-                                        Picker("To", selection: $monthSelection.timeEnd) {
+                                        Picker("To", selection: $monthSelection.stringTimeEnd) {
                                             ForEach(TimeFrame.months, id: \.self) {item in
                                                 Text(item)
                                             }
@@ -142,7 +140,7 @@ struct WidgetMenu : View {
                 HStack {
                     Spacer()
                     Button("Create Widget") {
-                        let map : [String : TimeFrameState] = [
+                        let map : [String : TimeFrameInfo] = [
                             TimeFrame.month: monthSelection,
                             TimeFrame.dayOfTheMonth: dateSelection,
                             TimeFrame.dayOfTheWeek: daySelection,
@@ -150,7 +148,7 @@ struct WidgetMenu : View {
                         var timeFrames : [TimeFrameInfo] = []
                         // order matters!
                         for selection in timeFrameSelection {
-                            timeFrames.append(map[selection]!.makeCodableInfo())
+                            timeFrames.append(map[selection]!)
                         }
                         _ = WidgetViewModel(
                             triggerType: triggerSelection,

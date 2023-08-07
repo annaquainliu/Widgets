@@ -123,19 +123,20 @@ class DisplayDesktopWidgets: ObservableObject {
 //                RunLoop.main.add(timer, forMode: .common)
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
-//        var validTimeFrame = true
-//        // the time frame must be valid for all widgets
-//        for timeFrame in widget.timeFrame {
-//            if !timeFrame.nowWithinTimeRange() {
-//                validTimeFrame = false
-//                break
-//            }
-//        }
-//        if validTimeFrame {
-//            makeWindowController(widget: widget)
-//            // set timer for it to close
-//        } else {
-//
-//        }
+        
+        var validTimeFrame = true
+        // the time frame must be valid for all widgets
+        for timeFrame in widget.timeFrame {
+            if !timeFrame.nowWithinTimeRange() {
+                validTimeFrame = false
+                break
+            }
+        }
+        if validTimeFrame {
+            makeWindowController(widget: widget)
+            // set timer for it to close
+        } else {
+            
+        }
     }
 }

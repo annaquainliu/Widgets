@@ -89,235 +89,44 @@ struct TimeFrame {
     }
 }
 
-// START of Codable Time Frames
-class TimeFrameInfo : Codable {
+struct TimeFrameInfo : Codable {
+    var selected : Bool = false
     var type : String
+    var intTimeStart : Int = 0
+    var intTimeEnd : Int = 0
+    var stringTimeStart : String
+    var stringTimeEnd : String
+    var dateTimeStart : Date = Date()
+    var dateTimeEnd : Date = Date()
     
-    init(type: String) {
+    init(type : String) {
         self.type = type
+        
+        switch type {
+            case TimeFrame.dayOfTheWeek:
+                stringTimeStart = TimeFrame.weekdays[0]
+                stringTimeEnd = TimeFrame.weekdays[0]
+            case TimeFrame.month:
+                stringTimeStart = TimeFrame.months[0]
+                stringTimeEnd = TimeFrame.months[0]
+            default:
+                stringTimeStart = ""
+                stringTimeEnd = ""
+        }
     }
     
-    func printSelf() {
-        print("type: \(type)")
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case type
-    }
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decode(String.self, forKey: .type)
+    func nowWithinTimeRange() -> Bool {
+        switch type {
+            case TimeFrame.hour:
+                return Date().get(.hour) >= dateTimeStart.get(.hour) && Date().get(.hour) <= dateTimeEnd.get(.hour)
+            case TimeFrame.dayOfTheWeek:
+                return Date().get(.weekday) >= TimeFrame.getWeekdayIndex(weekday: stringTimeStart)
+                        && Date().get(.weekday) <= TimeFrame.getWeekdayIndex(weekday: stringTimeEnd)
+            case TimeFrame.dayOfTheMonth:
+                return Date().get(.day) >= intTimeStart && Date().get(.day) <= intTimeEnd
+            default:
+                return Date().get(.month) >= TimeFrame.getMonthIndex(month: stringTimeStart)
+                && Date().get(.month) <= TimeFrame.getMonthIndex(month: stringTimeEnd)
+        }
     }
 }
-
-class HourTimeFrameInfo : TimeFrameInfo {
-    var timeStart : Date
-    var timeEnd : Date
-    
-    init(timeStart: Date, timeEnd: Date) {
-        self.timeStart = timeStart
-        self.timeEnd = timeEnd
-        super.init(type: TimeFrame.hour)
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case timeStart
-        case timeEnd
-    }
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        timeStart = try container.decode(Date.self, forKey: .timeStart)
-        timeEnd = try container.decode(Date.self, forKey: .timeEnd)
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
-    }
-    
-    override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.timeStart, forKey: .timeStart)
-        try container.encode(self.timeEnd, forKey: .timeEnd)
-    }
-    
-    override func printSelf() {
-        super.printSelf()
-        print("timeStart: \(timeStart.get(.hour)), timeEnd: \(timeEnd.get(.hour))")
-    }
-}
-
-class WeekdayTimeFrameInfo : TimeFrameInfo {
-    var timeStart : String
-    var timeEnd : String
-    
-    init(timeStart: String, timeEnd: String) {
-        self.timeStart = timeStart
-        self.timeEnd = timeEnd
-        super.init(type: TimeFrame.dayOfTheWeek)
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case timeStart
-        case timeEnd
-    }
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        timeStart = try container.decode(String.self, forKey: .timeStart)
-        timeEnd = try container.decode(String.self, forKey: .timeEnd)
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
-    }
-    
-    override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.timeStart, forKey: .timeStart)
-        try container.encode(self.timeEnd, forKey: .timeEnd)
-    }
-    
-    override func printSelf() {
-        super.printSelf()
-        print("timeStart: \(timeStart), timeEnd: \(timeEnd)")
-    }
-}
-
-class DateTimeFrameInfo : TimeFrameInfo {
-    var timeStart : Int
-    var timeEnd : Int
-    
-    init(timeStart: Int, timeEnd: Int) {
-        self.timeStart = timeStart
-        self.timeEnd = timeEnd
-        super.init(type: TimeFrame.dayOfTheMonth)
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case timeStart
-        case timeEnd
-    }
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        timeStart = try container.decode(Int.self, forKey: .timeStart)
-        timeEnd = try container.decode(Int.self, forKey: .timeEnd)
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
-    }
-    
-    override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.timeStart, forKey: .timeStart)
-        try container.encode(self.timeEnd, forKey: .timeEnd)
-    }
-    
-    override func printSelf() {
-        super.printSelf()
-        print("timeStart: \(timeStart), timeEnd: \(timeEnd)")
-    }
-}
-
-class MonthTimeFrameInfo : TimeFrameInfo {
-    var timeStart : String
-    var timeEnd : String
-    
-    init(timeStart: String, timeEnd: String) {
-        self.timeStart = timeStart
-        self.timeEnd = timeEnd
-        super.init(type: TimeFrame.month)
-    }
-    
-    override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.timeStart, forKey: .timeStart)
-        try container.encode(self.timeEnd, forKey: .timeEnd)
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case timeStart
-        case timeEnd
-    }
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        timeStart = try container.decode(String.self, forKey: .timeStart)
-        timeEnd = try container.decode(String.self, forKey: .timeEnd)
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
-    }
-    
-    override func printSelf() {
-        super.printSelf()
-        print("timeStart: \(timeStart), timeEnd: \(timeEnd)")
-    }
-}
-// End of Codable Time Frames
-
-
-// Start of Time Frame Observable objects
-class TimeFrameState : ObservableObject {
-    @Published var selected : Bool = false
-    var type : String
-    
-    init(type: String) {
-        self.type = type
-    }
-    
-    func makeCodableInfo() -> TimeFrameInfo {
-        return TimeFrameInfo(type: type)
-    }
-}
-
-class HourTimeFrameState : TimeFrameState {
-    @Published var timeStart : Date = Date()
-    @Published var timeEnd  : Date = Date()
-    
-    init() {
-        super.init(type: TimeFrame.hour)
-    }
-    
-    override func makeCodableInfo() -> TimeFrameInfo {
-        return HourTimeFrameInfo(timeStart: timeStart, timeEnd: timeEnd)
-    }
-}
-
-class WeekdayTimeFrameState : TimeFrameState {
-    @Published var timeStart : String = TimeFrame.weekdays[0]
-    @Published var timeEnd  : String = TimeFrame.weekdays[0]
-    
-    init() {
-        super.init(type: TimeFrame.dayOfTheWeek)
-    }
-    
-    override func makeCodableInfo() -> TimeFrameInfo {
-        return WeekdayTimeFrameInfo(timeStart: timeStart, timeEnd: timeEnd)
-    }
-}
-
-class DateTimeFrameState : TimeFrameState {
-    @Published var timeStart : Int = 0
-    @Published var timeEnd : Int = 0
-    
-    init() {
-        super.init(type: TimeFrame.dayOfTheMonth)
-    }
-    override func makeCodableInfo() -> TimeFrameInfo {
-        return DateTimeFrameInfo(timeStart: timeStart, timeEnd: timeEnd)
-    }
-}
-
-class MonthTimeFrameState : TimeFrameState {
-    @Published var timeStart : String = TimeFrame.months[0]
-    @Published var timeEnd : String = TimeFrame.months[0]
-    
-    init() {
-        super.init(type: TimeFrame.month)
-    }
-    override func makeCodableInfo() -> TimeFrameInfo {
-        return MonthTimeFrameInfo(timeStart: timeStart, timeEnd: timeEnd)
-    }
-}
-// END of Time Frame Observable objects
