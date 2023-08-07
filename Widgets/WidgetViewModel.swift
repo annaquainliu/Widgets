@@ -112,34 +112,20 @@ class DisplayDesktopWidgets: ObservableObject {
         }
         self.currentWidgets.removeValue(forKey: id)
     }
-    
-    private func displayTimeFrameWidget(widget: WidgetInfo) {
-        // the only condition for always trigger widgets is the time frame
-//        if TimeFrame.timeWithinRange(widget: widget) {
-//            makeWindowController(widget: widget)
-//                let timer = Timer(fireAt: widget.timeFrame.timeRange[1],
+// let timer = Timer(fireAt: widget.timeFrame.timeRange[1],
 //                                  interval: 0,
 //                                  target: self,
 //                                  selector: #selector(removeWidgetSelector(sender:)),
 //                                  userInfo: widget.getID(),
 //                                  repeats: false)
 //                RunLoop.main.add(timer, forMode: .common)
-//        } else {
-//            if (Date.now < widget.timeFrame.timeRange[0]) {
-//                    let timer = Timer(fireAt: widget.timeFrame.timeRange[0],
-//                                      interval: 0,
-//                                      target: self,
-//                                      selector: #selector(makeWindowControllerSelector(sender:)),
-//                                      userInfo: widget,
-//                                      repeats: false)
-//                    RunLoop.main.add(timer, forMode: .common)
-//            } //if the current date is passed the time range
-//            else if (Date.now > widget.timeFrame.timeRange[1]) {
-//                Task {
-//                    await store!.deleteWidget(id: widget.getID())
-//                }
-//            }
-//        }
+    
+    private func displayTimeFrameWidget(widget: WidgetInfo) {
+        var validTimeFrame = false
+        for timeFrame in widget.timeFrame {
+            
+        }
+        
     }
 
 }

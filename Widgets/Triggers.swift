@@ -39,7 +39,6 @@ struct Triggers {
     static var weather = "Weather"
     static var loc = "Location"
     static var timeFrame = "TimeFrame"
-    static var freq = "Frequency"
     
     static func triggerDescription() -> some View {
         return HStack {
@@ -72,39 +71,70 @@ struct Duration : Codable {
     }
 }
 
-struct TimeFrame : Hashable, Codable {
+class TimeFrame : Codable {
+    static var hour = "hour" // e.g. between 3pm and 6pm, option to repeat every day
+    static var dayOfTheWeek = "day" // e.g .monday - tuesday, option to repeat every week
+    static var dayOfTheMonth = "date" // e.g. 23rd-25th, option to repeat every month
+    static var month = "month" // e.g. between november and december, option to repeat every year
+    static var measurements : [String] = [TimeFrame.hour, TimeFrame.dayOfTheWeek, TimeFrame.dayOfTheMonth, TimeFrame.month]
+    static var months = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    static var weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    
     var doRepeat : Bool = false
-    var stringTimeStart : String = ""
-    var stringTimeEnd : String = ""
-    var intTimeStart : Int = 0
-    var intTimeEnd : Int = 0
-    var dateTimeStart : Date = Date.now
-    var dateTimeEnd : Date = Date.now
     var selected : Bool = false
     var type : String
     
     init(type : String) {
         self.type = type
-        switch type {
-            case TimeFrameList.month:
-                stringTimeStart = TimeFrameList.months[0]
-                stringTimeEnd = TimeFrameList.months[0]
-            case TimeFrameList.dayOfTheWeek:
-                stringTimeStart = TimeFrameList.weekdays[0]
-                stringTimeEnd = TimeFrameList.weekdays[0]
-            default:
-                stringTimeStart = ""
-                stringTimeEnd = ""
-        }
+    }
+    
+    static func getMonthIndex(month: String) -> Int {
+        return TimeFrame.months.firstIndex(of: month)! + 1
+    }
+    
+    static func getWeekdayIndex(weekday: String) -> Int {
+        return TimeFrame.weekdays.firstIndex(of: weekday)! + 1
     }
 }
 
-class TimeFrameList {
-    static var hour = "hour" // e.g. between 3pm and 6pm, option to repeat every day
-    static var dayOfTheWeek = "day" // e.g .monday - tuesday, option to repeat every week
-    static var dayOfTheMonth = "date" // e.g. 23rd-25th, option to repeat every month
-    static var month = "month" // e.g. between november and december, option to repeat every year
-    static var measurements : [String] = [TimeFrameList.hour, TimeFrameList.dayOfTheWeek, TimeFrameList.dayOfTheMonth, TimeFrameList.month]
-    static var months = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    static var weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+class MonthTimeFrame : TimeFrame {
+    var timeStart : String = TimeFrame.months[0]
+    var timeEnd : String = TimeFrame.months[0]
+    
+    func nowWithinTimeRange() -> Bool {
+        let nowIndex =  Date().get(.month)
+        return nowIndex >= TimeFrame.getMonthIndex(month: timeStart)
+        && nowIndex <= TimeFrame.getMonthIndex(month: timeEnd)
+    }
+}
+
+class WeekDayTimeFrame : TimeFrame {
+    var timeStart : String = TimeFrame.weekdays[0]
+    var timeEnd : String = TimeFrame.weekdays[0]
+    
+    func nowWithinTimeRange() -> Bool {
+        let nowIndex = Date().get(.weekday)
+        
+        return nowIndex >= TimeFrame.getWeekdayIndex(weekday: timeStart)
+        && nowIndex <= TimeFrame.getWeekdayIndex(weekday: timeEnd)
+    }
+}
+
+class HourTimeFrame : TimeFrame {
+    var timeStart : Date = Date.now
+    var timeEnd : Date = Date.now
+    
+    func nowWithinTimeRange() -> Bool {
+        return Date.now >= timeStart && Date.now <= timeEnd
+    }
+}
+
+class DateTimeFrame : TimeFrame {
+    var timeStart : Int = 0
+    var timeEnd : Int = 0
+    
+    func nowWithinTimeRange() -> Bool {
+        let day = Date().get(.day)
+        return day >= timeStart && day <= timeEnd
+    }
 }
