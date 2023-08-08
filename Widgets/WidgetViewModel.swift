@@ -124,17 +124,14 @@ class DisplayDesktopWidgets: ObservableObject {
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
         var validTimeFrame = true
-//        var startingDateComponents = DateComponents()
-//        var endingDateComponents = DateComponents()
 //         the time frame must be valid for all widgets
-        let timeFrames : [TimeFrameCodable?] = [widget.timeFrame.Date, widget.timeFrame.Hour, widget.timeFrame.Month, widget.timeFrame.Weekday]
+        let timeFrames : [TimeFrameCodable?] = [widget.timeFrame.date, widget.timeFrame.Hour, widget.timeFrame.Month, widget.timeFrame.Weekday]
         for timeFrame in timeFrames {
             if timeFrame != nil && !timeFrame!.nowWithinTimeRange() {
                 validTimeFrame = false
                 break
             }
         }
-        
         if validTimeFrame {
             makeWindowController(widget: widget)
         } else {

@@ -113,6 +113,13 @@ struct WeekdayTimeFrame : TimeFrameCodable {
         return Date().get(.weekday) >= TimeFrame.getWeekdayIndex(weekday: timeStart)
             && Date().get(.weekday) <= TimeFrame.getWeekdayIndex(weekday: timeEnd)
     }
+    
+    func getNextWeekday(afterDate: Date) -> Date {
+        let cal = Calendar.current
+        var comps = DateComponents()
+        comps.weekday = TimeFrame.getWeekdayIndex(weekday: timeStart)
+        return cal.nextDate(after: afterDate, matching: comps, matchingPolicy: .nextTimePreservingSmallerComponents)!
+    }
 }
 
 struct DateTimeFrame : TimeFrameCodable {
@@ -134,20 +141,90 @@ struct MonthTimeFrame : TimeFrameCodable {
         return Date().get(.month) >= TimeFrame.getMonthIndex(month: timeStart)
              && Date().get(.month) <= TimeFrame.getMonthIndex(month: timeEnd)
     }
+    
+    func getStartingTime() -> Date {
+        return MonthTimeFrame.getStartingMonth(month: TimeFrame.getMonthIndex(month: timeStart))
+    }
+    
+    static func getStartingMonth(month: Int) -> Date {
+        let calendar = Calendar(identifier: .gregorian)
+        let date = calendar.date(from: DateComponents(year: Date().get(.year),
+                                                      month: month,
+                                                      day: 1))!
+        return date
+    }
+    
 }
 
 struct TimeFrameInfo : Codable {
     var Hour : HourTimeFrame?
     var Weekday : WeekdayTimeFrame?
-    var Date : DateTimeFrame?
+    var date : DateTimeFrame?
     var Month : MonthTimeFrame?
     
     init(Hour: HourTimeFrame? = nil, Weekday: WeekdayTimeFrame? = nil, Date: DateTimeFrame? = nil, Month: MonthTimeFrame? = nil) {
         self.Hour = Hour
         self.Weekday = Weekday
-        self.Date = Date
+        self.date = Date
         self.Month = Month
     }
     
+    // will always be called when it is currently before the starting time
+    func getStartingTime() -> Date {
+        var dateComponents = DateComponents()
+        dateComponents.year = Date().get(.year)
+        if Hour == nil {
+            dateComponents.hour = 1
+            dateComponents.minute = 0
+        } else {
+            dateComponents.hour = Hour?.timeStart.get(.hour)
+            dateComponents.minute = Hour?.timeStart.get(.minute)
+        }
+        let userCalendar = Calendar(identifier: .gregorian)
+        return userCalendar.date(from: dateComponents)!
+    }
     
+    func getMonthAndDay() -> [String : Int] {
+        // if no month is specified, use current month
+        var month = Month == nil ? Date().get(.month) : TimeFrame.getMonthIndex(month: Month!.timeStart)
+        let monthDate = MonthTimeFrame.getStartingMonth(month: month)
+        var dayOfMonth : Int = 0
+        if Weekday == nil && self.date == nil { // if no day/weekday specified, use current day
+            dayOfMonth = Date().get(.day)
+        }
+        else if self.date == nil {
+            // if only weekday specified, find the nearest date
+            let nextweekday = Weekday!.getNextWeekday(afterDate: monthDate)
+            // incase the nextweekday rolls over, use its new month and day
+            month = nextweekday.get(.month)
+            dayOfMonth = nextweekday.get(.day)
+        }
+        else if self.Weekday == nil { // if only date is specified
+            dayOfMonth = self.date!.timeStart
+        }
+        else { // both are available - find earliest date
+            let day = self.date!.timeStart
+            let nextweekday = Weekday!.getNextWeekday(afterDate: monthDate)
+            // if the next weekday rolls over to the next month, set the day to be the specified date
+            if nextweekday.get(.month) > month {
+                dayOfMonth = day
+            } else {
+                // if the next weekday is at the same month of the date, fin the earliest day
+                dayOfMonth = day < nextweekday.get(.day) ? day : nextweekday.get(.day)
+            }
+        }
+        return ["month": month, "day": dayOfMonth]
+    }
+    
+//    func getEndingTime() -> Date {
+//        var dateComponents = DateComponents()
+//        if Hour == nil {
+//            dateComponents.hour = 23
+//            dateComponents.minute = 59
+//        } else {
+//            dateComponents.hour = Hour?.timeStart.get(.hour)
+//            dateComponents.minute = Hour?.timeStart.get(.minute)
+//        }
+//
+//    }
 }
