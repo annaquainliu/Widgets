@@ -123,16 +123,22 @@ class DisplayDesktopWidgets: ObservableObject {
 //                RunLoop.main.add(timer, forMode: .common)
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
-//        var validTimeFrame = true
-//        var dateComponents = DateComponents()
-        // the time frame must be valid for all widgets
+        var validTimeFrame = true
+//        var startingDateComponents = DateComponents()
+//        var endingDateComponents = DateComponents()
+//         the time frame must be valid for all widgets
+        let timeFrames : [TimeFrameCodable?] = [widget.timeFrame.Date, widget.timeFrame.Hour, widget.timeFrame.Month, widget.timeFrame.Weekday]
+        for timeFrame in timeFrames {
+            if timeFrame != nil && !timeFrame!.nowWithinTimeRange() {
+                validTimeFrame = false
+                break
+            }
+        }
         
-//        if validTimeFrame {
-//            makeWindowController(widget: widget)
-            
-            // set timer for it to close
-//        } else {
-            // set timer to recursively call displayTimeFrameWidget
-//        }
+        if validTimeFrame {
+            makeWindowController(widget: widget)
+        } else {
+            print("invalid date")
+        }
     }
 }

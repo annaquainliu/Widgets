@@ -78,7 +78,7 @@ struct TimeFrame {
     static var month = "month" // e.g. between november and december, option to repeat every year
     static var measurements : [String] = [TimeFrame.hour, TimeFrame.dayOfTheWeek, TimeFrame.dayOfTheMonth, TimeFrame.month]
     static var months = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    static var weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    static var weekdays = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     
     static func getMonthIndex(month: String) -> Int {
         return TimeFrame.months.firstIndex(of: month)! + 1
@@ -89,28 +89,51 @@ struct TimeFrame {
     }
 }
 
-struct HourTimeFrame : Codable {
+protocol TimeFrameCodable : Codable {
+    func nowWithinTimeRange() -> Bool
+}
+
+struct HourTimeFrame : TimeFrameCodable {
     var selected : Bool = false
     var timeStart : Date = Date.now
     var timeEnd : Date = Date.now
+    
+    func nowWithinTimeRange() -> Bool {
+        return Date().get(.hour) >= timeStart.get(.hour) && Date().get(.hour) <= timeEnd.get(.hour)
+              && Date().get(.minute) >= timeStart.get(.minute)  && Date().get(.minute) <= timeEnd.get(.minute)
+    }
 }
 
-struct WeekdayTimeFrame : Codable {
+struct WeekdayTimeFrame : TimeFrameCodable {
     var selected : Bool = false
     var timeStart : String = TimeFrame.weekdays[0]
     var timeEnd : String = TimeFrame.weekdays[0]
+    
+    func nowWithinTimeRange() -> Bool {
+        return Date().get(.weekday) >= TimeFrame.getWeekdayIndex(weekday: timeStart)
+            && Date().get(.weekday) <= TimeFrame.getWeekdayIndex(weekday: timeEnd)
+    }
 }
 
-struct DateTimeFrame : Codable {
+struct DateTimeFrame : TimeFrameCodable {
     var selected : Bool = false
     var timeStart : Int = 0
     var timeEnd : Int = 0
+    
+    func nowWithinTimeRange() -> Bool {
+        return Date().get(.day) >= timeStart + 1 && Date().get(.day) <= timeEnd + 1
+    }
 }
 
-struct MonthTimeFrame : Codable {
+struct MonthTimeFrame : TimeFrameCodable {
     var selected : Bool = false
     var timeStart : String = TimeFrame.months[0]
     var timeEnd : String = TimeFrame.months[0]
+    
+    func nowWithinTimeRange() -> Bool {
+        return Date().get(.month) >= TimeFrame.getMonthIndex(month: timeStart)
+             && Date().get(.month) <= TimeFrame.getMonthIndex(month: timeEnd)
+    }
 }
 
 struct TimeFrameInfo : Codable {
@@ -125,20 +148,6 @@ struct TimeFrameInfo : Codable {
         self.Date = Date
         self.Month = Month
     }
-//
-//    func nowWithinTimeRange() -> Bool {
-//        switch type {
-//            case TimeFrame.hour:
-//                return Date().get(.hour) >= dateTimeStart.get(.hour) && Date().get(.hour) <= dateTimeEnd.get(.hour)
-//            case TimeFrame.dayOfTheWeek:
-//                return Date().get(.weekday) >= TimeFrame.getWeekdayIndex(weekday: stringTimeStart)
-//                        && Date().get(.weekday) <= TimeFrame.getWeekdayIndex(weekday: stringTimeEnd)
-//            case TimeFrame.dayOfTheMonth:
-//                return Date().get(.day) >= intTimeStart && Date().get(.day) <= intTimeEnd
-//            default:
-//                return Date().get(.month) >= TimeFrame.getMonthIndex(month: stringTimeStart)
-//                && Date().get(.month) <= TimeFrame.getMonthIndex(month: stringTimeEnd)
-//        }
-//    }
+    
     
 }
