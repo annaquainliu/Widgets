@@ -61,4 +61,13 @@ extension Date {
     func get(_ component: Calendar.Component, calendar: Calendar = Calendar.current) -> Int {
         return calendar.component(component, from: self)
     }
+    func startOfMonth(month: Int) -> Date {
+        var comp = Calendar.current.dateComponents([.year], from: Calendar.current.startOfDay(for: self))
+        comp.month = month
+        return Calendar.current.date(from: comp)!
+    }
+    
+    func endOfMonth(month: Int) -> Date {
+        return Calendar.current.date(byAdding: DateComponents(month: month, day: -1), to: self.startOfMonth(month: month))!
+    }
 }
