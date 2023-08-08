@@ -130,6 +130,13 @@ struct WeekdayTimeFrame : TimeFrameCodable {
         comps.weekday = TimeFrame.getWeekdayIndex(weekday: timeStart)
         return cal.nextDate(after: afterDate, matching: comps, matchingPolicy: .nextTimePreservingSmallerComponents)!
     }
+    
+    func getNextEndWeekday() -> Date {
+        let cal = Calendar.current
+        var comps = DateComponents()
+        comps.weekday = TimeFrame.getWeekdayIndex(weekday: timeEnd)
+        return cal.nextDate(after: Date(), matching: comps, matchingPolicy: .nextTimePreservingSmallerComponents)!
+    }
 }
 
 struct DateTimeFrame : TimeFrameCodable {
@@ -170,6 +177,14 @@ struct TimeFrameInfo : Codable {
     func getStartingTime() -> Date {
         var dateComponents = DateComponents()
         var startHour: Int; var startMinute: Int
+        // if no hour specified, start in the beginning
+        if Hour == nil {
+            startHour = 0
+            startMinute = 0
+        } else {
+            startHour = Hour!.timeStart.get(.hour)
+            startMinute = Hour!.timeStart.get(.minute)
+        }
         // if the start month is not specified, use current month
         let startMonth = Month == nil ? Date().get(.month) : TimeFrame.getMonthIndex(month: Month!.timeStart)
         // if the startMonth is less than the current month, increase year by 1
@@ -184,18 +199,10 @@ struct TimeFrameInfo : Codable {
             if date.get(.weekday) != TimeFrame.getWeekdayIndex(weekday: Weekday!.timeStart) {
                 let nextWeekdayDate = Weekday!.getNextStartWeekday(afterDate: date)
                 // only override the date if the nextweekdate is on the same month as the start date
-                if nextWeekdayDate.get(.month) <= startMonth {
+                if nextWeekdayDate.get(.month) == startMonth {
                     startDate = nextWeekdayDate.get(.day)
                 }
             }
-        }
-        // if no hour specified, start in the beginning
-        if Hour == nil {
-            startHour = 0
-            startMinute = 0
-        } else {
-            startHour = Hour!.timeStart.get(.hour)
-            startMinute = Hour!.timeStart.get(.minute)
         }
         dateComponents.year = startYear
         dateComponents.month = startMonth
@@ -206,8 +213,41 @@ struct TimeFrameInfo : Codable {
         return userCalendar.date(from: dateComponents)!
     }
     
+    // Invariant : Will be called inside of range
     func getEndingTime() -> Date {
-        
+        var dateComponents = DateComponents()
+        var endHour: Int; var endMinute: Int
+        if Hour == nil {
+            endHour = 24
+            endMinute = 0
+        } else {
+            endHour = Hour!.timeEnd.get(.hour)
+            endMinute = Hour!.timeEnd.get(.minute)
+        }
+        // if the start month is not specified, use current month
+        let endMonth = Month == nil ? Date().get(.month) : TimeFrame.getMonthIndex(month: Month!.timeEnd)
+        let endYear = endMonth < Date().get(.month) ? Date().get(.year) + 1 : Date().get(.year)
+        // if the date isn't specified, use the last day
+        var endDate = date == nil ? Date().endOfMonth(month: endMonth).get(.day) : date!.timeEnd
+        if Weekday != nil {
+            // make the date of the current start year, month, and date
+            let date = TimeFrame.makeDate(year: endYear, month: endMonth, day: endDate)
+            // if the weekday doesn't match, find the nearest weekday
+            if date.get(.weekday) != TimeFrame.getWeekdayIndex(weekday: Weekday!.timeEnd) {
+                let nextWeekdayDate = Weekday!.getNextEndWeekday()
+                // only override the date if the nextweekdate is before the end
+                if nextWeekdayDate <= date {
+                    endDate = nextWeekdayDate.get(.day)
+                }
+            }
+        }
+        dateComponents.year = endYear
+        dateComponents.month = endMonth
+        dateComponents.day = endDate
+        dateComponents.hour = endHour
+        dateComponents.minute = endMinute
+        let userCalendar = Calendar(identifier: .gregorian)
+        return userCalendar.date(from: dateComponents)!
     }
     
 }
