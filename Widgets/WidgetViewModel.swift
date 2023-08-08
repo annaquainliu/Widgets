@@ -91,13 +91,15 @@ class DisplayDesktopWidgets: ObservableObject {
     }
     
     @objc private func removeWidgetSelector(sender: Timer) {
-        let id = (sender.userInfo as? UUID)!
-        removeWidget(id: id)
+        let widget = (sender.userInfo as? WidgetInfo)!
+        removeWidget(id: widget.getID())
+        displayWidget(widget: widget) //sets the timer again
     }
     
     @objc private func makeWindowControllerSelector(sender: Timer) {
         let widget = (sender.userInfo as? WidgetInfo)!
         makeWindowController(widget: widget)
+        displayWidget(widget: widget)
     }
     
     private func makeWindowController(widget: WidgetInfo) {
@@ -109,18 +111,8 @@ class DisplayDesktopWidgets: ObservableObject {
     private func removeWidget(id: UUID) {
         let controller = self.currentWidgets[id]!
         controller.window?.close()
-        Task {
-            await store!.deleteWidget(id: id)
-        }
         self.currentWidgets.removeValue(forKey: id)
     }
-// let timer = Timer(fireAt: widget.timeFrame.timeRange[1],
-//                                  interval: 0,
-//                                  target: self,
-//                                  selector: #selector(removeWidgetSelector(sender:)),
-//                                  userInfo: widget.getID(),
-//                                  repeats: false)
-//                RunLoop.main.add(timer, forMode: .common)
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
         var validTimeFrame = true
@@ -134,8 +126,21 @@ class DisplayDesktopWidgets: ObservableObject {
         }
         if validTimeFrame {
             makeWindowController(widget: widget)
+            let timer = Timer(fireAt: widget.timeFrame.getEndingTime(),
+                              interval: 0,
+                              target: self,
+                              selector: #selector(removeWidgetSelector(sender:)),
+                              userInfo: widget,
+                              repeats: false)
+            RunLoop.main.add(timer, forMode: .common)
         } else {
-            print("invalid date")
+            let timer = Timer(fireAt: widget.timeFrame.getStartingTime(),
+                              interval: 0,
+                              target: self,
+                              selector: #selector(makeWindowControllerSelector(sender:)),
+                              userInfo: widget,
+                              repeats: false)
+            RunLoop.main.add(timer, forMode: .common)
         }
     }
 }
