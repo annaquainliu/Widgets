@@ -10,7 +10,7 @@ import SwiftUI
 
 struct WidgetMenu : View {
     @State private var triggerSelection = Triggers.always
-    @State var weatherSelection =  WeatherOptionInfo(title: WeatherOptionInfo.sunny, systemImage: "sun.min.fill")
+    @State var weatherSelection =  WeatherOptionInfo(title: WeatherTrigger.sunny, systemImage: "sun.min.fill")
     @State private var alertInstructions = false
     @State var timeFrameSelection = Set<String>()
     @State var hourSelection = HourTimeFrame()
@@ -31,9 +31,7 @@ struct WidgetMenu : View {
             }
             print(timeFrameSelection)
         } label: {
-            if selected.wrappedValue {
-                Image(systemName: "checkmark.square")
-            }
+            Image(systemName: selected.wrappedValue ? "checkmark.square" : "square")
         }
     }
     

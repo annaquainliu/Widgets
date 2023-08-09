@@ -91,18 +91,19 @@ class DisplayDesktopWidgets: ObservableObject {
     }
     
     @objc private func removeWidgetSelector(sender: Timer) {
+        print("removing widget, now date is: \(Date.now)")
         let widget = (sender.userInfo as? WidgetInfo)!
         removeWidget(id: widget.getID())
         displayWidget(widget: widget) //sets the timer again
     }
     
-    @objc private func makeWindowControllerSelector(sender: Timer) {
+    @objc private func displayWidgetSelector(sender: Timer) {
         let widget = (sender.userInfo as? WidgetInfo)!
-        makeWindowController(widget: widget)
         displayWidget(widget: widget)
     }
     
     private func makeWindowController(widget: WidgetInfo) {
+        print("making controller")
         let controller = ScreenWindowController(window: DesktopWidgetWindow(widgetInfo: widget))
         self.currentWidgets[widget.getID()] = controller
     }
@@ -126,7 +127,9 @@ class DisplayDesktopWidgets: ObservableObject {
         }
         if validTimeFrame {
             makeWindowController(widget: widget)
-            let timer = Timer(fireAt: widget.timeFrame.getEndingTime(),
+            let endingDate = widget.timeFrame.getEndingTime()
+            print("ending date is: \(endingDate)")
+            let timer = Timer(fireAt: endingDate,
                               interval: 0,
                               target: self,
                               selector: #selector(removeWidgetSelector(sender:)),
@@ -134,13 +137,15 @@ class DisplayDesktopWidgets: ObservableObject {
                               repeats: false)
             RunLoop.main.add(timer, forMode: .common)
         } else {
-            let timer = Timer(fireAt: widget.timeFrame.getStartingTime(),
-                              interval: 0,
-                              target: self,
-                              selector: #selector(makeWindowControllerSelector(sender:)),
-                              userInfo: widget,
-                              repeats: false)
-            RunLoop.main.add(timer, forMode: .common)
+            let startingDate = widget.timeFrame.getStartingTime()
+            print("starting date is: \(startingDate)")
+//            let timer = Timer(fireAt: startingDate,
+//                              interval: 0,
+//                              target: self,
+//                              selector: #selector(displayWidgetSelector(sender:)),
+//                              userInfo: widget,
+//                              repeats: false)
+//            RunLoop.main.add(timer, forMode: .common)
         }
     }
 }
