@@ -345,15 +345,18 @@ struct TimeFrameInfo : Codable {
                                                        day: endDate, hour: endHour,
                                                        minute: endMinute)
                 let desiredWeekday = TimeFrame.getWeekdayIndex(weekday: Weekday!.timeEnd)
-                // if weekday doesn't match
-                if potentialDate.get(.weekday) != desiredWeekday {
-                    let nextWeekdayDate = Weekday!.getNextEndWeekday()
-                    // only override the date if the nextweekdate is before the end
-                    if (date == nil && nextWeekdayDate.get(.month) <= endMonth)
-                        || nextWeekdayDate <= potentialDate {
-                        endDate = nextWeekdayDate.get(.day)
-                    }
+                var nextWeekdayDate = Weekday!.getNextEndWeekday()
+                // to make sure if the next weekend actually refers to today
+                if currentDate.get(.weekday) == desiredWeekday {
+                    nextWeekdayDate = currentDate
                 }
+                print("next weekday date is: \(nextWeekdayDate)")
+                // only override the date if the nextweekdate is before the end
+                if (date == nil && nextWeekdayDate.get(.month) <= endMonth)
+                    || nextWeekdayDate <= potentialDate {
+                    endDate = nextWeekdayDate.get(.day)
+                }
+                
             }
         } else {
             endHour = Hour!.timeEnd.get(.hour)
