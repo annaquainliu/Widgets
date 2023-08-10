@@ -154,17 +154,17 @@ struct WeekdayTimeFrame : TimeFrameCodable {
     var timeEnd : String = TimeFrame.weekdays[0]
     
     // how about from between saturday (7) and tuesday (3)
-    // the range would be [7, 1, 2, 3] - split into two ranges
-    // 7, 8, 9, 10
+    // the range would be [6, 7, 1, 2, 3]
+    // 6, 7, 8, 9, 10
     // add 7 to the index and see if it falls into the range
     func nowWithinTimeRange() -> Bool {
         let now = Date()
-        var startingIndex = TimeFrame.getWeekdayIndex(weekday: timeStart)
-        var endingIndex = TimeFrame.getWeekdayIndex(weekday: timeEnd)
+        let startingIndex = TimeFrame.getWeekdayIndex(weekday: timeStart)
+        let endingIndex = TimeFrame.getWeekdayIndex(weekday: timeEnd)
         let currentWeekday = now.get(.weekday)
         if startingIndex > endingIndex {
             let compareIndex = currentWeekday + 7
-            let highEnd = startingIndex + endingIndex
+            let highEnd = startingIndex + (7 - startingIndex) + endingIndex
             return compareIndex >= startingIndex && compareIndex <= highEnd
         } else {
             return currentWeekday >= startingIndex && currentWeekday <= endingIndex
@@ -219,17 +219,48 @@ struct TimeFrameInfo : Codable {
         self.date = Date
         self.Month = Month
     }
+    // invariant for everything: EVERYTHING must repeat if selected!!
     
-    // Invariant: Will be called outside of range
+    // Invariant: Will be called outside of range (before or after)
     func getStartingTime() -> Date {
         var dateComponents = DateComponents()
-        var startHour: Int; var startMinute: Int
-        // if no hour specified, start in the beginning
-        // if the start month is not specified, use current month
-        let startMonth = Month == nil ? Date().get(.month) : TimeFrame.getMonthIndex(month: Month!.timeStart)
+        var startHour: Int; var startMinute: Int; var startDate : Int; var startMonth: Int
+        // if month is not specified
+        if Month == nil {
+            startMonth = Date().get(.month)
+            if date == nil {
+                startDate = Date().get(.day)
+            }
+            else {
+                let currentDay = Date().get(.day)
+                // if date is specified, check if the current day is after the date
+                if currentDay > date!.timeEnd {
+                    startMonth += 1 // increase month because it's after time range
+                    startDate = date!.timeStart
+                }
+                else {
+                    startDate = currentDay < date!.timeStart ? date!.timeStart : currentDay
+                }
+            }
+        } else {
+            // if month is specified
+            let currMonth = Date().get(.month)
+            if Month!.nowWithinTimeRange() {
+                startMonth = currMonth
+                // if the date is not specified, use current day, e
+                if date == nil {
+                    startDate = Date().get(.day)
+                } else {
+                    startDate = date!.nowWithinTimeRange() ? Date().get(.day) : date!.timeStart
+                }
+            }
+            else { // if the month is not within time range
+                startMonth = TimeFrame.getMonthIndex(month: Month!.timeStart)
+                startDate = date == nil ? 1 : date!.timeStart
+            }
+        }
         // if the startMonth is less than the current month, increase year by 1
         let startYear = startMonth < Date().get(.month) ? Date().get(.year) + 1 : Date().get(.year)
-        var startDate : Int
         if Hour == nil {
             startHour = 0
             startMinute = 0
@@ -237,31 +268,25 @@ struct TimeFrameInfo : Codable {
             startHour = Hour!.timeStart.get(.hour)
             startMinute = Hour!.timeStart.get(.minute)
         }
-        if date == nil {
-            // if the date isn't specified && it is the start month, then use today
-            if startMonth == Date().get(.month) {
-                startDate = Date().get(.day)
-            } else {
-                // if the date isn't specified && it is NOT the start month, then use 1
-                startDate = 1
-            }
-        } else {
-            startDate = date!.timeStart
-        }
         // if weekday is null, the start day would already be set, otherwise, override
         if Weekday != nil {
-            // make the date of the current start year, month, and date
             let current = Date()
+            // make the date of the current start year, month, and date
             let potentialDate = TimeFrame.makeDate(year: startYear, month: startMonth,
                                                    day: startDate, hour: startHour,
                                                    minute: startMinute)
-            let desiredWeekday = TimeFrame.getWeekdayIndex(weekday: Weekday!.timeStart)
-            // only override if it is currently after time range, NOT before **OR** if weekdays don't match
-            if current > potentialDate || potentialDate.get(.weekday) != desiredWeekday {
+            // if it is out of range
+            if (current > potentialDate &&
+                current.get(.weekday) == TimeFrame.getWeekdayIndex(weekday: Weekday!.timeEnd))
+                || !Weekday!.nowWithinTimeRange() {
+                
                 let nextWeekdayDate = Weekday!.getNextStartWeekday(afterDate: potentialDate)
+                // Note: The start date might be outside the time range,
+                // but the timer verification takes care of this
                 startDate = nextWeekdayDate.get(.day)
             }
         }
+        // if the hour is specified, and the current date is in the past, increase day by 1
         if Hour != nil && Hour!.startTimeIsBeforeNow() &&
             TimeFrame.eqDayMonthYear(year: startYear, month: startMonth, day: startDate) {
             startDate += 1
@@ -271,6 +296,7 @@ struct TimeFrameInfo : Codable {
         dateComponents.day = startDate
         dateComponents.hour = startHour
         dateComponents.minute = startMinute
+        print("starting UTC date is: \(startMonth)/\(startDate)/\(startYear), Time: \(startHour):\(startMinute)")
         let userCalendar = Calendar(identifier: .gregorian)
         return userCalendar.date(from: dateComponents)!
     }
@@ -282,46 +308,39 @@ struct TimeFrameInfo : Codable {
         // if the start month is not specified, use current month
         let endMonth = Month == nil ? Date().get(.month) : TimeFrame.getMonthIndex(month: Month!.timeEnd)
         let endYear = endMonth < Date().get(.month) ? Date().get(.year) + 1 : Date().get(.year)
-        // if the date isn't specified, use today
         var endDate : Int
+        // if hour is specified, day must repeat
         if Hour == nil {
-            endHour = 24
-            endMinute = 0
+            endHour = 23
+            endMinute = 59
+            endDate = date == nil ? Date().endOfMonth(month: endMonth).get(.day) : date!.timeEnd
+            if Weekday != nil {
+                // make the date of the current start year, month, and date
+                let potentialDate = TimeFrame.makeDate(year: endYear, month: endMonth,
+                                                       day: endDate, hour: endHour,
+                                                       minute: endMinute)
+                let desiredWeekday = TimeFrame.getWeekdayIndex(weekday: Weekday!.timeEnd)
+                // if weekday doesn't match
+                if potentialDate.get(.weekday) != desiredWeekday {
+                    let nextWeekdayDate = Weekday!.getNextEndWeekday()
+                    // only override the date if the nextweekdate is before the end
+                    if (date == nil && nextWeekdayDate.get(.month) <= endMonth)
+                        || nextWeekdayDate <= potentialDate {
+                        endDate = nextWeekdayDate.get(.day)
+                    }
+                }
+            }
         } else {
             endHour = Hour!.timeEnd.get(.hour)
             endMinute = Hour!.timeEnd.get(.minute)
-        }
-        if date == nil {
-            // if the date isn't specified && it is the end month, then use today
-            if endMonth == Date().get(.month) {
-                endDate = Date().get(.day)
-            } else {
-                // if the date isn't specified && it is NOT the end month, then use last day of month
-                endDate = Date().endOfMonth(month: endMonth).get(.day)
-            }
-        } else {
-            endDate = date!.timeEnd
-        }
-        if Weekday != nil {
-            // make the date of the current start year, month, and date
-            let potentialDate = TimeFrame.makeDate(year: endYear, month: endMonth,
-                                                   day: endDate, hour: endHour,
-                                                   minute: endMinute)
-            let desiredWeekday = TimeFrame.getWeekdayIndex(weekday: Weekday!.timeEnd)
-            // if weekday doesn't match
-            if potentialDate.get(.weekday) != desiredWeekday {
-                let nextWeekdayDate = Weekday!.getNextEndWeekday()
-                // only override the date if the nextweekdate is before the end
-                if date == nil || nextWeekdayDate <= potentialDate {
-                    endDate = nextWeekdayDate.get(.day)
-                }
-            }
+            endDate = Date().get(.day)
         }
         dateComponents.year = endYear
         dateComponents.month = endMonth
         dateComponents.day = endDate
         dateComponents.hour = endHour
         dateComponents.minute = endMinute + 1
+        print("ending UTC date is: \(endMonth)/\(endDate)/\(endYear), Time: \(endHour):\(endMinute)")
         let userCalendar = Calendar(identifier: .gregorian)
         return userCalendar.date(from: dateComponents)!
     }
