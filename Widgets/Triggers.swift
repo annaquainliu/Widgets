@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import CoreLocation
 
 struct WeatherOptionInfo : Hashable {
     var title : String;
@@ -34,6 +35,68 @@ struct WeatherTrigger {
         WeatherOptionInfo(title: WeatherTrigger.snowing, systemImage: "cloud.snow.fill"),
         WeatherOptionInfo(title: WeatherTrigger.thunder, systemImage: "cloud.bolt.rain")]
 }
+
+class WeatherManager {
+    private var apiKey = "4Q2MZ44JDQAXYD4G5EC34SUG6"
+    var displayWidget : ((WidgetInfo) -> ())?
+    var removeWidget : ((UUID) -> ())?
+    
+    init(displayWidget: ((WidgetInfo) -> ())? = nil, removeWidget: ((UUID) -> ())? = nil) {
+        self.displayWidget = displayWidget
+        self.removeWidget = removeWidget
+    }
+    
+    func fetchWeather(location: CLLocation)  {
+        let longitude = location.coordinate.longitude
+        let latitude = location.coordinate.latitude
+        let current = Date()
+        let date = "\(current.get(.year))-\(current.get(.month))-\(current.get(.day))"
+        let url = URL(string: "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/\(latitude),\(longitude)/\(date)?key=\(apiKey)")!
+        print(url)
+        Task {
+            do {
+                let (data, _) = try await URLSession.shared.data(from: url)
+                print(data)
+                let decoded = try JSONDecoder().decode(WeatherApi.self, from: data)
+                let currentConditions = decoded.currentConditions
+                if currentConditions != nil {
+                    print(currentConditions!)
+                }
+            } catch {
+                print(String(describing: error))
+            }
+        }
+    }
+}
+
+class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+    private let manager = CLLocationManager()
+    var lastKnownLocation: CLLocation?
+    var weatherManager : WeatherManager?
+    var startedUpdating : Bool = false
+    
+    func startUpdating() {
+        manager.delegate = self
+        manager.requestWhenInUseAuthorization()
+        manager.startUpdatingLocation()
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        startedUpdating = true
+        print(locations)
+        lastKnownLocation = locations.last
+        if weatherManager != nil {
+            weatherManager?.fetchWeather(location: lastKnownLocation!)
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorized {
+            manager.startUpdatingLocation()
+        }
+    }
+}
+
 
 struct Triggers {
     

@@ -65,12 +65,14 @@ class DisplayDesktopWidgets: ObservableObject {
     
     var store : WidgetStore?
     private var currentWidgets : [UUID : ScreenWindowController]
-//    private var locationManager = LocationManager()
+    private var locationManager = LocationManager()
+    private var weatherManager = WeatherManager()
     
     init() {
         self.store = nil
         self.currentWidgets = [:]
-//        locationManager.startUpdating()
+        weatherManager.displayWidget = makeWindowController(widget:)
+        weatherManager.removeWidget = removeWidget(id:)
     }
     
     func loadWidgets() {
@@ -85,6 +87,10 @@ class DisplayDesktopWidgets: ObservableObject {
                 makeWindowController(widget: widget)
             case Triggers.timeFrame:
                 displayTimeFrameWidget(widget: widget)
+            case Triggers.loc:
+                displayLocationWidget(widget: widget)
+            case Triggers.weather:
+                displayWeatherWidget(widget: widget)
             default:
                 print("default")
         }
@@ -110,9 +116,29 @@ class DisplayDesktopWidgets: ObservableObject {
     
     // removes widget from storage and from desktop
     private func removeWidget(id: UUID) {
+        if self.currentWidgets[id] == nil {
+            return
+        }
         let controller = self.currentWidgets[id]!
         controller.window?.close()
         self.currentWidgets.removeValue(forKey: id)
+    }
+    
+    private func displayLocationWidget(widget: WidgetInfo) {
+        if !locationManager.startedUpdating {
+            locationManager.startUpdating()
+        }
+    }
+    
+    private func displayWeatherWidget(widget: WidgetInfo) {
+        if locationManager.weatherManager == nil {
+            locationManager.weatherManager = weatherManager
+        }
+        if locationManager.startedUpdating {
+            weatherManager.fetchWeather(location: locationManager.lastKnownLocation!)
+        } else {
+            locationManager.startUpdating()
+        }
     }
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
@@ -129,23 +155,29 @@ class DisplayDesktopWidgets: ObservableObject {
             makeWindowController(widget: widget)
             let endingDate = widget.timeFrame.getEndingTime()
             print("ending date is: \(endingDate)")
-            let timer = Timer(fireAt: endingDate,
-                              interval: 0,
-                              target: self,
-                              selector: #selector(removeWidgetSelector(sender:)),
-                              userInfo: widget,
-                              repeats: false)
-            RunLoop.main.add(timer, forMode: .common)
+            let diffs = Calendar.current.dateComponents([.day], from: Date(), to: endingDate)
+            if diffs.day! <= 5 {
+                let timer = Timer(fireAt: endingDate,
+                                  interval: 0,
+                                  target: self,
+                                  selector: #selector(removeWidgetSelector(sender:)),
+                                  userInfo: widget,
+                                  repeats: false)
+                RunLoop.main.add(timer, forMode: .common)
+            }
         } else {
             let startingDate = widget.timeFrame.getStartingTime()
+            let diffs = Calendar.current.dateComponents([.day], from: Date(), to: startingDate)
             print("starting date is: \(startingDate)")
-//            let timer = Timer(fireAt: startingDate,
-//                              interval: 0,
-//                              target: self,
-//                              selector: #selector(displayWidgetSelector(sender:)),
-//                              userInfo: widget,
-//                              repeats: false)
-//            RunLoop.main.add(timer, forMode: .common)
+            if diffs.day! <= 5 {
+                let timer = Timer(fireAt: startingDate,
+                                  interval: 0,
+                                  target: self,
+                                  selector: #selector(displayWidgetSelector(sender:)),
+                                  userInfo: widget,
+                                  repeats: false)
+                RunLoop.main.add(timer, forMode: .common)
+            }
         }
     }
 }

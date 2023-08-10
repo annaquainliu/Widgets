@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305EC7F02A772527009A24F8 /* NSWindow.swift */; };
 		305EC7F52A77364A009A24F8 /* autumn_leaf.png in Resources */ = {isa = PBXBuildFile; fileRef = 305EC7F42A77364A009A24F8 /* autumn_leaf.png */; };
-		30AEC6162A7F486700592B7C /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AEC6152A7F486700592B7C /* LocationManager.swift */; };
+		306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FAA542A8574760097CE04 /* WeatherAPI.swift */; };
 		30B14F332A73777F007A1672 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B14F322A73777F007A1672 /* Utilities.swift */; };
 		30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */; };
 		30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */; };
@@ -60,7 +60,7 @@
 /* Begin PBXFileReference section */
 		305EC7F02A772527009A24F8 /* NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
 		305EC7F42A77364A009A24F8 /* autumn_leaf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = autumn_leaf.png; path = ../../../personalCS/desktop/images/autumn_leaf.png; sourceTree = "<group>"; };
-		30AEC6152A7F486700592B7C /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		306FAA542A8574760097CE04 /* WeatherAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAPI.swift; sourceTree = "<group>"; };
 		30B14F322A73777F007A1672 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetViewModel.swift; sourceTree = "<group>"; };
 		30B79BBD2A771BF0002C79E7 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -129,7 +129,6 @@
 		30BDD91B2A71CD2D007E5F3B = {
 			isa = PBXGroup;
 			children = (
-				30AEC6152A7F486700592B7C /* LocationManager.swift */,
 				305EC7F32A7735FF009A24F8 /* Images */,
 				30BDD9262A71CD2D007E5F3B /* Widgets */,
 				30BDD9382A71CD2E007E5F3B /* WidgetsTests */,
@@ -164,6 +163,7 @@
 				30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */,
 				305EC7F02A772527009A24F8 /* NSWindow.swift */,
 				30CD4C6B2A79D74B008B830B /* WidgetStore.swift */,
+				306FAA542A8574760097CE04 /* WeatherAPI.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -334,12 +334,12 @@
 			files = (
 				30CD4C6C2A79D74B008B830B /* WidgetStore.swift in Sources */,
 				30F4E6D02A76035700EBA9CD /* WidgetMenu.swift in Sources */,
-				30AEC6162A7F486700592B7C /* LocationManager.swift in Sources */,
 				30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */,
 				305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */,
 				30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */,
 				30B14F332A73777F007A1672 /* Utilities.swift in Sources */,
 				30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */,
+				306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */,
 				30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */,
 				30F4E6CE2A75BD0700EBA9CD /* Triggers.swift in Sources */,
 			);
