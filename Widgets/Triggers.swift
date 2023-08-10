@@ -124,9 +124,16 @@ struct HourTimeFrame : TimeFrameCodable {
     
     func nowWithinTimeRange() -> Bool {
         let current = Date()
-        print("hour time start: \(timeStart), hour time end: \(timeEnd)")
-        return current.get(.hour) >= timeStart.get(.hour) && current.get(.hour) <= timeEnd.get(.hour)
-              && current.get(.minute) >= timeStart.get(.minute) && current.get(.minute) <= timeEnd.get(.minute)
+        let timeStartDate = TimeFrame.makeDate(year: current.get(.year), month: current.get(.month),
+                                               day: current.get(.day), hour: timeStart.get(.hour),
+                                               minute: timeStart.get(.minute))
+        var timeEndDate = TimeFrame.makeDate(year: current.get(.year), month: current.get(.month),
+                                             day: current.get(.day), hour: timeEnd.get(.hour),
+                                             minute: timeEnd.get(.minute))
+        if timeEndDate < timeStartDate {
+            timeEndDate = Calendar.current.date(byAdding: .day, value: 1, to: timeEndDate)!
+        }
+        return (timeStartDate...timeEndDate).contains(current)
     }
     // Note: We do not just compare the dates here because this excludes second difference
     func startTimeIsBeforeNow() -> Bool {
@@ -294,9 +301,11 @@ struct TimeFrameInfo : Codable {
                 startDate = nextWeekdayDate.get(.day)
             }
         }
-        // if the hour is specified, and the current date is in the past, increase day by 1
-        if Hour != nil && Hour!.startTimeIsBeforeNow() &&
-            TimeFrame.eqDayMonthYear(year: startYear, month: startMonth, day: startDate) {
+        let futureDate = TimeFrame.makeDate(year: startYear, month: startMonth,
+                                               day: startDate, hour: startHour,
+                                               minute: startMinute)
+        // if the future date is in the past, it is referring to tomorrow
+        if futureDate < currentDate {
             startDate += 1
         }
         dateComponents.year = startYear
@@ -350,6 +359,13 @@ struct TimeFrameInfo : Codable {
             endHour = Hour!.timeEnd.get(.hour)
             endMinute = Hour!.timeEnd.get(.minute)
             endDate = currentDate.get(.day)
+        }
+        let futureDate = TimeFrame.makeDate(year: endYear, month: endMonth,
+                                               day: endDate, hour: endHour,
+                                               minute: endMinute)
+        // if the future date is in the past, it is referring to tomorrow
+        if futureDate < currentDate {
+            endDate += 1
         }
         dateComponents.year = endYear
         dateComponents.month = endMonth

@@ -69,6 +69,7 @@ struct WidgetMenu : View {
                         view: HStack {
                             TriggerCategoryText(text: "Time Frame")
                             List {
+                                Text("Note: All selected time frames will repeat. *E.g.: 10:40AM-2PM will repeat every day*")
                                 HStack {
                                     makeToggle(selected: $hourSelection.selected, tag: TimeFrame.hour)
                                     HStack {
