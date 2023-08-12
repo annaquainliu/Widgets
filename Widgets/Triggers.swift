@@ -37,43 +37,60 @@ struct WeatherTrigger {
 }
 
 class WeatherManager {
-    private var apiKey = "4Q2MZ44JDQAXYD4G5EC34SUG6"
-    var displayWidget : ((WidgetInfo) -> ())?
-    var removeWidget : ((UUID) -> ())?
+    static var apiKey = "4Q2MZ44JDQAXYD4G5EC34SUG6"
+    static var currentConditions : CurrentConditions? = nil
     
-    init(displayWidget: ((WidgetInfo) -> ())? = nil, removeWidget: ((UUID) -> ())? = nil) {
-        self.displayWidget = displayWidget
-        self.removeWidget = removeWidget
-    }
-    
-    func fetchWeather(location: CLLocation)  {
+    static func fetchWeather() async {
+        if LocationManager.lastKnownLocation == nil {
+            print("location manager last known location is null")
+            return
+        }
+        let location = LocationManager.lastKnownLocation!
         let longitude = location.coordinate.longitude
         let latitude = location.coordinate.latitude
         let current = Date()
         let date = "\(current.get(.year))-\(current.get(.month))-\(current.get(.day))"
         let url = URL(string: "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/\(latitude),\(longitude)/\(date)?key=\(apiKey)")!
-        print(url)
-        Task {
-            do {
-                let (data, _) = try await URLSession.shared.data(from: url)
-                print(data)
-                let decoded = try JSONDecoder().decode(WeatherApi.self, from: data)
-                let currentConditions = decoded.currentConditions
-                if currentConditions != nil {
-                    print(currentConditions!)
-                }
-            } catch {
-                print(String(describing: error))
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decoded = try JSONDecoder().decode(WeatherApi.self, from: data)
+            let currentConditions = decoded.currentConditions
+            WeatherManager.currentConditions = currentConditions
+            print(currentConditions as Any)
+        } catch {
+            fatalError(error.localizedDescription)
+        }
+    }
+    
+    static func shouldWidgetBeOn(widget: WidgetInfo) -> Bool {
+        if WeatherManager.currentConditions == nil {
+            print("called shouldWidgetBeOn when current conditions is nil error")
+            return false
+        }
+        let weatherType = widget.weather
+        if WeatherManager.currentConditions!.precipprob > 0.2 {
+            if weatherType == WeatherTrigger.snowing {
+                return WeatherManager.currentConditions?.preciptype == "snow"
             }
+            else if weatherType == WeatherTrigger.raining {
+                return WeatherManager.currentConditions?.preciptype == "rain"
+            }
+        }
+        switch weatherType {
+            case WeatherTrigger.cloudy:
+                return WeatherManager.currentConditions!.cloudcover > 0.4
+            case WeatherTrigger.windy:
+                return WeatherManager.currentConditions!.windspeed > 20
+            default:
+                return WeatherManager.currentConditions!.solarradiation > 35
         }
     }
 }
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
-    var lastKnownLocation: CLLocation?
-    var weatherManager : WeatherManager?
-    var startedUpdating : Bool = false
+    static var lastKnownLocation: CLLocation? = nil
+    var displayDesktopWidgets : DisplayDesktopWidgets?
     
     func startUpdating() {
         manager.delegate = self
@@ -82,17 +99,15 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        startedUpdating = true
-        print(locations)
-        lastKnownLocation = locations.last
-        if weatherManager != nil {
-            weatherManager?.fetchWeather(location: lastKnownLocation!)
-        }
+        LocationManager.lastKnownLocation = locations.last
+        displayDesktopWidgets?.loadWidgets()
     }
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorized {
             manager.startUpdatingLocation()
+        } else {
+            displayDesktopWidgets?.loadWidgets()
         }
     }
 }

@@ -12,15 +12,17 @@ struct WidgetsApp: App {
     
     @StateObject var store = WidgetStore()
     @StateObject var displayDesktopWidget = DisplayDesktopWidgets()
+    var locationManager = LocationManager()
     
     var body: some Scene {
         WindowGroup {
             ContentView().task {
                 do {
-                    try await store.save(newWidgets: []) // COMMENT THIS OUT!
+//                    try await store.save(newWidgets: []) // COMMENT THIS OUT!
                     try await store.load()
                     displayDesktopWidget.store = store
-                    displayDesktopWidget.loadWidgets()
+                    locationManager.displayDesktopWidgets = displayDesktopWidget
+                    locationManager.startUpdating()
                 } catch {
                     fatalError(error.localizedDescription)
                 }

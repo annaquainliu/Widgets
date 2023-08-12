@@ -65,23 +65,25 @@ class DisplayDesktopWidgets: ObservableObject {
     
     var store : WidgetStore?
     private var currentWidgets : [UUID : ScreenWindowController]
-    private var locationManager = LocationManager()
-    private var weatherManager = WeatherManager()
     
     init() {
         self.store = nil
         self.currentWidgets = [:]
-        weatherManager.displayWidget = makeWindowController(widget:)
-        weatherManager.removeWidget = removeWidget(id:)
     }
     
     func loadWidgets() {
+        if store == nil {
+            return
+        }
         for widget in store!.widgets {
             displayWidget(widget: widget)
         }
     }
     
     func displayWidget(widget: WidgetInfo) {
+        Task {
+            await WeatherManager.fetchWeather()
+        }
         switch widget.triggerType {
             case Triggers.always:
                 makeWindowController(widget: widget)
@@ -125,20 +127,30 @@ class DisplayDesktopWidgets: ObservableObject {
     }
     
     private func displayLocationWidget(widget: WidgetInfo) {
-        if !locationManager.startedUpdating {
-            locationManager.startUpdating()
+        if LocationManager.lastKnownLocation == nil {
+           print("User denied location")
+           return
         }
+        
     }
     
     private func displayWeatherWidget(widget: WidgetInfo) {
-        if locationManager.weatherManager == nil {
-            locationManager.weatherManager = weatherManager
+        if LocationManager.lastKnownLocation == nil {
+           print("User denied location")
+           return
         }
-        if locationManager.startedUpdating {
-            weatherManager.fetchWeather(location: locationManager.lastKnownLocation!)
-        } else {
-            locationManager.startUpdating()
+        Task {
+            if WeatherManager.currentConditions == nil {
+                await WeatherManager.fetchWeather()
+            }
+            
+            
         }
+        /*
+            1. see if locations is set - if it isn't, throw error (user denied locations)
+            2. if it is, set the widget to be on or off
+            4. set a timer for each one
+         */
     }
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
