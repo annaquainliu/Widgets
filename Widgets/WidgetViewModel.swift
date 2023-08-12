@@ -81,9 +81,6 @@ class DisplayDesktopWidgets: ObservableObject {
     }
     
     func displayWidget(widget: WidgetInfo) {
-        Task {
-            await WeatherManager.fetchWeather()
-        }
         switch widget.triggerType {
             case Triggers.always:
                 makeWindowController(widget: widget)
