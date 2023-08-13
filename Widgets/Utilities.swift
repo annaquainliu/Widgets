@@ -23,10 +23,10 @@ func ImportPhoto() -> some View {
             .resizable()
             .scaledToFit()
             .frame(width: 32.0, height: 32.0)
-    }.contentShape(Rectangle())
-     .frame(width: 150, height: 150)
-     .overlay(RoundedRectangle(cornerRadius: 16)
+    }.frame(width: 150, height: 150)
+    .overlay(RoundedRectangle(cornerRadius: 16)
         .stroke(.white, lineWidth: 2))
+    .contentShape(Rectangle())
 }
 
 func ImportMultiplePhotos() -> some View {
@@ -70,4 +70,13 @@ extension Date {
     func endOfMonth(month: Int) -> Date {
         return Calendar.current.date(byAdding: DateComponents(month: month, day: -1), to: self.startOfMonth(month: month))!
     }
+}
+
+func alertMessage(question: String, text: String) -> Bool {
+    let alert = NSAlert()
+    alert.messageText = question
+    alert.informativeText = text
+    alert.alertStyle = .warning
+    alert.addButton(withTitle: "OK")
+    return alert.runModal() == .alertFirstButtonReturn
 }

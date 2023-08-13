@@ -11,18 +11,19 @@ import SwiftUI
 struct ImageOrGifView : View {
     
     @EnvironmentObject var store : WidgetStore
+    @State var fileName : URL? = nil
     
     var body : some View {
         VStack(alignment: .leading) {
             TitleText(text : "Image/Gif")
             Spacer().frame(height: 30)
             HStack {
-                ImportPhoto()
+                FilePicker(filename: $fileName)
                 Spacer(minLength: 40)
-                WidgetMenu()
+                WidgetMenu(fileName: $fileName)
             }.padding()
         }.padding()
-         .frame(width: 1000, height: 700)
+         .frame(width: 1200, height: 700)
     }
 }
 

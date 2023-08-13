@@ -8,17 +8,25 @@
 import Foundation
 import SwiftUI
 
+struct Alerts {
+    var alertInvalidTimeFrame = false
+    var alertInstructions = false
+    var nullFileName = false
+    var documentsFileName = false
+}
+
 struct WidgetMenu : View {
     @State private var triggerSelection = Triggers.always
     @State var weatherSelection =  WeatherOptionInfo(title: WeatherTrigger.sunny, systemImage: "sun.min.fill")
-    @State private var alertInstructions = false
     @State var timeFrameSelection = Set<String>()
     @State var hourSelection = HourTimeFrame()
     @State var daySelection = WeekdayTimeFrame()
     @State var dateSelection = DateTimeFrame()
     @State var monthSelection = MonthTimeFrame()
     @State var staticTimeFrame = StaticTimeFrame(timeStart: Date(), timeEnd: Date())
-    @State private var showingPicker = false
+    @State private var alerts = Alerts()
+    
+    @Binding var fileName : URL?
     
     @EnvironmentObject var store : WidgetStore
     @EnvironmentObject var displayDesktop: DisplayDesktopWidgets
@@ -63,7 +71,10 @@ struct WidgetMenu : View {
                         selection: triggerSelection)
                     makeRadioOption(title: Triggers.staticTimeFrame,
                                     view: HStack {
-                                     TriggerCategoryText(text: "Time Frame (Static)")
+                                    VStack(alignment: .leading) {
+                                        TriggerCategoryText(text: "Time Frame")
+                                        Text("(Static)").padding(.bottom)
+                                    }
                                      DatePicker("From", selection: $staticTimeFrame.timeStart, displayedComponents: [.hourAndMinute, .date])
                                     DatePicker("To", selection: $staticTimeFrame.timeEnd, displayedComponents: [.hourAndMinute, .date])
                                     },
@@ -71,9 +82,12 @@ struct WidgetMenu : View {
                     makeRadioOption(
                         title: Triggers.timeFrame,
                         view: HStack {
-                            TriggerCategoryText(text: "Time Frame (Repeated)")
+                            VStack(alignment: .leading) {
+                                TriggerCategoryText(text: "Time Frame")
+                                Text("(Repeated)").padding(.bottom)
+                            }
                             List {
-                                Text("Note: All selected time frames will repeat. *(E.g.: 10:40AM-2PM will repeat every day)*")
+                                Text("Note: All selected time frames will repeat.")
                                 HStack {
                                     makeToggle(selected: $hourSelection.selected, tag: TimeFrame.hour)
                                     HStack {
@@ -143,12 +157,25 @@ struct WidgetMenu : View {
                 HStack {
                     Spacer()
                     Button("Create Widget") {
+                        if triggerSelection == Triggers.staticTimeFrame &&
+                            staticTimeFrame.timeStart > staticTimeFrame.timeEnd {
+                            alerts.alertInvalidTimeFrame = true
+                            return
+                        }
+                        if fileName == nil {
+                            alerts.nullFileName = true
+                            return
+                        }
+                        if fileName!.absoluteString.contains("/Documents/") {
+                            alerts.documentsFileName = true
+                            return
+                        }
+                        print(fileName!)
                         let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
                         let dayParam = timeFrameSelection.contains(TimeFrame.dayOfTheWeek) ? daySelection : nil
                         let dateParam = timeFrameSelection.contains(TimeFrame.dayOfTheMonth) ? dateSelection : nil
                         let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
                         let timeFrame = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
-                        
                         
                         _ = WidgetViewModel(
                             triggerType: triggerSelection,
@@ -156,23 +183,26 @@ struct WidgetMenu : View {
                             staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
                             weather: triggerSelection == Triggers.weather ? weatherSelection.title : nil,
                             store: store,
-                            displayDesktop: displayDesktop)
+                            displayDesktop: displayDesktop,
+                            imageName: fileName!)
                         
-                        
-                        alertInstructions = true
+                        alerts.alertInstructions = true
                     }
                     .padding(40)
-                    .alert("You can click on the widget to drag it or resize it. \n\n To delete the widget, press the x mark on the top left. \n\n To save changes, press the 'Save Changes' button.", isPresented: $alertInstructions) {
+                    .alert("You can click on the widget to drag it or resize it. \n\n To delete the widget, press the x mark on the top left. \n\n To save changes, press the 'Save Changes' button.", isPresented: $alerts.alertInstructions) {
+                        Button("OK", role: .cancel) { }
+                    }
+                    .alert("The start time for the Static Time Frame should be before the end time.", isPresented: $alerts.alertInvalidTimeFrame) {
+                        Button("OK", role: .cancel) { }
+                    }
+                    .alert("Please import a photo", isPresented: $alerts.nullFileName) {
+                        Button("OK", role: .cancel) { }
+                    }
+                    .alert("The file cannot be imported from the Documents folder!", isPresented: $alerts.documentsFileName) {
                         Button("OK", role: .cancel) { }
                     }
                 }
             }
         }
-    }
-}
-
-struct WidgetMenu_Providers: PreviewProvider {
-    static var previews: some View {
-        WidgetMenu().frame(width: 1000)
     }
 }

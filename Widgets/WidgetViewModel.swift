@@ -17,10 +17,10 @@ class WidgetInfo : Codable {
     var xCoord : Double = 0
     var yCoord : Double = 0
     var widgetSize : NSSize
-    var imageName : String
+    var imageName : URL
     private var id = UUID()
     
-    init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?, imageName: String) {
+    init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?, imageName: URL) {
         self.triggerType = triggerType
         self.weather = weather
         self.timeFrame = timeFrame
@@ -46,8 +46,7 @@ class WidgetViewModel : ObservableObject {
     private var windowController : ScreenWindowController
     private var displayDesktop: DisplayDesktopWidgets
     
-    init(triggerType: String, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?, weather: String?, store: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
-        let imageName = "autumn_leaf"
+    init(triggerType: String, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?, weather: String?, store: WidgetStore, displayDesktop: DisplayDesktopWidgets, imageName: URL) {
         self.store = store
         self.displayDesktop = displayDesktop
         self.widgetInfo = WidgetInfo(triggerType: triggerType,
@@ -158,12 +157,16 @@ class DisplayDesktopWidgets: ObservableObject {
                                   repeats: false)
                 RunLoop.main.add(timer, forMode: .common)
             }
+        } else {
+            Task {
+                await self.store!.deleteWidget(id: widget.getID())
+            }
         }
     }
     
     private func displayWeatherWidget(widget: WidgetInfo) {
         if LocationManager.lastKnownLocation == nil {
-            _ = locationServicesDenied(question: "Please enable location services to create a weather widget", text: "")
+            _ = alertMessage(question: "Please enable location services to create a weather widget", text: "")
            return
         }
         if !setWeatherInterval {
@@ -185,15 +188,6 @@ class DisplayDesktopWidgets: ObservableObject {
             displayWeatherHelper(widget: widget)
             self.weatherWidgets.insert(widget, at: self.weatherWidgets.endIndex)
         }
-    }
-    
-    func locationServicesDenied(question: String, text: String) -> Bool {
-        let alert = NSAlert()
-        alert.messageText = question
-        alert.informativeText = text
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "OK")
-        return alert.runModal() == .alertFirstButtonReturn
     }
     
     private func displayWeatherHelper(widget: WidgetInfo) {

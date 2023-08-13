@@ -8,19 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305EC7F02A772527009A24F8 /* NSWindow.swift */; };
-		305EC7F52A77364A009A24F8 /* autumn_leaf.png in Resources */ = {isa = PBXBuildFile; fileRef = 305EC7F42A77364A009A24F8 /* autumn_leaf.png */; };
 		306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FAA542A8574760097CE04 /* WeatherAPI.swift */; };
 		30B14F332A73777F007A1672 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B14F322A73777F007A1672 /* Utilities.swift */; };
 		30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */; };
 		30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */; };
-		30BDD92C2A71CD2E007E5F3B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30BDD92B2A71CD2E007E5F3B /* Assets.xcassets */; };
-		30BDD92F2A71CD2E007E5F3B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30BDD92E2A71CD2E007E5F3B /* Preview Assets.xcassets */; };
 		30BDD93A2A71CD2E007E5F3B /* WidgetsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9392A71CD2E007E5F3B /* WidgetsTests.swift */; };
 		30BDD9442A71CD2E007E5F3B /* WidgetsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9432A71CD2E007E5F3B /* WidgetsUITests.swift */; };
 		30BDD9462A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9452A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift */; };
-		30C3E5782A78C34F00C3F2F8 /* outside.gif in Resources */ = {isa = PBXBuildFile; fileRef = 30C3E5772A78C34F00C3F2F8 /* outside.gif */; };
+		30C01BFC2A88790A002BE9EC /* FilePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C01BFB2A88790A002BE9EC /* FilePicker.swift */; };
 		30CD4C6C2A79D74B008B830B /* WidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CD4C6B2A79D74B008B830B /* WidgetStore.swift */; };
-		30CD4C6E2A7A31DA008B830B /* dog.png in Resources */ = {isa = PBXBuildFile; fileRef = 30CD4C6D2A7A31DA008B830B /* dog.png */; };
 		30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */; };
 		30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1D12A7362A500A1F2BE /* ContentView.swift */; };
 		30F4E6CE2A75BD0700EBA9CD /* Triggers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4E6CD2A75BD0700EBA9CD /* Triggers.swift */; };
@@ -74,6 +70,7 @@
 		30BDD93F2A71CD2E007E5F3B /* WidgetsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WidgetsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		30BDD9432A71CD2E007E5F3B /* WidgetsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsUITests.swift; sourceTree = "<group>"; };
 		30BDD9452A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		30C01BFB2A88790A002BE9EC /* FilePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePicker.swift; sourceTree = "<group>"; };
 		30C3E5772A78C34F00C3F2F8 /* outside.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = outside.gif; path = ../../../personalCS/desktop/gifs/christmas/day/outside.gif; sourceTree = "<group>"; };
 		30CD4C6B2A79D74B008B830B /* WidgetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetStore.swift; sourceTree = "<group>"; };
 		30CD4C6D2A7A31DA008B830B /* dog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dog.png; path = ../../../../Downloads/dog.png; sourceTree = "<group>"; };
@@ -164,6 +161,7 @@
 				305EC7F02A772527009A24F8 /* NSWindow.swift */,
 				30CD4C6B2A79D74B008B830B /* WidgetStore.swift */,
 				306FAA542A8574760097CE04 /* WeatherAPI.swift */,
+				30C01BFB2A88790A002BE9EC /* FilePicker.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -302,11 +300,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30C3E5782A78C34F00C3F2F8 /* outside.gif in Resources */,
-				30BDD92F2A71CD2E007E5F3B /* Preview Assets.xcassets in Resources */,
-				30CD4C6E2A7A31DA008B830B /* dog.png in Resources */,
-				30BDD92C2A71CD2E007E5F3B /* Assets.xcassets in Resources */,
-				305EC7F52A77364A009A24F8 /* autumn_leaf.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -339,6 +332,7 @@
 				30B14F332A73777F007A1672 /* Utilities.swift in Sources */,
 				30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */,
 				306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */,
+				30C01BFC2A88790A002BE9EC /* FilePicker.swift in Sources */,
 				30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */,
 				30F4E6CE2A75BD0700EBA9CD /* Triggers.swift in Sources */,
 			);

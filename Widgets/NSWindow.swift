@@ -43,16 +43,16 @@ class WidgetNSWindow : NSWindow {
     var widgetInfo : WidgetInfo
     
     init(widgetInfo: WidgetInfo, widgetStore: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
-        let image = NSImage(named: widgetInfo.imageName)!
-        self.imageSize = image.size
         self.widgetInfo = widgetInfo
         self.store = widgetStore
         self.displayDesktop = displayDesktop
-        super.init(contentRect: NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height),
+        let image = NSImage(contentsOf: widgetInfo.imageName)
+        self.imageSize = image!.size
+        super.init(contentRect: NSRect(x: 0, y: 0, width: image!.size.width, height: image!.size.height),
                    styleMask: [.resizable, .titled, .closable, .fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
-        self.contentView = NSImageView(image: image)
+        self.contentView = NSImageView(image: image!)
         self.contentView?.addSubview(makeButton())
         adjustWidgetWindow()
     }
@@ -132,7 +132,14 @@ class DesktopWidgetWindow : NSWindow {
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
         self.backgroundColor = NSColor.clear
-        self.contentView = NSImageView(image: NSImage(named: widgetInfo.imageName)!)
+        let relativePath = widgetInfo.imageName.relativePath
+        if !FileManager.default.fileExists(atPath: relativePath) {
+            _ = alertMessage(question: "\(widgetInfo.imageName.relativePath) does not exist.", text: "")
+            self.close()
+            return
+        }
+        print(relativePath)
+        self.contentView = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
         self.aspectRatio = widgetInfo.widgetSize
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
     }
