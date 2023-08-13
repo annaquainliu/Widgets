@@ -18,7 +18,7 @@ struct WidgetsApp: App {
         WindowGroup {
             ContentView().task {
                 do {
-//                    try await store.save(newWidgets: []) // COMMENT THIS OUT!
+                    try await store.save(newWidgets: []) // COMMENT THIS OUT!
                     try await store.load()
                     displayDesktopWidget.store = store
                     locationManager.displayDesktopWidgets = displayDesktopWidget

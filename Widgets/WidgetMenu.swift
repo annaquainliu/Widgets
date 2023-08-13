@@ -17,6 +17,8 @@ struct WidgetMenu : View {
     @State var daySelection = WeekdayTimeFrame()
     @State var dateSelection = DateTimeFrame()
     @State var monthSelection = MonthTimeFrame()
+    @State var staticTimeFrame = StaticTimeFrame(timeStart: Date(), timeEnd: Date())
+    @State private var showingPicker = false
     
     @EnvironmentObject var store : WidgetStore
     @EnvironmentObject var displayDesktop: DisplayDesktopWidgets
@@ -59,17 +61,19 @@ struct WidgetMenu : View {
                             }.pickerStyle(.menu)
                         },
                         selection: triggerSelection)
-                    makeRadioOption(
-                        title: Triggers.loc,
-                        view: HStack {
-                            TriggerCategoryText(text: Triggers.loc)
-                    }, selection: triggerSelection)
+                    makeRadioOption(title: Triggers.staticTimeFrame,
+                                    view: HStack {
+                                     TriggerCategoryText(text: "Time Frame (Static)")
+                                     DatePicker("From", selection: $staticTimeFrame.timeStart, displayedComponents: [.hourAndMinute, .date])
+                                    DatePicker("To", selection: $staticTimeFrame.timeEnd, displayedComponents: [.hourAndMinute, .date])
+                                    },
+                                    selection: triggerSelection)
                     makeRadioOption(
                         title: Triggers.timeFrame,
                         view: HStack {
-                            TriggerCategoryText(text: "Time Frame")
+                            TriggerCategoryText(text: "Time Frame (Repeated)")
                             List {
-                                Text("Note: All selected time frames will repeat. *E.g.: 10:40AM-2PM will repeat every day*")
+                                Text("Note: All selected time frames will repeat. *(E.g.: 10:40AM-2PM will repeat every day)*")
                                 HStack {
                                     makeToggle(selected: $hourSelection.selected, tag: TimeFrame.hour)
                                     HStack {
@@ -139,18 +143,22 @@ struct WidgetMenu : View {
                 HStack {
                     Spacer()
                     Button("Create Widget") {
-                        // order matters!
                         let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
                         let dayParam = timeFrameSelection.contains(TimeFrame.dayOfTheWeek) ? daySelection : nil
                         let dateParam = timeFrameSelection.contains(TimeFrame.dayOfTheMonth) ? dateSelection : nil
                         let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
                         let timeFrame = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
+                        
+                        
                         _ = WidgetViewModel(
                             triggerType: triggerSelection,
-                            timeFrame: timeFrame,
-                            weather: weatherSelection.title,
+                            timeFrame: triggerSelection == Triggers.timeFrame ? timeFrame : nil,
+                            staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
+                            weather: triggerSelection == Triggers.weather ? weatherSelection.title : nil,
                             store: store,
                             displayDesktop: displayDesktop)
+                        
+                        
                         alertInstructions = true
                     }
                     .padding(40)

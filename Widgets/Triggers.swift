@@ -60,6 +60,7 @@ class WeatherManager {
         } catch {
             fatalError(error.localizedDescription)
         }
+        
     }
     
     static func shouldWidgetBeOn(widget: WidgetInfo) -> Bool {
@@ -67,7 +68,7 @@ class WeatherManager {
             print("called shouldWidgetBeOn when current conditions is nil error")
             return false
         }
-        let weatherType = widget.weather
+        let weatherType = widget.weather!
         if WeatherManager.currentConditions!.precipprob > 0.2 {
             if weatherType == WeatherTrigger.snowing {
                 return WeatherManager.currentConditions?.preciptype == "snow"
@@ -81,8 +82,10 @@ class WeatherManager {
                 return WeatherManager.currentConditions!.cloudcover > 0.4
             case WeatherTrigger.windy:
                 return WeatherManager.currentConditions!.windspeed > 20
+            case WeatherTrigger.sunny:
+                return WeatherManager.currentConditions!.solarradiation > 600
             default:
-                return WeatherManager.currentConditions!.solarradiation > 35
+                return false
         }
     }
 }
@@ -117,8 +120,8 @@ struct Triggers {
     
     static var always = "Always"
     static var weather = "Weather"
-    static var loc = "Location"
     static var timeFrame = "TimeFrame"
+    static var staticTimeFrame = "staticTimeFrame"
     
     static func triggerDescription() -> some View {
         return HStack {
@@ -128,27 +131,9 @@ struct Triggers {
     }
 }
 
-struct Frequency : Codable {
-    var measurement : String
-    var frequency : Int
-    var startDate : Date
-    
-    static func none() -> Frequency {
-        return Frequency(measurement: "", frequency: 0, startDate: Date())
-    }
-}
-
-struct Duration : Codable {
-    static var untilDeactivate = "UntilDeactivated"
-    static var duration  = "duration"
-    
-    var durationSelection : String
-    var durationMeasurement : String
-    var duration : Int
-    
-    static func none() -> Duration {
-        return Duration(durationSelection: "", durationMeasurement: "", duration: 0)
-    }
+struct StaticTimeFrame : Codable {
+    var timeStart : Date
+    var timeEnd : Date
 }
 
 struct TimeFrame {

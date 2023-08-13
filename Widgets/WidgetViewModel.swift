@@ -11,18 +11,20 @@ import CoreLocation
 
 class WidgetInfo : Codable {
     var triggerType : String
-    var weather : String
-    var timeFrame : TimeFrameInfo
+    var weather : String?
+    var timeFrame : TimeFrameInfo?
+    var staticTimeFrame : StaticTimeFrame?
     var xCoord : Double = 0
     var yCoord : Double = 0
     var widgetSize : NSSize
     var imageName : String
     private var id = UUID()
     
-    init(triggerType: String, weather: String, timeFrame: TimeFrameInfo, imageName: String) {
+    init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?, imageName: String) {
         self.triggerType = triggerType
         self.weather = weather
         self.timeFrame = timeFrame
+        self.staticTimeFrame = staticTimeFrame
         self.imageName = imageName
         self.widgetSize = NSSize()
     }
@@ -44,14 +46,14 @@ class WidgetViewModel : ObservableObject {
     private var windowController : ScreenWindowController
     private var displayDesktop: DisplayDesktopWidgets
     
-    init(triggerType: String, timeFrame: TimeFrameInfo, weather: String, store: WidgetStore,
-         displayDesktop: DisplayDesktopWidgets) {
+    init(triggerType: String, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?, weather: String?, store: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
         let imageName = "autumn_leaf"
         self.store = store
         self.displayDesktop = displayDesktop
         self.widgetInfo = WidgetInfo(triggerType: triggerType,
                                      weather: weather,
                                      timeFrame: timeFrame,
+                                     staticTimeFrame: staticTimeFrame,
                                      imageName: imageName)
         self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo,
                                                                               widgetStore: store,
@@ -65,10 +67,13 @@ class DisplayDesktopWidgets: ObservableObject {
     
     var store : WidgetStore?
     private var currentWidgets : [UUID : ScreenWindowController]
+    private var weatherWidgets : [WidgetInfo]
+    private var setWeatherInterval = false
     
     init() {
         self.store = nil
         self.currentWidgets = [:]
+        self.weatherWidgets = []
     }
     
     func loadWidgets() {
@@ -86,16 +91,14 @@ class DisplayDesktopWidgets: ObservableObject {
                 makeWindowController(widget: widget)
             case Triggers.timeFrame:
                 displayTimeFrameWidget(widget: widget)
-            case Triggers.loc:
-                displayLocationWidget(widget: widget)
             case Triggers.weather:
                 displayWeatherWidget(widget: widget)
             default:
-                print("default")
+                displayStaticTimeWidget(widget: widget)
         }
     }
     
-    @objc private func removeWidgetSelector(sender: Timer) {
+    @objc private func removeWidgetRepeat(sender: Timer) {
         print("removing widget, now date is: \(Date.now)")
         let widget = (sender.userInfo as? WidgetInfo)!
         removeWidget(id: widget.getID())
@@ -123,37 +126,98 @@ class DisplayDesktopWidgets: ObservableObject {
         self.currentWidgets.removeValue(forKey: id)
     }
     
-    private func displayLocationWidget(widget: WidgetInfo) {
-        if LocationManager.lastKnownLocation == nil {
-           print("User denied location")
-           return
+    @objc private func removeWidgetNoRepeat(sender: Timer) {
+        let id = (sender.userInfo as? UUID)!
+        removeWidget(id: id)
+    }
+    
+    private func displayStaticTimeWidget(widget: WidgetInfo) {
+        let start = widget.staticTimeFrame!.timeStart
+        let end = widget.staticTimeFrame!.timeEnd
+        let current = Date()
+        if (start...end).contains(current) {
+            makeWindowController(widget: widget)
+            let diffs = Calendar.current.dateComponents([.day], from: current, to: end)
+            if diffs.day! <= 5 {
+                let timeOut = Timer(fireAt: end,
+                                    interval: 0,
+                                    target: self,
+                                    selector: #selector(removeWidgetNoRepeat(sender:)),
+                                    userInfo: widget.getID(),
+                                    repeats: false)
+                RunLoop.main.add(timeOut, forMode: .common)
+            }
+        } else if start > current {
+            let diffs = Calendar.current.dateComponents([.day], from: current, to: start)
+            if diffs.day! <= 5 {
+                let timer = Timer(fireAt: start,
+                                  interval: 0,
+                                  target: self,
+                                  selector: #selector(displayWidgetSelector(sender:)),
+                                  userInfo: widget,
+                                  repeats: false)
+                RunLoop.main.add(timer, forMode: .common)
+            }
         }
-        
     }
     
     private func displayWeatherWidget(widget: WidgetInfo) {
         if LocationManager.lastKnownLocation == nil {
-           print("User denied location")
+            _ = locationServicesDenied(question: "Please enable location services to create a weather widget", text: "")
            return
+        }
+        if !setWeatherInterval {
+            setWeatherInterval = true
+            let timer = Timer(timeInterval: 1800, repeats: true) { Timer in
+                Task {
+                    await WeatherManager.fetchWeather()
+                    for weatherWidget in self.weatherWidgets {
+                        self.displayWeatherHelper(widget: weatherWidget)
+                    }
+                }
+            }
+            RunLoop.main.add(timer, forMode: .common)
         }
         Task {
             if WeatherManager.currentConditions == nil {
                 await WeatherManager.fetchWeather()
             }
-            
-            
+            displayWeatherHelper(widget: widget)
+            self.weatherWidgets.insert(widget, at: self.weatherWidgets.endIndex)
         }
-        /*
-            1. see if locations is set - if it isn't, throw error (user denied locations)
-            2. if it is, set the widget to be on or off
-            4. set a timer for each one
-         */
+    }
+    
+    func locationServicesDenied(question: String, text: String) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = question
+        alert.informativeText = text
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+    
+    private func displayWeatherHelper(widget: WidgetInfo) {
+        let isWidgetValid = WeatherManager.shouldWidgetBeOn(widget: widget)
+        let widgetIsOn = self.currentWidgets[widget.getID()] != nil
+        
+        if widgetIsOn != isWidgetValid {
+            if widgetIsOn {
+                DispatchQueue.main.async {
+                    self.removeWidget(id: widget.getID())
+                }
+            }
+            else {
+                DispatchQueue.main.async {
+                    self.makeWindowController(widget: widget)
+                }
+            }
+        }
     }
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
         var validTimeFrame = true
 //         the time frame must be valid for all widgets
-        let timeFrames : [TimeFrameCodable?] = [widget.timeFrame.date, widget.timeFrame.Hour, widget.timeFrame.Month, widget.timeFrame.Weekday]
+        let timeFrames : [TimeFrameCodable?] = [widget.timeFrame!.date, widget.timeFrame!.Hour, widget.timeFrame!.Month, widget.timeFrame!.Weekday]
         for timeFrame in timeFrames {
             if timeFrame != nil && !timeFrame!.nowWithinTimeRange() {
                 validTimeFrame = false
@@ -162,20 +226,20 @@ class DisplayDesktopWidgets: ObservableObject {
         }
         if validTimeFrame {
             makeWindowController(widget: widget)
-            let endingDate = widget.timeFrame.getEndingTime()
+            let endingDate = widget.timeFrame!.getEndingTime()
             print("ending date is: \(endingDate)")
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: endingDate)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: endingDate,
                                   interval: 0,
                                   target: self,
-                                  selector: #selector(removeWidgetSelector(sender:)),
+                                  selector: #selector(removeWidgetRepeat(sender:)),
                                   userInfo: widget,
                                   repeats: false)
                 RunLoop.main.add(timer, forMode: .common)
             }
         } else {
-            let startingDate = widget.timeFrame.getStartingTime()
+            let startingDate = widget.timeFrame!.getStartingTime()
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: startingDate)
             print("starting date is: \(startingDate)")
             if diffs.day! <= 5 {
