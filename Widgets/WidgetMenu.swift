@@ -12,7 +12,6 @@ struct Alerts {
     var alertInvalidTimeFrame = false
     var alertInstructions = false
     var nullFileName = false
-    var documentsFileName = false
 }
 
 struct WidgetMenu : View {
@@ -166,10 +165,6 @@ struct WidgetMenu : View {
                             alerts.nullFileName = true
                             return
                         }
-                        if fileName!.absoluteString.contains("/Documents/") {
-                            alerts.documentsFileName = true
-                            return
-                        }
                         print(fileName!)
                         let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
                         let dayParam = timeFrameSelection.contains(TimeFrame.dayOfTheWeek) ? daySelection : nil
@@ -196,9 +191,6 @@ struct WidgetMenu : View {
                         Button("OK", role: .cancel) { }
                     }
                     .alert("Please import a photo", isPresented: $alerts.nullFileName) {
-                        Button("OK", role: .cancel) { }
-                    }
-                    .alert("The file cannot be imported from the Documents folder!", isPresented: $alerts.documentsFileName) {
                         Button("OK", role: .cancel) { }
                     }
                 }

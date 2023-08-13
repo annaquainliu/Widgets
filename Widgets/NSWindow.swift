@@ -138,7 +138,6 @@ class DesktopWidgetWindow : NSWindow {
             self.close()
             return
         }
-        print(relativePath)
         self.contentView = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
         self.aspectRatio = widgetInfo.widgetSize
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
