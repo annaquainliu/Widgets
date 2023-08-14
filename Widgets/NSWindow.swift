@@ -154,6 +154,14 @@ class DesktopWidgetWindow : NSWindow {
     }
 }
 
+class CalendarWidget: DesktopWidgetWindow {
+    
+    init(widget: WidgetInfo) {
+        super.init(widgetInfo: widget)
+        self.contentView = NSHostingView(rootView: CalendarView())
+    }
+}
+
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
     init(window : NSWindow) {
         super.init(window: window)

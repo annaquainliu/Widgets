@@ -80,3 +80,13 @@ func alertMessage(question: String, text: String) -> Bool {
     alert.addButton(withTitle: "OK")
     return alert.runModal() == .alertFirstButtonReturn
 }
+
+struct CalendarView : View {
+    @State var selection = Date()
+    
+    var body: some View {
+        DatePicker("", selection: $selection, displayedComponents: [.date])
+            .padding(.horizontal)
+            .datePickerStyle(.graphical)
+    }
+}

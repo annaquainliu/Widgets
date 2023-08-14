@@ -15,6 +15,7 @@ struct Alerts {
 }
 
 struct WidgetMenu : View {
+    var type : WidgetInfo.types
     @State private var triggerSelection = Triggers.always
     @State var weatherSelection =  WeatherOptionInfo(title: WeatherTrigger.sunny, systemImage: "sun.min.fill")
     @State var timeFrameSelection = Set<String>()
@@ -179,7 +180,8 @@ struct WidgetMenu : View {
                             weather: triggerSelection == Triggers.weather ? weatherSelection.title : nil,
                             store: store,
                             displayDesktop: displayDesktop,
-                            imageName: fileName!)
+                            imageName: fileName!,
+                            type: type)
                         
                         alerts.alertInstructions = true
                     }

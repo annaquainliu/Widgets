@@ -10,6 +10,7 @@ import AppKit
 import CoreLocation
 
 class WidgetInfo : Codable {
+    var type : WidgetInfo.types
     var triggerType : String
     var weather : String?
     var timeFrame : TimeFrameInfo?
@@ -20,12 +21,18 @@ class WidgetInfo : Codable {
     var imageName : URL
     private var id = UUID()
     
-    init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?, imageName: URL) {
+    enum types : Int, Codable {
+        case image, calendar, countdown, weather, slideshow
+    }
+    
+    init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,
+         staticTimeFrame: StaticTimeFrame?, imageName: URL, type: WidgetInfo.types) {
         self.triggerType = triggerType
         self.weather = weather
         self.timeFrame = timeFrame
         self.staticTimeFrame = staticTimeFrame
         self.imageName = imageName
+        self.type = type
         self.widgetSize = NSSize()
     }
     
@@ -40,26 +47,22 @@ class WidgetInfo : Codable {
     }
 }
 
+// Stores information of the widget and displays the widget in Edit Mode
 class WidgetViewModel : ObservableObject {
-    private var store: WidgetStore
-    private var widgetInfo : WidgetInfo
-    private var windowController : ScreenWindowController
-    private var displayDesktop: DisplayDesktopWidgets
-    
-    init(triggerType: String, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?, weather: String?, store: WidgetStore, displayDesktop: DisplayDesktopWidgets, imageName: URL) {
-        self.store = store
-        self.displayDesktop = displayDesktop
-        self.widgetInfo = WidgetInfo(triggerType: triggerType,
+    // the displayDesktop class and the WidgetStore is passed in
+    init(triggerType: String, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?,
+         weather: String?, store: WidgetStore, displayDesktop: DisplayDesktopWidgets, imageName: URL,
+         type: WidgetInfo.types) {
+        let widgetInfo = WidgetInfo(triggerType: triggerType,
                                      weather: weather,
                                      timeFrame: timeFrame,
                                      staticTimeFrame: staticTimeFrame,
-                                     imageName: imageName)
-        self.windowController = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo,
-                                                                              widgetStore: store,
-                                                                              displayDesktop: displayDesktop))
+                                     imageName: imageName,
+                                     type: type)
+       _ = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo,
+                                                          widgetStore: store,
+                                                          displayDesktop: displayDesktop))
     }
-    
-    // todo: make verification functions that verify if the inputs are correct
 }
 
 class DisplayDesktopWidgets: ObservableObject {
