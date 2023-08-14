@@ -31,6 +31,7 @@ struct FilePicker: View {
             }.frame(width: 150, height: 150)
             .overlay(RoundedRectangle(cornerRadius: 16)
                 .stroke(.white, lineWidth: 2))
+            .cornerRadius(16)
             .contentShape(Rectangle())
             .onTapGesture {
                 let panel = NSOpenPanel()

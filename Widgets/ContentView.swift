@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         if tab == "Menu" {
             VStack(alignment : .center) {
-                TitleText(text: "Widgets")
+                TitleText(text: "MacWidgets")
                 Text("Make your own widgets appear based on **triggers**!").padding([.bottom, .leading], 20)
                 Spacer().frame(maxHeight: 10)
                 VStack {
@@ -28,6 +28,7 @@ struct ContentView: View {
                         MenuButton(title : "Text", ImageName:
                                     "textformat", parent:self)
                         MenuButton(title: "Calendar", ImageName: "calendar", parent:self)
+                        MenuButton(title: "Countdown", ImageName: "calendar.badge.clock", parent: self)
                     }
                 }.padding(30)
             }.padding([.top, .bottom], 30)
@@ -52,11 +53,14 @@ struct MenuButton : View {
                 .frame(width: 32.0, height: 32.0)
         }.frame(width: 150, height: 150)
          .overlay(RoundedRectangle(cornerRadius: 16)
-         .stroke(.white, lineWidth: 2))
-         .contentShape(Rectangle())
-          .onTapGesture {
+                    .stroke(.white, lineWidth: 2))
+         .contentShape(RoundedRectangle(cornerRadius: 16))
+         .background()
+         .cornerRadius(16)
+         .onTapGesture {
              parent.tab = title
-          }
+         }
+        
     }
 }
 

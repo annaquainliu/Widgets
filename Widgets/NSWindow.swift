@@ -128,19 +128,25 @@ class DesktopWidgetWindow : NSWindow {
                                        y: widgetInfo.yCoord,
                                        width: widgetInfo.widgetSize.width,
                                        height: widgetInfo.widgetSize.height),
-                   styleMask: [.fullSizeContentView],
+                   styleMask: [.fullSizeContentView, .titled],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
-        self.backgroundColor = NSColor.clear
         let relativePath = widgetInfo.imageName.relativePath
         if !FileManager.default.fileExists(atPath: relativePath) {
             _ = alertMessage(question: "\(widgetInfo.imageName.relativePath) does not exist.", text: "")
             self.close()
             return
         }
+        self.backgroundColor = NSColor.clear
         self.contentView = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
         self.aspectRatio = widgetInfo.widgetSize
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
+        self.standardWindowButton(.zoomButton)?.isHidden = true
+        self.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        self.standardWindowButton(.closeButton)?.isHidden = true
+        self.titlebarAppearsTransparent = true
+        self.titleVisibility = .hidden
+        self.hasShadow = false
     }
     
     override var canBecomeKey: Bool {

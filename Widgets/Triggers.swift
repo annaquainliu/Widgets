@@ -196,6 +196,7 @@ struct HourTimeFrame : TimeFrameCodable {
         if timeEndDate < timeStartDate {
             timeEndDate = Calendar.current.date(byAdding: .day, value: 1, to: timeEndDate)!
         }
+        timeEndDate = Calendar.current.date(byAdding: .minute, value: 1, to: timeEndDate)!
         return (timeStartDate...timeEndDate).contains(current)
     }
     // Note: We do not just compare the dates here because this excludes second difference
@@ -261,6 +262,14 @@ struct DateTimeFrame : TimeFrameCodable {
     func nowWithinTimeRange() -> Bool {
         return Date().get(.day) >= timeStart + 1 && Date().get(.day) <= timeEnd + 1
     }
+    
+    func getTimeStart() -> Int {
+        return timeStart + 1
+    }
+    
+    func getTimeEnd() -> Int {
+        return timeEnd + 1
+    }
 }
 
 struct MonthTimeFrame : TimeFrameCodable {
@@ -303,6 +312,13 @@ struct TimeFrameInfo : Codable {
         let currentDate = Date()
         var dateComponents = DateComponents()
         var startHour: Int; var startMinute: Int; var startDate : Int; var startMonth: Int
+        if Hour == nil {
+            startHour = 0
+            startMinute = 0
+        } else {
+            startHour = Hour!.timeStart.get(.hour)
+            startMinute = Hour!.timeStart.get(.minute)
+        }
         // if month is not specified
         if Month == nil {
             startMonth = currentDate.get(.month)
@@ -311,13 +327,16 @@ struct TimeFrameInfo : Codable {
             }
             else {
                 let currentDay = currentDate.get(.day)
+                let potentialDate = TimeFrame.makeDate(year: currentDate.get(.year), month: startMonth,
+                                                       day: date!.getTimeEnd(), hour: startHour,
+                                                       minute: startMinute)
                 // if date is specified, check if the current day is after the date
-                if currentDay > date!.timeEnd {
+                if currentDate > potentialDate {
                     startMonth += 1 // increase month because it's after time range
-                    startDate = date!.timeStart
+                    startDate = date!.getTimeStart()
                 }
                 else {
-                    startDate = currentDay < date!.timeStart ? date!.timeStart : currentDay
+                    startDate = currentDay < date!.getTimeStart() ? date!.getTimeStart() : currentDay
                 }
             }
         } else {
@@ -329,23 +348,16 @@ struct TimeFrameInfo : Codable {
                 if date == nil {
                     startDate = currentDate.get(.day)
                 } else {
-                    startDate = date!.nowWithinTimeRange() ? currentDate.get(.day) : date!.timeStart
+                    startDate = date!.nowWithinTimeRange() ? currentDate.get(.day) : date!.getTimeStart()
                 }
             }
             else { // if the month is not within time range
                 startMonth = TimeFrame.getMonthIndex(month: Month!.timeStart)
-                startDate = date == nil ? 1 : date!.timeStart
+                startDate = date == nil ? 1 : date!.getTimeStart()
             }
         }
         // if the startMonth is less than the current month, increase year by 1
         let startYear = startMonth < currentDate.get(.month) ? currentDate.get(.year) + 1 : currentDate.get(.year)
-        if Hour == nil {
-            startHour = 0
-            startMinute = 0
-        } else {
-            startHour = Hour!.timeStart.get(.hour)
-            startMinute = Hour!.timeStart.get(.minute)
-        }
         // if weekday is null, the start day would already be set, otherwise, override
         if Weekday != nil {
             let current = currentDate
@@ -401,7 +413,7 @@ struct TimeFrameInfo : Codable {
         if Hour == nil {
             endHour = 23
             endMinute = 59
-            endDate = date == nil ? currentDate.endOfMonth(month: endMonth).get(.day) : date!.timeEnd
+            endDate = date == nil ? currentDate.endOfMonth(month: endMonth).get(.day) : date!.getTimeEnd()
             if Weekday != nil {
                 // make the date of the current start year, month, and date
                 let potentialDate = TimeFrame.makeDate(year: endYear, month: endMonth,
@@ -419,13 +431,13 @@ struct TimeFrameInfo : Codable {
                     || nextWeekdayDate <= potentialDate {
                     endDate = nextWeekdayDate.get(.day)
                 }
-                
             }
         } else {
             endHour = Hour!.timeEnd.get(.hour)
             endMinute = Hour!.timeEnd.get(.minute)
             endDate = currentDate.get(.day)
         }
+        endMinute += 1 //add 1 to make the end time be the end of the minute
         let futureDate = TimeFrame.makeDate(year: endYear, month: endMonth,
                                                day: endDate, hour: endHour,
                                                minute: endMinute)
@@ -437,8 +449,8 @@ struct TimeFrameInfo : Codable {
         dateComponents.month = endMonth
         dateComponents.day = endDate
         dateComponents.hour = endHour
-        dateComponents.minute = endMinute + 1
-        print("ending UTC date is: \(endMonth)/\(endDate)/\(endYear), Time: \(endHour):\(endMinute + 1)")
+        dateComponents.minute = endMinute
+        print("ending UTC date is: \(endMonth)/\(endDate)/\(endYear), Time: \(endHour):\(endMinute)")
         let userCalendar = Calendar(identifier: .gregorian)
         return userCalendar.date(from: dateComponents)!
     }
