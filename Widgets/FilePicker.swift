@@ -19,7 +19,7 @@ struct FilePicker: View {
             VStack {
                 if fileSelected && filename != nil {
                     Image(nsImage: NSImage(contentsOf: filename!)!)
-                        .scaledToFit()
+                        .resizable()
                         .frame(width: 150.0, height: 150.0)
                 } else {
                     Text("Import a photo/gif").font(.headline)
@@ -29,8 +29,7 @@ struct FilePicker: View {
                         .frame(width: 32.0, height: 32.0)
                 }
             }.frame(width: 150, height: 150)
-            .overlay(RoundedRectangle(cornerRadius: 16)
-                .stroke(.white, lineWidth: 2))
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(.white, lineWidth: fileSelected ? 0 : 2))
             .animation(.default, value: hover)
             .onHover { over in
                 hover = over

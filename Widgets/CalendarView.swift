@@ -29,16 +29,17 @@ struct CalendarView : View {
                         VStack(alignment: .center) {
                             Text("Choose Your Type").font(.title)
                             HStack {
-                                DatePicker("", selection: $selection, displayedComponents: [.date])
-                                .datePickerStyle(.graphical)
-                                .fixedSize()
-                                DatePicker("", selection: $selection, displayedComponents: [.hourAndMinute])
-                                .datePickerStyle(.graphical)
-                                .fixedSize()
+                                makeCalendarButton(view: DatePicker("", selection: $selection, displayedComponents: [.date])
+                                    .datePickerStyle(.graphical), type: CalendarSizes.types.calendar)
+                               makeCalendarButton(view: DatePicker("", selection: $selection, displayedComponents: [.hourAndMinute])
+                                .datePickerStyle(.graphical), type: CalendarSizes.types.clock)
                             }
                         }
-                        Spacer().frame(width: width / 4)
-                        FilePicker(filename: $fileName)
+                        Spacer().frame(width: width / 5)
+                        VStack {
+                            Text("Background").font(.title)
+                            FilePicker(filename: $fileName)
+                        }
                     }.frame(width: width)
                     Spacer().frame(height: 30)
                     HStack {
@@ -48,6 +49,23 @@ struct CalendarView : View {
                 }.padding()
             }.frame(width: width, height: height)
         }
+    }
+    
+    func makeCalendarButton(view: some View, type: CalendarSizes.types) -> some View {
+        return view
+            .labelsHidden()
+            .fixedSize()
+            .frame(width: 150, height: 150)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if calendarTypes.contains(type) {
+                    calendarTypes.remove(type)
+                } else {
+                    calendarTypes.insert(type)
+                }
+            }.background(
+                calendarTypes.contains(type) ? Color.gray : Color.clear
+            )
     }
 }
 
