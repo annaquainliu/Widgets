@@ -87,14 +87,16 @@ struct CalendarView : View {
     @FocusState var isFocused : Bool
     
     var body: some View {
-        DatePicker("", selection: Binding(get: {selection}, set: {
+        
+            DatePicker("", selection: Binding(get: {selection}, set: {
                 selection = $0
-                isFocused = false 
-             }), displayedComponents: [.date])
+                isFocused = false
+            }), displayedComponents: [.date])
             .datePickerStyle(.graphical)
             .scaleEffect(scale, anchor: .leading)
-            .frame(width: 156.5 * scale, height: 168 * scale, alignment: .center)
+            .frame(width: 156.5 * scale, height: 168 * scale)
             .focused($isFocused)
+        
     }
 }
 

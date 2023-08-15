@@ -10,11 +10,10 @@ import AppKit
 import Cocoa
 import SwiftUI
 
-
 class WidgetNSWindow : NSWindow {
     
     private var desktopEditMode = false
-    var windowSize : NSSize
+    private var windowSize : NSSize
     private var store : WidgetStore
     private var displayDesktop : DisplayDesktopWidgets
     var widgetInfo : WidgetInfo
@@ -34,6 +33,25 @@ class WidgetNSWindow : NSWindow {
         adjustWidgetWindow()
     }
     
+    // for widgets that are not resizable
+    init(widgetInfo: WidgetInfo, widgetStore: WidgetStore, displayDesktop: DisplayDesktopWidgets,
+         windowSize: NSSize) {
+        self.widgetInfo = widgetInfo
+        self.store = widgetStore
+        self.displayDesktop = displayDesktop
+        let image = NSImage(contentsOf: widgetInfo.imageName)!
+        self.windowSize = windowSize
+        super.init(contentRect: NSRect(x: 0, y: 0, width: windowSize.width, height: windowSize.height),
+                   styleMask: [.titled, .closable, .fullSizeContentView],
+                   backing: NSWindow.BackingStoreType.buffered,
+                   defer: true)
+        let imageView = NSImageView(image: image)
+        imageView.imageScaling = .scaleAxesIndependently
+        self.contentView = imageView
+        adjustWidgetWindow()
+    }
+    
+    
     private func adjustWidgetWindow() {
         self.standardWindowButton(.zoomButton)?.isHidden = true
         self.standardWindowButton(.miniaturizeButton)?.isHidden = true
@@ -51,7 +69,7 @@ class WidgetNSWindow : NSWindow {
         self.center()
     }
     
-    private func makeButton() -> NSButton {
+    func makeButton() -> NSButton {
         let button = NSButton(frame: NSRect(x: 10, y: 10, width: 20, height: 20))
         button.isBordered = false
         button.wantsLayer = true
@@ -88,11 +106,10 @@ class WidgetNSWindow : NSWindow {
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.backstopMenu)))
         self.aspectRatio = self.windowSize
     }
-
+    
     override var canBecomeKey: Bool {
         return true
     }
-   
 }
 
 class DesktopWidgetWindow : NSWindow {
@@ -115,7 +132,9 @@ class DesktopWidgetWindow : NSWindow {
             return
         }
         self.backgroundColor = NSColor.clear
-        self.contentView = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
+        let image = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
+        image.imageScaling = .scaleAxesIndependently
+        self.contentView = image
         self.aspectRatio = widgetInfo.widgetSize
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.backstopMenu)))
         self.standardWindowButton(.zoomButton)?.isHidden = true
@@ -132,39 +151,39 @@ class DesktopWidgetWindow : NSWindow {
 }
 
 extension NSWindow {
-    func makeCalendarNSView(defaultWidth: Double, defaultHeight: Double) {
-        let widthRatio = self.frame.width / defaultWidth
-        let heightRatio = self.frame.height / defaultHeight
-        let ratio = min(widthRatio, heightRatio)
-        let width = defaultWidth * ratio
-        let height = defaultHeight * ratio
-        print("ratio is \(ratio)")
-        let calendarView = NSHostingView(rootView: CalendarView(scale: ratio))
-        calendarView.frame = NSRect(origin: CGPoint(x: (self.frame.width - width) / 2,
-                                                    y: (self.frame.height - height) / 2),
-                                    size: CGSize(width: width, height: height))
+    func makeCalendarNSView() {
+        let defaultWidth = CalendarSizes.defaultWidth
+        let defaultHeight = CalendarSizes.defaultHeight
+        let calendarView = NSHostingView(rootView: CalendarView(scale: CalendarSizes.scale))
+        calendarView.frame = NSRect(origin: CGPoint(x: (self.frame.width - defaultWidth) / 2,
+                                                    y: (self.frame.height - defaultHeight) / 2 + 10),
+                                    size: CGSize(width: defaultWidth, height: defaultHeight))
         self.contentView?.addSubview(calendarView)
-        self.styleMask.remove(.resizable)
     }
+}
+
+struct CalendarSizes {
+    static var defaultWidth = 156.5 * CalendarSizes.scale
+    static var defaultHeight = 168.0 * CalendarSizes.scale
+    static var scale = 1.5
 }
 
 class CalendarWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
-        let defaultWidth = 156.5
-        let defaultHeight = 168.0
         super.init(widgetInfo: widget)
-        self.makeCalendarNSView(defaultWidth: defaultWidth, defaultHeight: defaultHeight)
+        self.makeCalendarNSView()
     }
 }
 
 class EditCalendarWidget: WidgetNSWindow {
     
     init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
-        let defaultWidth = 156.5
-        let defaultHeight = 168.0
-        super.init(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
-        self.makeCalendarNSView(defaultWidth: defaultWidth, defaultHeight: defaultHeight)
+        let size = NSSize(width: CalendarSizes.defaultWidth, height: CalendarSizes.defaultHeight)
+        super.init(widgetInfo: widget, widgetStore: store,
+                   displayDesktop: displayDesktop, windowSize: size)
+        self.makeCalendarNSView()
+        self.contentView?.addSubview(makeButton())
     }
 }
 
@@ -203,7 +222,10 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
         }
         super.init(window: window)
         self.window?.makeKeyAndOrderFront(self)
+        
     }
+    
+    
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
