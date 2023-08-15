@@ -17,24 +17,16 @@ struct WidgetsApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView().task {
-//                do {
-//                    print("starting app")
-//                    try await store.save(newWidgets: [])
-//                    try await store.load()
-//                    displayDesktopWidget.store = store
-//                    locationManager.displayDesktopWidgets = displayDesktopWidget
-//                    locationManager.startUpdating()
-//                } catch {
-//                    fatalError(error.localizedDescription)
-//                }
-                _ = ScreenWindowController(widget: WidgetInfo(triggerType: Triggers.always,
-                                                              weather: nil,
-                                                              timeFrame: nil,
-                                                              staticTimeFrame: nil,
-                                                              imageName: URL(filePath: "/Users/annaliu/Downloads/ghost.png"),
-                                                              type: WidgetInfo.types.calendar),
-                                           displayDesktop: displayDesktopWidget,
-                                           store: store)
+                do {
+                    print("starting app")
+                    try await store.save(newWidgets: [])
+                    try await store.load()
+                    displayDesktopWidget.store = store
+                    locationManager.displayDesktopWidgets = displayDesktopWidget
+                    locationManager.startUpdating()
+                } catch {
+                    fatalError(error.localizedDescription)
+                }
             }.environmentObject(store)
              .environmentObject(displayDesktopWidget)
         }

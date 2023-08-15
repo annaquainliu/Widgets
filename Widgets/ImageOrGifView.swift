@@ -12,18 +12,23 @@ struct ImageOrGifView : View {
     
     @EnvironmentObject var store : WidgetStore
     @State var fileName : URL? = nil
+    @State var backButtonPressed = false
     
     var body : some View {
-        VStack(alignment: .leading) {
-            TitleText(text : "Image/Gif")
-            Spacer().frame(height: 30)
-            HStack {
-                FilePicker(filename: $fileName)
-                Spacer(minLength: 40)
-                WidgetMenu(type: WidgetInfo.types.calendar, fileName: $fileName)
+        if backButtonPressed {
+            ContentView()
+        } else {
+            VStack(alignment: .leading) {
+                WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Image/Gif")
+                Spacer().frame(height: 30)
+                HStack {
+                    FilePicker(filename: $fileName)
+                    Spacer(minLength: 40)
+                    WidgetMenu(type: WidgetInfo.types.image, fileName: $fileName)
+                }.padding()
             }.padding()
-        }.padding()
-         .frame(width: 1200, height: 700)
+             .frame(width: 1200, height: 700)
+        }
     }
 }
 

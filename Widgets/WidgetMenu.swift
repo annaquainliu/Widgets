@@ -147,7 +147,7 @@ struct WidgetMenu : View {
                                         
                                     }.disabled(!monthSelection.selected)
                                 }
-                            }
+                            }.frame(height: 200)
                         },
                         selection: triggerSelection)
                 }.pickerStyle(RadioGroupPickerStyle())

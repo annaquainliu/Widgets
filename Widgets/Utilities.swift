@@ -16,6 +16,25 @@ func TitleText(text : String) -> some View {
             .weight(.heavy))
 }
 
+struct WidgetTypeTab : View {
+    @Binding var backButtonPressed : Bool
+    var titleText : String
+    
+    var body: some View {
+        HStack {
+            Button {
+                backButtonPressed = true
+            } label : {
+                Image(systemName: "chevron.backward.square.fill")
+                    .font(.system(size: 30, weight: .heavy))
+            }.padding()
+            .padding([.leading, .trailing], 20)
+            .buttonStyle(.borderless)
+            TitleText(text : titleText)
+        }
+    }
+}
+
 func ImportPhoto() -> some View {
     return VStack {
         Text("Import a photo/gif").font(.headline)
@@ -81,34 +100,67 @@ func alertMessage(question: String, text: String) -> Bool {
     return alert.runModal() == .alertFirstButtonReturn
 }
 
-struct CalendarView : View {
+struct CalendarIcon : View {
     @State var selection = Date()
-    var scale: CGFloat
     @FocusState var isFocused : Bool
     
     var body: some View {
-        
             DatePicker("", selection: Binding(get: {selection}, set: {
                 selection = $0
                 isFocused = false
             }), displayedComponents: [.date])
             .datePickerStyle(.graphical)
-            .scaleEffect(scale, anchor: .leading)
-            .frame(width: 156.5 * scale, height: 168 * scale)
+            .scaleEffect(CalendarSizes.scale, anchor: .leading)
+            .frame(width: CalendarSizes.calWidth, height: CalendarSizes.calHeight)
             .focused($isFocused)
-        
+            .accentColor(.white)
     }
 }
 
+struct ClockIcon : View {
+    @State var selection = Date()
+    @FocusState var isFocused : Bool
+    
+    var body: some View {
+        DatePicker("", selection: Binding(get: {selection}, set: {
+            selection = $0
+            isFocused = false
+        }), displayedComponents: [.hourAndMinute])
+        .datePickerStyle(.graphical)
+        .scaleEffect(CalendarSizes.scale, anchor: .leading)
+        .frame(width: CalendarSizes.clockWidth, height: CalendarSizes.clockHeight)
+        .focused($isFocused)
+        .accentColor(.white)
+        .labelsHidden()
+    }
+}
+
+struct CalendarSizes {
+    static var calWidth = 156.5 * CalendarSizes.scale
+    static var calHeight = 168.0 * CalendarSizes.scale
+    static var clockWidth = 120 * CalendarSizes.scale
+    static var clockHeight = 120 * CalendarSizes.scale
+    static var scale = 1.5
+    
+    enum types {
+        case calendar, clock, both
+    }
+}
+
+extension URL {
+    var isDirectory: Bool {
+       (try? resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+    }
+}
 
 struct CalendarView_Providers: PreviewProvider {
     static var previews: some View {
-        CalendarView(scale: 1.7857142857142858)
+        CalendarIcon()
     }
 }
 
-//struct CalendarImage_Providers: PreviewProvider {
-//    static var previews: some View {
-//        CalendarImage(image: NSImage(contentsOf: URL(filePath: "/Users/annaliu/Downloads/christmas.gif"))!, size: NSSize(width: 234.75, height: 252.0), scale: 0.84)
-//    }
-//}
+struct ClockView_Providers: PreviewProvider {
+    static var previews: some View {
+        ClockIcon()
+    }
+}

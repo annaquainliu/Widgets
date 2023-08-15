@@ -18,6 +18,7 @@ class WidgetNSWindow : NSWindow {
     private var displayDesktop : DisplayDesktopWidgets
     var widgetInfo : WidgetInfo
     
+    // for widgets that ARE resizable
     init(widgetInfo: WidgetInfo, widgetStore: WidgetStore, displayDesktop: DisplayDesktopWidgets) {
         self.widgetInfo = widgetInfo
         self.store = widgetStore
@@ -33,7 +34,7 @@ class WidgetNSWindow : NSWindow {
         adjustWidgetWindow()
     }
     
-    // for widgets that are not resizable
+    // for widgets that are NOT resizable
     init(widgetInfo: WidgetInfo, widgetStore: WidgetStore, displayDesktop: DisplayDesktopWidgets,
          windowSize: NSSize) {
         self.widgetInfo = widgetInfo
@@ -152,20 +153,14 @@ class DesktopWidgetWindow : NSWindow {
 
 extension NSWindow {
     func makeCalendarNSView() {
-        let defaultWidth = CalendarSizes.defaultWidth
-        let defaultHeight = CalendarSizes.defaultHeight
-        let calendarView = NSHostingView(rootView: CalendarView(scale: CalendarSizes.scale))
+        let defaultWidth = CalendarSizes.calWidth
+        let defaultHeight = CalendarSizes.calHeight
+        let calendarView = NSHostingView(rootView: CalendarIcon())
         calendarView.frame = NSRect(origin: CGPoint(x: (self.frame.width - defaultWidth) / 2,
                                                     y: (self.frame.height - defaultHeight) / 2 + 10),
                                     size: CGSize(width: defaultWidth, height: defaultHeight))
         self.contentView?.addSubview(calendarView)
     }
-}
-
-struct CalendarSizes {
-    static var defaultWidth = 156.5 * CalendarSizes.scale
-    static var defaultHeight = 168.0 * CalendarSizes.scale
-    static var scale = 1.5
 }
 
 class CalendarWidget: DesktopWidgetWindow {
@@ -179,7 +174,7 @@ class CalendarWidget: DesktopWidgetWindow {
 class EditCalendarWidget: WidgetNSWindow {
     
     init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
-        let size = NSSize(width: CalendarSizes.defaultWidth, height: CalendarSizes.defaultHeight)
+        let size = NSSize(width: CalendarSizes.calWidth, height: CalendarSizes.calHeight)
         super.init(widgetInfo: widget, widgetStore: store,
                    displayDesktop: displayDesktop, windowSize: size)
         self.makeCalendarNSView()
@@ -224,8 +219,6 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
         self.window?.makeKeyAndOrderFront(self)
         
     }
-    
-    
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

@@ -10,7 +10,6 @@ import SwiftUI
 struct ContentView: View {
     @State var tab: String = "Menu"
     @EnvironmentObject var store : WidgetStore
-    let map = ["Image/GIF" : ImageOrGifView()]
     
     var body: some View {
         if tab == "Menu" {
@@ -33,7 +32,12 @@ struct ContentView: View {
                 }.padding(30)
             }.padding([.top, .bottom], 30)
         } else {
-            map[tab]
+            switch tab {
+                case "Calendar":
+                    CalendarView()
+                default:
+                    ImageOrGifView()
+            }
         }
     }
 }
