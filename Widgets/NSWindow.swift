@@ -9,35 +9,12 @@ import Foundation
 import AppKit
 import Cocoa
 import SwiftUI
-import Quartz
-
-extension NSImage {
-    func resizedMaintainingAspectRatio(screenWidth: CGFloat, screenHeight: CGFloat) -> NSImage {
-        var ratioX = screenWidth / size.width
-        var ratioY = screenHeight / size.height
-        if (ratioX > 1 || ratioY > 1) {
-            ratioX = size.width / screenWidth
-            ratioY = size.height / screenHeight
-        }
-        let ratio = ratioX < ratioY ? ratioX : ratioY
-        let newHeight = size.height * ratio
-        let newWidth = size.width * ratio
-        let newSize = NSSize(width: newWidth, height: newHeight)
-        let image = NSImage(size: NSSize(width: newWidth, height: newHeight))
-        image.lockFocus()
-        let context = NSGraphicsContext.current
-        context!.imageInterpolation = .high
-        draw(in: NSRect(origin: .zero, size: newSize), from: NSZeroRect, operation: .copy, fraction: 1)
-        image.unlockFocus()
-        return image
-    }
-}
 
 
 class WidgetNSWindow : NSWindow {
     
     private var desktopEditMode = false
-    private var imageSize : NSSize
+    var windowSize : NSSize
     private var store : WidgetStore
     private var displayDesktop : DisplayDesktopWidgets
     var widgetInfo : WidgetInfo
@@ -47,7 +24,7 @@ class WidgetNSWindow : NSWindow {
         self.store = widgetStore
         self.displayDesktop = displayDesktop
         let image = NSImage(contentsOf: widgetInfo.imageName)
-        self.imageSize = image!.size
+        self.windowSize = image!.size
         super.init(contentRect: NSRect(x: 0, y: 0, width: image!.size.width, height: image!.size.height),
                    styleMask: [.resizable, .titled, .closable, .fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
@@ -62,8 +39,8 @@ class WidgetNSWindow : NSWindow {
         self.standardWindowButton(.miniaturizeButton)?.isHidden = true
         self.standardWindowButton(.closeButton)?.isHidden = false
         self.backgroundColor = NSColor.init(calibratedWhite: 1, alpha: 0.3)
-        self.maxSize = self.imageSize
-        self.aspectRatio = self.imageSize
+        self.maxSize = self.windowSize
+        self.aspectRatio = self.windowSize
         self.display()
         self.isMovable = true
         self.isMovableByWindowBackground = true
@@ -109,7 +86,7 @@ class WidgetNSWindow : NSWindow {
         }
         desktopEditMode = !desktopEditMode
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.backstopMenu)))
-        self.aspectRatio = self.imageSize
+        self.aspectRatio = self.windowSize
     }
 
     override var canBecomeKey: Bool {
@@ -140,7 +117,7 @@ class DesktopWidgetWindow : NSWindow {
         self.backgroundColor = NSColor.clear
         self.contentView = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
         self.aspectRatio = widgetInfo.widgetSize
-        self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
+        self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.backstopMenu)))
         self.standardWindowButton(.zoomButton)?.isHidden = true
         self.standardWindowButton(.miniaturizeButton)?.isHidden = true
         self.standardWindowButton(.closeButton)?.isHidden = true
@@ -154,16 +131,76 @@ class DesktopWidgetWindow : NSWindow {
     }
 }
 
+extension NSWindow {
+    func makeCalendarNSView(defaultWidth: Double, defaultHeight: Double) {
+        let widthRatio = self.frame.width / defaultWidth
+        let heightRatio = self.frame.height / defaultHeight
+        let ratio = min(widthRatio, heightRatio)
+        let width = defaultWidth * ratio
+        let height = defaultHeight * ratio
+        print("ratio is \(ratio)")
+        let calendarView = NSHostingView(rootView: CalendarView(scale: ratio))
+        calendarView.frame = NSRect(origin: CGPoint(x: (self.frame.width - width) / 2,
+                                                    y: (self.frame.height - height) / 2),
+                                    size: CGSize(width: width, height: height))
+        self.contentView?.addSubview(calendarView)
+        self.styleMask.remove(.resizable)
+    }
+}
+
 class CalendarWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
+        let defaultWidth = 156.5
+        let defaultHeight = 168.0
         super.init(widgetInfo: widget)
-        self.contentView = NSHostingView(rootView: CalendarView())
+        self.makeCalendarNSView(defaultWidth: defaultWidth, defaultHeight: defaultHeight)
+    }
+}
+
+class EditCalendarWidget: WidgetNSWindow {
+    
+    init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
+        let defaultWidth = 156.5
+        let defaultHeight = 168.0
+        super.init(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
+        self.makeCalendarNSView(defaultWidth: defaultWidth, defaultHeight: defaultHeight)
     }
 }
 
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
     init(window : NSWindow) {
+        super.init(window: window)
+        self.window?.makeKeyAndOrderFront(self)
+    }
+    
+    // for edit widget
+    init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
+        var window : NSWindow
+        
+        switch widget.type {
+            case WidgetInfo.types.calendar:
+                window = EditCalendarWidget(widget: widget, displayDesktop: displayDesktop, store: store)
+                break
+            default:
+                window = WidgetNSWindow(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
+                break
+        }
+        super.init(window: window)
+        self.window?.makeKeyAndOrderFront(self)
+    }
+    
+    // desktop mode
+    init(widget: WidgetInfo) {
+        var window: NSWindow
+        
+        switch widget.type {
+            case WidgetInfo.types.calendar:
+                window = CalendarWidget(widget: widget)
+                break
+            default:
+                window = DesktopWidgetWindow(widgetInfo: widget)
+        }
         super.init(window: window)
         self.window?.makeKeyAndOrderFront(self)
     }

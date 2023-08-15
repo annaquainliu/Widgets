@@ -20,7 +20,7 @@ struct ImageOrGifView : View {
             HStack {
                 FilePicker(filename: $fileName)
                 Spacer(minLength: 40)
-                WidgetMenu(type: WidgetInfo.types.image, fileName: $fileName)
+                WidgetMenu(type: WidgetInfo.types.calendar, fileName: $fileName)
             }.padding()
         }.padding()
          .frame(width: 1200, height: 700)

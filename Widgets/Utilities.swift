@@ -83,10 +83,30 @@ func alertMessage(question: String, text: String) -> Bool {
 
 struct CalendarView : View {
     @State var selection = Date()
+    var scale: CGFloat
+    @FocusState var isFocused : Bool
     
     var body: some View {
-        DatePicker("", selection: $selection, displayedComponents: [.date])
-            .padding(.horizontal)
+        DatePicker("", selection: Binding(get: {selection}, set: {
+                selection = $0
+                isFocused = false 
+             }), displayedComponents: [.date])
             .datePickerStyle(.graphical)
+            .scaleEffect(scale, anchor: .leading)
+            .frame(width: 156.5 * scale, height: 168 * scale, alignment: .center)
+            .focused($isFocused)
     }
 }
+
+
+struct CalendarView_Providers: PreviewProvider {
+    static var previews: some View {
+        CalendarView(scale: 1.7857142857142858)
+    }
+}
+
+//struct CalendarImage_Providers: PreviewProvider {
+//    static var previews: some View {
+//        CalendarImage(image: NSImage(contentsOf: URL(filePath: "/Users/annaliu/Downloads/christmas.gif"))!, size: NSSize(width: 234.75, height: 252.0), scale: 0.84)
+//    }
+//}

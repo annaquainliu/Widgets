@@ -59,9 +59,7 @@ class WidgetViewModel : ObservableObject {
                                      staticTimeFrame: staticTimeFrame,
                                      imageName: imageName,
                                      type: type)
-       _ = ScreenWindowController(window: WidgetNSWindow(widgetInfo: widgetInfo,
-                                                          widgetStore: store,
-                                                          displayDesktop: displayDesktop))
+       _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
     }
 }
 
@@ -114,7 +112,7 @@ class DisplayDesktopWidgets: ObservableObject {
     
     private func makeWindowController(widget: WidgetInfo) {
         print("making controller")
-        let controller = ScreenWindowController(window: DesktopWidgetWindow(widgetInfo: widget))
+        let controller = ScreenWindowController(widget: widget)
         self.currentWidgets[widget.getID()] = controller
     }
     
