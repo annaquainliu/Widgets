@@ -41,7 +41,8 @@ class WidgetNSWindow : NSWindow {
         self.store = widgetStore
         self.displayDesktop = displayDesktop
         self.windowSize = windowSize
-        super.init(contentRect: NSRect(x: 0, y: 0, width: windowSize.width, height: windowSize.height),
+        let bounds = NSRect(x: 0, y: 0, width: windowSize.width, height: windowSize.height)
+        super.init(contentRect: bounds,
                    styleMask: [.titled, .closable, .fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
@@ -149,15 +150,6 @@ class DesktopWidgetWindow : NSWindow {
         self.hasShadow = false
     }
     
-    private func makeRoundedCornerView() -> NSView {
-        let roundedCorners = NSView(frame: NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width,
-                                                  height: widgetInfo.widgetSize.height))
-        roundedCorners.wantsLayer = true
-        roundedCorners.layer!.cornerRadius = 15
-        roundedCorners.layer!.backgroundColor = CGColor.clear
-        return roundedCorners
-    }
-    
     override var canBecomeKey: Bool {
         return true
     }
@@ -166,9 +158,9 @@ class DesktopWidgetWindow : NSWindow {
 extension NSWindow {
     
     func makeTimeLayer(defaultWidth: Double, defaultHeight: Double, view: NSHostingView<some View>) {
-        view.frame =  NSRect(origin: CGPoint(x: (self.frame.width - defaultWidth) / 2,
-                                             y: (self.frame.height - defaultHeight) / 2 + 10),
-                             size: CGSize(width: defaultWidth, height: defaultHeight))
+        view.frame = NSRect(origin: CGPoint(x: (self.frame.width - defaultWidth) / 2,
+                                            y: (self.frame.height - defaultHeight) / 2),
+                            size: CGSize(width: defaultWidth, height: defaultHeight))
         self.contentView?.addSubview(view)
     }
     
@@ -187,6 +179,15 @@ extension NSWindow {
         }
         
     }
+    
+    func makeRoundedCornerView() -> NSView {
+        let roundedCorners = NSView(frame: NSRect(x: 0, y: 0, width: self.frame.width,
+                                                  height: self.frame.height))
+        roundedCorners.wantsLayer = true
+        roundedCorners.layer!.cornerRadius = 15
+        roundedCorners.layer!.backgroundColor = CGColor.clear
+        return roundedCorners
+    }
 }
 
 class CalendarWidget: DesktopWidgetWindow {
@@ -204,6 +205,8 @@ class EditCalendarWidget: WidgetNSWindow {
         super.init(widgetInfo: widget, widgetStore: store,
                    displayDesktop: displayDesktop, windowSize: size)
         self.makeCalendarView(type: widget.info.calendarType!)
+        let amnt = self.contentView!.subviews.count
+        self.contentView?.subviews[amnt - 1].frame.origin.y += 10
         self.contentView?.addSubview(makeButton())
     }
 }
