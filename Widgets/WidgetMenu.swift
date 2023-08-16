@@ -164,11 +164,10 @@ struct WidgetMenu : View {
                             alerts.alertInvalidTimeFrame = true
                             return
                         }
-                        if fileName == nil {
+                        if fileName == nil && type == WidgetInfo.types.image {
                             alerts.nullFileName = true
                             return
                         }
-                        print(fileName!)
                         var timeFrame : TimeFrameInfo? = nil
                         if triggerSelection == Triggers.timeFrame {
                             let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
@@ -182,7 +181,7 @@ struct WidgetMenu : View {
                                                     weather:  triggerSelection == Triggers.weather ? weatherSelection.title : nil,
                                                     timeFrame: timeFrame,
                                                     staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
-                                                    imageName: fileName!,
+                                                    imageName: fileName,
                                                     type: type,
                                                     info: info)
                         

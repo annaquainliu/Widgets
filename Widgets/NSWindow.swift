@@ -23,7 +23,7 @@ class WidgetNSWindow : NSWindow {
         self.widgetInfo = widgetInfo
         self.store = widgetStore
         self.displayDesktop = displayDesktop
-        let image = NSImage(contentsOf: widgetInfo.imageName)
+        let image = NSImage(contentsOf: widgetInfo.imageName!)
         self.windowSize = image!.size
         super.init(contentRect: NSRect(x: 0, y: 0, width: image!.size.width, height: image!.size.height),
                    styleMask: [.resizable, .titled, .closable, .fullSizeContentView],
@@ -40,15 +40,17 @@ class WidgetNSWindow : NSWindow {
         self.widgetInfo = widgetInfo
         self.store = widgetStore
         self.displayDesktop = displayDesktop
-        let image = NSImage(contentsOf: widgetInfo.imageName)!
         self.windowSize = windowSize
         super.init(contentRect: NSRect(x: 0, y: 0, width: windowSize.width, height: windowSize.height),
                    styleMask: [.titled, .closable, .fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
-        let imageView = NSImageView(image: image)
-        imageView.imageScaling = .scaleAxesIndependently
-        self.contentView = imageView
+        if widgetInfo.imageName != nil {
+            let image = NSImage(contentsOf: widgetInfo.imageName!)!
+            let imageView = NSImageView(image: image)
+            imageView.imageScaling = .scaleAxesIndependently
+            self.contentView = imageView
+        }
         adjustWidgetWindow()
     }
     
@@ -123,24 +125,32 @@ class DesktopWidgetWindow : NSWindow {
                                        y: widgetInfo.yCoord,
                                        width: widgetInfo.widgetSize.width,
                                        height: widgetInfo.widgetSize.height),
-                   styleMask: [.fullSizeContentView, .titled],
+                   styleMask: [.fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
-        let relativePath = widgetInfo.imageName.relativePath
-        if !FileManager.default.fileExists(atPath: relativePath) {
-            _ = alertMessage(question: "\(widgetInfo.imageName.relativePath) does not exist.", text: "")
-            self.close()
-            return
+        let effect = NSVisualEffectView(frame: NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width,
+                                                      height: widgetInfo.widgetSize.height))
+        effect.state = .active
+        effect.material = .contentBackground
+        effect.wantsLayer = true
+        effect.layer?.cornerRadius = 15.0
+        self.isOpaque = false
+        self.contentView = effect
+        if widgetInfo.imageName != nil {
+            let relativePath = widgetInfo.imageName!.relativePath
+            if !FileManager.default.fileExists(atPath: relativePath) {
+                _ = alertMessage(question: "\(widgetInfo.imageName!.relativePath) does not exist.", text: "")
+                self.close()
+                return
+            }
+            let image = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
+            image.frame = NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width, height: widgetInfo.widgetSize.height)
+            image.imageScaling = .scaleAxesIndependently
+            self.contentView?.addSubview(image)
         }
         self.backgroundColor = NSColor.clear
-        let image = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
-        image.imageScaling = .scaleAxesIndependently
-        self.contentView = image
         self.aspectRatio = widgetInfo.widgetSize
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.backstopMenu)))
-        self.standardWindowButton(.zoomButton)?.isHidden = true
-        self.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        self.standardWindowButton(.closeButton)?.isHidden = true
         self.titlebarAppearsTransparent = true
         self.titleVisibility = .hidden
         self.hasShadow = false
