@@ -128,14 +128,7 @@ class DesktopWidgetWindow : NSWindow {
                    styleMask: [.fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
-        let effect = NSVisualEffectView(frame: NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width,
-                                                      height: widgetInfo.widgetSize.height))
-        effect.state = .active
-        effect.material = .contentBackground
-        effect.wantsLayer = true
-        effect.layer?.cornerRadius = 15.0
-        self.isOpaque = false
-        self.contentView = effect
+        self.contentView = makeRoundedCornerView()
         if widgetInfo.imageName != nil {
             let relativePath = widgetInfo.imageName!.relativePath
             if !FileManager.default.fileExists(atPath: relativePath) {
@@ -154,6 +147,15 @@ class DesktopWidgetWindow : NSWindow {
         self.titlebarAppearsTransparent = true
         self.titleVisibility = .hidden
         self.hasShadow = false
+    }
+    
+    private func makeRoundedCornerView() -> NSView {
+        let roundedCorners = NSView(frame: NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width,
+                                                  height: widgetInfo.widgetSize.height))
+        roundedCorners.wantsLayer = true
+        roundedCorners.layer!.cornerRadius = 15
+        roundedCorners.layer!.backgroundColor = CGColor.clear
+        return roundedCorners
     }
     
     override var canBecomeKey: Bool {
