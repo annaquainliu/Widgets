@@ -42,7 +42,8 @@ struct WidgetMenu : View {
             print(timeFrameSelection)
         } label: {
             Image(systemName: selected.wrappedValue ? "checkmark.square" : "square")
-        }
+                .font(.system(size: 30))
+        }.buttonStyle(.borderless)
     }
     
     var body : some View {
@@ -173,16 +174,14 @@ struct WidgetMenu : View {
                         let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
                         let timeFrame = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
                         
-                        _ = WidgetViewModel(
-                            triggerType: triggerSelection,
-                            timeFrame: triggerSelection == Triggers.timeFrame ? timeFrame : nil,
-                            staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
-                            weather: triggerSelection == Triggers.weather ? weatherSelection.title : nil,
-                            store: store,
-                            displayDesktop: displayDesktop,
-                            imageName: fileName!,
-                            type: type)
+                        let widgetInfo = WidgetInfo(triggerType: triggerSelection,
+                                                    weather:  triggerSelection == Triggers.weather ? weatherSelection.title : nil,
+                                                    timeFrame: triggerSelection == Triggers.timeFrame ? timeFrame : nil,
+                                                    staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
+                                                    imageName: fileName!,
+                                                    type: type)
                         
+                        _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
                         alerts.alertInstructions = true
                     }
                     .padding(40)

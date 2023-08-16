@@ -29,10 +29,8 @@ struct CalendarView : View {
                         VStack(alignment: .center) {
                             Text("Choose Your Type").font(.title)
                             HStack {
-                                makeCalendarButton(view: DatePicker("", selection: $selection, displayedComponents: [.date])
-                                    .datePickerStyle(.graphical), type: CalendarSizes.types.calendar)
-                               makeCalendarButton(view: DatePicker("", selection: $selection, displayedComponents: [.hourAndMinute])
-                                .datePickerStyle(.graphical), type: CalendarSizes.types.clock)
+                                makeCalendarButton(view: Image(systemName: "calendar").font(.system(size: 100)), type: CalendarSizes.types.calendar)
+                               makeCalendarButton(view: Image(systemName: "clock.fill").font(.system(size: 100)), type: CalendarSizes.types.clock)
                             }
                         }
                         Spacer().frame(width: width / 5)
@@ -64,8 +62,8 @@ struct CalendarView : View {
                     calendarTypes.insert(type)
                 }
             }.background(
-                calendarTypes.contains(type) ? Color.gray : Color.clear
-            )
+                calendarTypes.contains(type) ? Color.blue : Color.clear)
+            .cornerRadius(13)
     }
 }
 

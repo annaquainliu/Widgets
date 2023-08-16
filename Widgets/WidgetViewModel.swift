@@ -47,22 +47,6 @@ class WidgetInfo : Codable {
     }
 }
 
-// Stores information of the widget and displays the widget in Edit Mode
-class WidgetViewModel : ObservableObject {
-    // the displayDesktop class and the WidgetStore is passed in
-    init(triggerType: String, timeFrame: TimeFrameInfo?, staticTimeFrame: StaticTimeFrame?,
-         weather: String?, store: WidgetStore, displayDesktop: DisplayDesktopWidgets, imageName: URL,
-         type: WidgetInfo.types) {
-        let widgetInfo = WidgetInfo(triggerType: triggerType,
-                                     weather: weather,
-                                     timeFrame: timeFrame,
-                                     staticTimeFrame: staticTimeFrame,
-                                     imageName: imageName,
-                                     type: type)
-       _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
-    }
-}
-
 class DisplayDesktopWidgets: ObservableObject {
     
     var store : WidgetStore?

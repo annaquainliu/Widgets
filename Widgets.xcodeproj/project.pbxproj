@@ -20,7 +20,7 @@
 		30CD4C6C2A79D74B008B830B /* WidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CD4C6B2A79D74B008B830B /* WidgetStore.swift */; };
 		30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */; };
 		30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1D12A7362A500A1F2BE /* ContentView.swift */; };
-		30F4E6CE2A75BD0700EBA9CD /* Triggers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4E6CD2A75BD0700EBA9CD /* Triggers.swift */; };
+		30F4E6CE2A75BD0700EBA9CD /* WidgetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4E6CD2A75BD0700EBA9CD /* WidgetTypes.swift */; };
 		30F4E6D02A76035700EBA9CD /* WidgetMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */; };
 /* End PBXBuildFile section */
 
@@ -78,7 +78,7 @@
 		30CD4C6D2A7A31DA008B830B /* dog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dog.png; path = ../../../../Downloads/dog.png; sourceTree = "<group>"; };
 		30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOrGifView.swift; sourceTree = "<group>"; };
 		30F1B1D12A7362A500A1F2BE /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		30F4E6CD2A75BD0700EBA9CD /* Triggers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Triggers.swift; sourceTree = "<group>"; };
+		30F4E6CD2A75BD0700EBA9CD /* WidgetTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTypes.swift; sourceTree = "<group>"; };
 		30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetMenu.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -157,7 +157,7 @@
 				30BDD92D2A71CD2E007E5F3B /* Preview Content */,
 				30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */,
 				30B14F322A73777F007A1672 /* Utilities.swift */,
-				30F4E6CD2A75BD0700EBA9CD /* Triggers.swift */,
+				30F4E6CD2A75BD0700EBA9CD /* WidgetTypes.swift */,
 				30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */,
 				30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */,
 				305EC7F02A772527009A24F8 /* NSWindow.swift */,
@@ -338,7 +338,7 @@
 				306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */,
 				30C01BFC2A88790A002BE9EC /* FilePicker.swift in Sources */,
 				30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */,
-				30F4E6CE2A75BD0700EBA9CD /* Triggers.swift in Sources */,
+				30F4E6CE2A75BD0700EBA9CD /* WidgetTypes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

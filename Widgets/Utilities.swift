@@ -100,52 +100,6 @@ func alertMessage(question: String, text: String) -> Bool {
     return alert.runModal() == .alertFirstButtonReturn
 }
 
-struct CalendarIcon : View {
-    @State var selection = Date()
-    @FocusState var isFocused : Bool
-    
-    var body: some View {
-            DatePicker("", selection: Binding(get: {selection}, set: {
-                selection = $0
-                isFocused = false
-            }), displayedComponents: [.date])
-            .datePickerStyle(.graphical)
-            .scaleEffect(CalendarSizes.scale, anchor: .leading)
-            .frame(width: CalendarSizes.calWidth, height: CalendarSizes.calHeight)
-            .focused($isFocused)
-            .accentColor(.white)
-    }
-}
-
-struct ClockIcon : View {
-    @State var selection = Date()
-    @FocusState var isFocused : Bool
-    
-    var body: some View {
-        DatePicker("", selection: Binding(get: {selection}, set: {
-            selection = $0
-            isFocused = false
-        }), displayedComponents: [.hourAndMinute])
-        .datePickerStyle(.graphical)
-        .scaleEffect(CalendarSizes.scale, anchor: .leading)
-        .frame(width: CalendarSizes.clockWidth, height: CalendarSizes.clockHeight)
-        .focused($isFocused)
-        .accentColor(.white)
-        .labelsHidden()
-    }
-}
-
-struct CalendarSizes {
-    static var calWidth = 156.5 * CalendarSizes.scale
-    static var calHeight = 168.0 * CalendarSizes.scale
-    static var clockWidth = 120 * CalendarSizes.scale
-    static var clockHeight = 120 * CalendarSizes.scale
-    static var scale = 1.5
-    
-    enum types {
-        case calendar, clock, both
-    }
-}
 
 extension URL {
     var isDirectory: Bool {
