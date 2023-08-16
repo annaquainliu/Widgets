@@ -9,6 +9,62 @@ import Foundation
 import SwiftUI
 import CoreLocation
 
+class WidgetInfo : Codable {
+    var type : WidgetInfo.types
+    var info : WidgetTypeInfo
+    var triggerType : String
+    var weather : String?
+    var timeFrame : TimeFrameInfo?
+    var staticTimeFrame : StaticTimeFrame?
+    var xCoord : Double = 0
+    var yCoord : Double = 0
+    var widgetSize : NSSize
+    var imageName : URL
+    private var id = UUID()
+    
+    enum types : Int, Codable {
+        case image, calendar, countdown, weather, slideshow
+    }
+    
+    init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,
+         staticTimeFrame: StaticTimeFrame?, imageName: URL, type: WidgetInfo.types,
+         info: WidgetTypeInfo) {
+        self.triggerType = triggerType
+        self.weather = weather
+        self.timeFrame = timeFrame
+        self.staticTimeFrame = staticTimeFrame
+        self.imageName = imageName
+        self.type = type
+        self.widgetSize = NSSize()
+        self.info = info
+    }
+    
+    func initCoordsAndSize(xCoord : Double, yCoord : Double, size : NSSize) {
+        self.xCoord = xCoord
+        self.yCoord = yCoord
+        self.widgetSize = size
+    }
+    
+    func getID() -> UUID {
+        return self.id
+    }
+}
+
+struct WidgetTypeInfo : Codable {
+    var calendarType : CalendarSizes.types?
+    var countdownTime : Date?
+    var weatherType : String?
+    var text : String?
+    
+    init(calendarType: CalendarSizes.types? = nil, countdownTime: Date? = nil,
+         weatherType: String? = nil, text: String? = nil) {
+        self.calendarType = calendarType
+        self.countdownTime = countdownTime
+        self.weatherType = weatherType
+        self.text = text
+    }
+}
+
 struct WeatherOptionInfo : Hashable {
     var title : String;
     var systemImage : String;
@@ -457,49 +513,69 @@ struct TimeFrameInfo : Codable {
     
 }
 
-struct CalendarSizes {
+/** END OF WIDGET TRIGGERS! */
+
+/** START  OF WIDGET  TYPES! */
+
+struct CalendarSizes  {
     static var calWidth = 156.5 * CalendarSizes.scale
     static var calHeight = 168.0 * CalendarSizes.scale
-    static var clockWidth = 120 * CalendarSizes.scale
-    static var clockHeight = 120 * CalendarSizes.scale
+    static var clockWidth = 140 * CalendarSizes.scale
+    static var clockHeight = 140 * CalendarSizes.scale
     static var scale = 1.5
     
-    enum types {
+    enum types : Int, Codable {
         case calendar, clock, both
+    }
+    
+    static func makeCalendarSize(type: CalendarSizes.types) -> NSSize {
+        switch type {
+            case CalendarSizes.types.calendar:
+                return NSSize(width: calWidth, height: calHeight)
+            case CalendarSizes.types.clock:
+                return NSSize(width: clockWidth, height: clockHeight)
+            default:
+                return NSSize(width: clockWidth + calWidth, height: calHeight)
+        }
     }
 }
 
 struct CalendarIcon : View {
     @State var selection = Date()
-    @FocusState var isFocused : Bool
     
     var body: some View {
-            DatePicker("", selection: Binding(get: {selection}, set: {
-                selection = $0
-                isFocused = false
-            }), displayedComponents: [.date])
-            .datePickerStyle(.graphical)
-            .scaleEffect(CalendarSizes.scale, anchor: .leading)
-            .frame(width: CalendarSizes.calWidth, height: CalendarSizes.calHeight)
-            .focused($isFocused)
-            .accentColor(.white)
+        TimelineView(.periodic(from: Date(), by: 3600)) { context in
+            DatePicker("", selection: .constant(context.date), displayedComponents: [.date])
+                .datePickerStyle(.graphical)
+                .scaleEffect(CalendarSizes.scale, anchor: .leading)
+                .frame(width: CalendarSizes.calWidth, height: CalendarSizes.calHeight)
+                .accentColor(.white)
+        }
     }
 }
 
 struct ClockIcon : View {
-    @State var selection = Date()
-    @FocusState var isFocused : Bool
     
     var body: some View {
-        DatePicker("", selection: Binding(get: {selection}, set: {
-            selection = $0
-            isFocused = false
-        }), displayedComponents: [.hourAndMinute])
-        .datePickerStyle(.graphical)
-        .scaleEffect(CalendarSizes.scale, anchor: .leading)
-        .frame(width: CalendarSizes.clockWidth, height: CalendarSizes.clockHeight)
-        .focused($isFocused)
-        .accentColor(.white)
-        .labelsHidden()
+        TimelineView(.periodic(from: Date(), by: 60)) { context in
+            DatePicker("", selection: .constant(context.date), displayedComponents: [.hourAndMinute])
+            .datePickerStyle(.graphical)
+            .scaleEffect(CalendarSizes.scale, anchor: .leading)
+            .accentColor(.white)
+            .frame(width: CalendarSizes.clockWidth, height: CalendarSizes.clockHeight)
+        }
     }
 }
+
+//struct CalendarView_Providers: PreviewProvider {
+//    static var previews: some View {
+//        CalendarIcon()
+//    }
+//}
+
+//struct ClockView_Providers: PreviewProvider {
+//    static var previews: some View {
+//        ClockIcon()
+//    }
+//}
+

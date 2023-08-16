@@ -106,15 +106,3 @@ extension URL {
        (try? resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
     }
 }
-
-struct CalendarView_Providers: PreviewProvider {
-    static var previews: some View {
-        CalendarIcon()
-    }
-}
-
-struct ClockView_Providers: PreviewProvider {
-    static var previews: some View {
-        ClockIcon()
-    }
-}

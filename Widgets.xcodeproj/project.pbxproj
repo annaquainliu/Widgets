@@ -11,7 +11,7 @@
 		306829B42A8BF9BB003478A4 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306829B32A8BF9BB003478A4 /* CalendarView.swift */; };
 		306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FAA542A8574760097CE04 /* WeatherAPI.swift */; };
 		30B14F332A73777F007A1672 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B14F322A73777F007A1672 /* Utilities.swift */; };
-		30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */; };
+		30B79BB22A7701F0002C79E7 /* DisplayDesktop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* DisplayDesktop.swift */; };
 		30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */; };
 		30BDD93A2A71CD2E007E5F3B /* WidgetsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9392A71CD2E007E5F3B /* WidgetsTests.swift */; };
 		30BDD9442A71CD2E007E5F3B /* WidgetsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9432A71CD2E007E5F3B /* WidgetsUITests.swift */; };
@@ -60,7 +60,7 @@
 		306829B32A8BF9BB003478A4 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		306FAA542A8574760097CE04 /* WeatherAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAPI.swift; sourceTree = "<group>"; };
 		30B14F322A73777F007A1672 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
-		30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetViewModel.swift; sourceTree = "<group>"; };
+		30B79BB12A7701F0002C79E7 /* DisplayDesktop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayDesktop.swift; sourceTree = "<group>"; };
 		30B79BBD2A771BF0002C79E7 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		30BDD9242A71CD2D007E5F3B /* Widgets.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Widgets.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsApp.swift; sourceTree = "<group>"; };
@@ -159,7 +159,7 @@
 				30B14F322A73777F007A1672 /* Utilities.swift */,
 				30F4E6CD2A75BD0700EBA9CD /* WidgetTypes.swift */,
 				30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */,
-				30B79BB12A7701F0002C79E7 /* WidgetViewModel.swift */,
+				30B79BB12A7701F0002C79E7 /* DisplayDesktop.swift */,
 				305EC7F02A772527009A24F8 /* NSWindow.swift */,
 				30CD4C6B2A79D74B008B830B /* WidgetStore.swift */,
 				306FAA542A8574760097CE04 /* WeatherAPI.swift */,
@@ -334,7 +334,7 @@
 				305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */,
 				30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */,
 				30B14F332A73777F007A1672 /* Utilities.swift in Sources */,
-				30B79BB22A7701F0002C79E7 /* WidgetViewModel.swift in Sources */,
+				30B79BB22A7701F0002C79E7 /* DisplayDesktop.swift in Sources */,
 				306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */,
 				30C01BFC2A88790A002BE9EC /* FilePicker.swift in Sources */,
 				30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */,

@@ -26,6 +26,7 @@ struct WidgetMenu : View {
     @State var staticTimeFrame = StaticTimeFrame(timeStart: Date(), timeEnd: Date())
     @State private var alerts = Alerts()
     
+    @Binding var info : WidgetTypeInfo
     @Binding var fileName : URL?
     
     @EnvironmentObject var store : WidgetStore
@@ -168,18 +169,22 @@ struct WidgetMenu : View {
                             return
                         }
                         print(fileName!)
-                        let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
-                        let dayParam = timeFrameSelection.contains(TimeFrame.dayOfTheWeek) ? daySelection : nil
-                        let dateParam = timeFrameSelection.contains(TimeFrame.dayOfTheMonth) ? dateSelection : nil
-                        let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
-                        let timeFrame = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
+                        var timeFrame : TimeFrameInfo? = nil
+                        if triggerSelection == Triggers.timeFrame {
+                            let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
+                            let dayParam = timeFrameSelection.contains(TimeFrame.dayOfTheWeek) ? daySelection : nil
+                            let dateParam = timeFrameSelection.contains(TimeFrame.dayOfTheMonth) ? dateSelection : nil
+                            let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
+                            timeFrame = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
+                        }
                         
                         let widgetInfo = WidgetInfo(triggerType: triggerSelection,
                                                     weather:  triggerSelection == Triggers.weather ? weatherSelection.title : nil,
-                                                    timeFrame: triggerSelection == Triggers.timeFrame ? timeFrame : nil,
+                                                    timeFrame: timeFrame,
                                                     staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
                                                     imageName: fileName!,
-                                                    type: type)
+                                                    type: type,
+                                                    info: info)
                         
                         _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
                         alerts.alertInstructions = true

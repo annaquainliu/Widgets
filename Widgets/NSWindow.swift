@@ -152,14 +152,28 @@ class DesktopWidgetWindow : NSWindow {
 }
 
 extension NSWindow {
-    func makeCalendarNSView() {
-        let defaultWidth = CalendarSizes.calWidth
-        let defaultHeight = CalendarSizes.calHeight
-        let calendarView = NSHostingView(rootView: CalendarIcon())
-        calendarView.frame = NSRect(origin: CGPoint(x: (self.frame.width - defaultWidth) / 2,
-                                                    y: (self.frame.height - defaultHeight) / 2 + 10),
-                                    size: CGSize(width: defaultWidth, height: defaultHeight))
-        self.contentView?.addSubview(calendarView)
+    
+    func makeTimeLayer(defaultWidth: Double, defaultHeight: Double, view: NSHostingView<some View>) {
+        view.frame =  NSRect(origin: CGPoint(x: (self.frame.width - defaultWidth) / 2,
+                                             y: (self.frame.height - defaultHeight) / 2 + 10),
+                             size: CGSize(width: defaultWidth, height: defaultHeight))
+        self.contentView?.addSubview(view)
+    }
+    
+    func makeCalendarView(type: CalendarSizes.types) {
+        switch type {
+            case CalendarSizes.types.calendar:
+                self.makeTimeLayer(defaultWidth: CalendarSizes.calWidth,
+                                    defaultHeight: CalendarSizes.calHeight,
+                                    view: NSHostingView(rootView: CalendarIcon()))
+            case CalendarSizes.types.clock:
+                self.makeTimeLayer(defaultWidth: CalendarSizes.clockWidth,
+                                    defaultHeight: CalendarSizes.clockHeight,
+                                    view: NSHostingView(rootView: ClockIcon()))
+            default:
+            print("default")
+        }
+        
     }
 }
 
@@ -167,17 +181,17 @@ class CalendarWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
         super.init(widgetInfo: widget)
-        self.makeCalendarNSView()
+        self.makeCalendarView(type: widget.info.calendarType!)
     }
 }
 
 class EditCalendarWidget: WidgetNSWindow {
     
     init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
-        let size = NSSize(width: CalendarSizes.calWidth, height: CalendarSizes.calHeight)
+        let size = CalendarSizes.makeCalendarSize(type: widget.info.calendarType!)
         super.init(widgetInfo: widget, widgetStore: store,
                    displayDesktop: displayDesktop, windowSize: size)
-        self.makeCalendarNSView()
+        self.makeCalendarView(type: widget.info.calendarType!)
         self.contentView?.addSubview(makeButton())
     }
 }

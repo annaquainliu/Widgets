@@ -9,44 +9,6 @@ import Foundation
 import AppKit
 import CoreLocation
 
-class WidgetInfo : Codable {
-    var type : WidgetInfo.types
-    var triggerType : String
-    var weather : String?
-    var timeFrame : TimeFrameInfo?
-    var staticTimeFrame : StaticTimeFrame?
-    var xCoord : Double = 0
-    var yCoord : Double = 0
-    var widgetSize : NSSize
-    var imageName : URL
-    private var id = UUID()
-    
-    enum types : Int, Codable {
-        case image, calendar, countdown, weather, slideshow
-    }
-    
-    init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,
-         staticTimeFrame: StaticTimeFrame?, imageName: URL, type: WidgetInfo.types) {
-        self.triggerType = triggerType
-        self.weather = weather
-        self.timeFrame = timeFrame
-        self.staticTimeFrame = staticTimeFrame
-        self.imageName = imageName
-        self.type = type
-        self.widgetSize = NSSize()
-    }
-    
-    func initCoordsAndSize(xCoord : Double, yCoord : Double, size : NSSize) {
-        self.xCoord = xCoord
-        self.yCoord = yCoord
-        self.widgetSize = size
-    }
-    
-    func getID() -> UUID {
-        return self.id
-    }
-}
-
 class DisplayDesktopWidgets: ObservableObject {
     
     var store : WidgetStore?

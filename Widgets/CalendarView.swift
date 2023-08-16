@@ -15,6 +15,7 @@ struct CalendarView : View {
     @State var selection : Date = Date()
     @State var backButtonPressed : Bool = false
     @State var calendarTypes = Set<CalendarSizes.types>()
+    @State var info = WidgetTypeInfo(calendarType: CalendarSizes.types.calendar)
     let width : CGFloat = 1300
     let height : CGFloat = 700
     
@@ -42,7 +43,7 @@ struct CalendarView : View {
                     Spacer().frame(height: 30)
                     HStack {
                         Spacer(minLength: 40)
-                        WidgetMenu(type: WidgetInfo.types.calendar, fileName: $fileName)
+                        WidgetMenu(type: WidgetInfo.types.calendar, info: $info, fileName: $fileName)
                     }.padding()
                 }.padding()
             }.frame(width: width, height: height)
@@ -60,6 +61,12 @@ struct CalendarView : View {
                     calendarTypes.remove(type)
                 } else {
                     calendarTypes.insert(type)
+                }
+                if calendarTypes.count == 2 {
+                    info.calendarType = CalendarSizes.types.both
+                }
+                else if calendarTypes.count == 1 {
+                    info.calendarType = calendarTypes.first
                 }
             }.background(
                 calendarTypes.contains(type) ? Color.blue : Color.clear)

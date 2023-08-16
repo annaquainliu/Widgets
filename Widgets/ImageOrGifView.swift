@@ -13,6 +13,7 @@ struct ImageOrGifView : View {
     @EnvironmentObject var store : WidgetStore
     @State var fileName : URL? = nil
     @State var backButtonPressed = false
+    @State var info = WidgetTypeInfo()
     
     var body : some View {
         if backButtonPressed {
@@ -24,7 +25,7 @@ struct ImageOrGifView : View {
                 HStack {
                     FilePicker(filename: $fileName)
                     Spacer(minLength: 40)
-                    WidgetMenu(type: WidgetInfo.types.image, fileName: $fileName)
+                    WidgetMenu(type: WidgetInfo.types.image, info: $info, fileName: $fileName)
                 }.padding()
             }.padding()
              .frame(width: 1200, height: 700)
