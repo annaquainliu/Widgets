@@ -209,13 +209,13 @@ struct TimeFrame {
         return TimeFrame.weekdays.firstIndex(of: weekday)! + 1
     }
     
-    static func makeDate(year: Int, month: Int, day: Int, hour: Int, minute: Int) -> Date {
+    static func makeDate(year: Int, month: Int, day: Int, hour: Int? = nil, minute: Int? = nil) -> Date {
         var dateComponents = DateComponents()
         dateComponents.year = year
         dateComponents.month = month
         dateComponents.day = day
-        dateComponents.minute = minute
-        dateComponents.hour = hour
+        dateComponents.minute = minute == nil ? 0 : minute
+        dateComponents.hour = hour == nil ? 0 : hour
         // Create date from components
         let userCalendar = Calendar(identifier: .gregorian) // since the components above (like year 1980) are for Gregorian
         return userCalendar.date(from: dateComponents)!
@@ -544,7 +544,17 @@ struct CalendarIcon : View {
     @State var selection = Date()
     
     var body: some View {
-        TimelineView(.periodic(from: Date(), by: 3600)) { context in
+        var interval : Int = 86400
+        let _ = {
+            let curr = Date()
+            let next = TimeFrame.makeDate(year: curr.get(.year), month: curr.get(.month), day: curr.get(.day))
+            let diffs = Calendar.current.dateComponents([.second], from: curr, to: next)
+            interval = diffs.second!
+        }()
+        TimelineView(.periodic(from: Date(), by: TimeInterval(interval))) { context in
+            let _ = {
+                interval = 86400
+            }()
             DatePicker("", selection: .constant(context.date), displayedComponents: [.date])
                 .datePickerStyle(.graphical)
                 .scaleEffect(CalendarSizes.scale, anchor: .leading)
@@ -557,13 +567,44 @@ struct CalendarIcon : View {
 struct ClockIcon : View {
     
     var body: some View {
-        TimelineView(.periodic(from: Date(), by: 3)) { context in
+        var interval = 60
+        let _ = {
+            let currSeconds = Date().get(.second)
+            interval = 60 - currSeconds
+        }
+        TimelineView(.periodic(from: Date(), by: TimeInterval(interval))) { context in
+            let _ = {
+                interval = 60
+            }
             DatePicker("", selection: .constant(context.date), displayedComponents: [.hourAndMinute])
             .datePickerStyle(.graphical)
             .scaleEffect(CalendarSizes.scale, anchor: .leading)
             .accentColor(.white)
             .frame(width: CalendarSizes.clockWidth, height: CalendarSizes.clockHeight)
         }
+    }
+}
+
+struct AlarmIcon : View {
+    
+    var body: some View {
+        var interval : Double = 60
+        let _ = {
+            let currSeconds : Double = Double(Date().get(.second))
+            interval = 60 - currSeconds
+        }
+        TimelineView(.periodic(from: Date(), by: interval)) { context in
+            let _ = {
+                interval = 60
+            }
+            Text(context.date.formatted(.dateTime).split(separator: ",")[1] + " ").font(Font.custom("Seven Segment", size: 20))
+        }.frame(width: 100, height: 30)
+    }
+}
+
+struct AlarmIcon_Providers: PreviewProvider {
+    static var previews: some View {
+        AlarmIcon()
     }
 }
 
