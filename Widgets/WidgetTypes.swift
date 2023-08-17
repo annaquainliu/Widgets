@@ -525,7 +525,7 @@ struct CalendarSizes  {
     static var scale = 1.5
     
     enum types : Int, Codable {
-        case calendar, clock, both
+        case calendar, clock, text
     }
     
     static func makeCalendarSize(type: CalendarSizes.types) -> NSSize {
@@ -557,7 +557,7 @@ struct CalendarIcon : View {
 struct ClockIcon : View {
     
     var body: some View {
-        TimelineView(.periodic(from: Date(), by: 60)) { context in
+        TimelineView(.periodic(from: Date(), by: 3)) { context in
             DatePicker("", selection: .constant(context.date), displayedComponents: [.hourAndMinute])
             .datePickerStyle(.graphical)
             .scaleEffect(CalendarSizes.scale, anchor: .leading)
@@ -566,6 +566,7 @@ struct ClockIcon : View {
         }
     }
 }
+
 
 //struct CalendarView_Providers: PreviewProvider {
 //    static var previews: some View {

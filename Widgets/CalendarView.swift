@@ -14,7 +14,6 @@ struct CalendarView : View {
     @State var fileName : URL? = nil
     @State var selection : Date = Date()
     @State var backButtonPressed : Bool = false
-    @State var calendarTypes = Set<CalendarSizes.types>()
     @State var info = WidgetTypeInfo(calendarType: CalendarSizes.types.calendar)
     let width : CGFloat = 1300
     let height : CGFloat = 700
@@ -30,11 +29,12 @@ struct CalendarView : View {
                         VStack(alignment: .center) {
                             Text("Choose Your Type").font(.title)
                             HStack {
-                                makeCalendarButton(view: Image(systemName: "calendar").font(.system(size: 100)), type: CalendarSizes.types.calendar)
-                               makeCalendarButton(view: Image(systemName: "clock.fill").font(.system(size: 100)), type: CalendarSizes.types.clock)
+                                makeCalendarButton(view: Image(systemName: "calendar").font(.system(size: 90)), type: CalendarSizes.types.calendar)
+                               makeCalendarButton(view: Image(systemName: "clock.fill").font(.system(size: 90)), type: CalendarSizes.types.clock)
+                                makeCalendarButton(view: Image(systemName: "textformat").font(.system(size: 90)), type: CalendarSizes.types.text)
                             }
                         }
-                        Spacer().frame(width: width / 5)
+                        Spacer().frame(width: width / 6)
                         VStack {
                             Text("Background").font(.title)
                             FilePicker(filename: $fileName)
@@ -57,19 +57,9 @@ struct CalendarView : View {
             .frame(width: 150, height: 150)
             .contentShape(Rectangle())
             .onTapGesture {
-                if calendarTypes.contains(type) {
-                    calendarTypes.remove(type)
-                } else {
-                    calendarTypes.insert(type)
-                }
-                if calendarTypes.count == 2 {
-                    info.calendarType = CalendarSizes.types.both
-                }
-                else if calendarTypes.count == 1 {
-                    info.calendarType = calendarTypes.first
-                }
+                info.calendarType = type
             }.background(
-                calendarTypes.contains(type) ? Color.blue : Color.clear)
+                info.calendarType == type ? Color.blue : Color.clear)
             .cornerRadius(13)
     }
 }

@@ -15,6 +15,7 @@ class DisplayDesktopWidgets: ObservableObject {
     private var currentWidgets : [UUID : ScreenWindowController]
     private var weatherWidgets : [WidgetInfo]
     private var setWeatherInterval = false
+    private var loaded = false
     
     init() {
         self.store = nil
@@ -22,23 +23,30 @@ class DisplayDesktopWidgets: ObservableObject {
         self.weatherWidgets = []
     }
     
+    // CAN ONLY BE CALLED ONCE!
     func loadWidgets() {
-        if store == nil {
+        if store == nil || self.loaded {
             return
         }
+        print("loading widgets!!")
         for widget in store!.widgets {
             displayWidget(widget: widget)
         }
+        self.loaded = true
     }
     
     func displayWidget(widget: WidgetInfo) {
         switch widget.triggerType {
             case Triggers.always:
+                print("always")
                 makeWindowController(widget: widget)
+                break
             case Triggers.timeFrame:
                 displayTimeFrameWidget(widget: widget)
+                break
             case Triggers.weather:
                 displayWeatherWidget(widget: widget)
+                break
             default:
                 displayStaticTimeWidget(widget: widget)
         }

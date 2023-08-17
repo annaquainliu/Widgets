@@ -93,6 +93,7 @@ class WidgetNSWindow : NSWindow {
                                                        height: self.frame.height))
         Task {
             await store.addWidget(widget: self.widgetInfo)
+            print("saving widget")
             displayDesktop.displayWidget(widget: self.widgetInfo)
         }
     }
@@ -147,11 +148,16 @@ class DesktopWidgetWindow : NSWindow {
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.backstopMenu)))
         self.titlebarAppearsTransparent = true
         self.titleVisibility = .hidden
-        self.hasShadow = false
+        self.hasShadow = true
+        self.isMovableByWindowBackground = true
     }
     
     override var canBecomeKey: Bool {
         return true
+    }
+    
+    override public func mouseDown(with event: NSEvent) {
+        self.performDrag(with: event)
     }
 }
 
@@ -177,7 +183,6 @@ extension NSWindow {
             default:
             print("default")
         }
-        
     }
     
     func makeRoundedCornerView() -> NSView {

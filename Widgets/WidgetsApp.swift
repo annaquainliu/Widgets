@@ -19,7 +19,6 @@ struct WidgetsApp: App {
             ContentView().task {
                 do {
                     print("starting app")
-                    try await store.save(newWidgets: [])
                     try await store.load()
                     displayDesktopWidget.store = store
                     locationManager.displayDesktopWidgets = displayDesktopWidget
