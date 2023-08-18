@@ -20,7 +20,7 @@ struct FilePicker: View {
                 if fileSelected && filename != nil {
                     Image(nsImage: NSImage(contentsOf: filename!)!)
                         .resizable()
-                        .frame(width: 150.0, height: 150.0)
+                        .aspectRatio(contentMode: .fit)
                 } else {
                     Text("Import a photo/gif").font(.headline)
                     Image(systemName: "photo.fill")
@@ -55,16 +55,15 @@ struct FilePicker: View {
     }
 }
 
+//struct FilePicker_Previews : PreviewProvider {
+//    static var previews : some View {
+//        FilePickerView()
+//    }
+//}
 struct FilePickerView : View {
     @State var url : URL? = nil
     
     var body: some View {
         FilePicker(filename: $url)
-    }
-}
-
-struct FilePicker_Previews : PreviewProvider {
-    static var previews : some View {
-        FilePickerView()
     }
 }

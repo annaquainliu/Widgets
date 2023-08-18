@@ -52,7 +52,7 @@ class WidgetNSWindow : NSWindow {
             imageView.imageScaling = .scaleAxesIndependently
             self.contentView = imageView
         }
-        adjustWidgetWindow()
+        self.adjustWidgetWindow()
     }
     
     
@@ -72,15 +72,14 @@ class WidgetNSWindow : NSWindow {
         self.hasShadow = false
         self.center()
     }
-    
     func makeButton() -> NSButton {
-        let button = NSButton(frame: NSRect(x: 10, y: 10, width: 20, height: 20))
+        let button = NSButton(frame: NSRect(x: self.windowSize.width - 60, y: 10, width: 50, height: 20))
         button.isBordered = false
         button.wantsLayer = true
-        button.layer?.backgroundColor = CGColor.black
+        button.attributedTitle = NSMutableAttributedString(string: "Save", attributes: [NSAttributedString.Key.foregroundColor: NSColor.white, NSAttributedString.Key.font: NSFont.systemFont(ofSize: 15)])
+        button.layer?.backgroundColor = CGColor.init(red: 0.15, green: 0.8, blue: 0.2, alpha: 1)
         button.layer!.masksToBounds = true
-        button.layer!.cornerRadius = 10
-        button.image = NSImage(systemSymbolName: "checkmark", accessibilityDescription: "Save Changes")
+        button.layer!.cornerRadius = 6.5
         button.action = #selector(saveWidget)
         return button
     }
@@ -102,10 +101,8 @@ class WidgetNSWindow : NSWindow {
         self.performDrag(with: event)
         if (desktopEditMode) {
             self.backgroundColor = NSColor.init(calibratedWhite: 1, alpha: 0.3)
-            self.standardWindowButton(.closeButton)?.isHidden = false
         } else {
             self.backgroundColor = NSColor.clear
-            self.standardWindowButton(.closeButton)?.isHidden = true
         }
         desktopEditMode = !desktopEditMode
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.backstopMenu)))
@@ -181,7 +178,9 @@ extension NSWindow {
                                     defaultHeight: CalendarSizes.clockHeight,
                                     view: NSHostingView(rootView: ClockIcon()))
             default:
-            print("default")
+                self.makeTimeLayer(defaultWidth: CalendarSizes.alarmWidth,
+                                   defaultHeight: CalendarSizes.alarmHeight,
+                                   view: NSHostingView(rootView: AlarmIcon()))
         }
     }
     
