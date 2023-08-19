@@ -10,23 +10,6 @@ import SwiftUI
 import CoreLocation
 import Quartz
 
-struct QLImage: NSViewRepresentable {
-    var url: URL
-    
-    func makeNSView(context: NSViewRepresentableContext<QLImage>) -> QLPreviewView {
-        let preview = QLPreviewView(frame: .zero, style: .normal)
-        preview?.autostarts = true
-        preview?.previewItem = url as QLPreviewItem
-        
-        return preview ?? QLPreviewView()
-    }
-    
-    func updateNSView(_ nsView: QLPreviewView, context: NSViewRepresentableContext<QLImage>) {
-        nsView.previewItem = url as QLPreviewItem
-    }
-    
-    typealias NSViewType = QLPreviewView
-}
 
 class WidgetInfo : Codable {
     var type : WidgetInfo.types
@@ -42,7 +25,7 @@ class WidgetInfo : Codable {
     private var id = UUID()
     
     enum types : Int, Codable {
-        case image, calendar, countdown, weather, slideshow
+        case image, calendar, desktop, weather, slideshow
     }
     
     init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,
@@ -561,12 +544,12 @@ struct CalendarSizes  {
     }
 }
 
+
 struct CalendarIcon : View {
-    @State var selection = Date()
-    
+ 
     var body: some View {
-        TimelineView(.periodic(from: Date(), by: 3600)) { context in
-            DatePicker("", selection: .constant(context.date), displayedComponents: [.date])
+        TimelineView(.periodic(from: TimeFrame.makeDate(year: Date().get(.year), month: Date().get(.month), day: Date().get(.day) + 1) , by: 86400)) { context in
+            DatePicker("", selection: .constant(Date()), displayedComponents: [.date])
                 .datePickerStyle(.graphical)
                 .scaleEffect(CalendarSizes.scale, anchor: .leading)
                 .frame(width: CalendarSizes.calWidth, height: CalendarSizes.calHeight)
@@ -578,7 +561,7 @@ struct CalendarIcon : View {
 struct ClockIcon : View {
     
     var body: some View {
-        TimelineView(.periodic(from: Date(), by: 30)) { context in
+        TimelineView(.everyMinute) {context  in
             DatePicker("", selection: .constant(context.date), displayedComponents: [.hourAndMinute])
             .datePickerStyle(.graphical)
             .scaleEffect(CalendarSizes.scale, anchor: .leading)
@@ -591,12 +574,14 @@ struct ClockIcon : View {
 struct AlarmIcon : View {
     
     var body: some View {
-        TimelineView(.periodic(from: Date(), by: 30)) { context in
-            Text(context.date.formatted(.dateTime).split(separator: ",")[1] + " ").font(Font.custom("Arial", size: 70))
-            
-        }.frame(width: CalendarSizes.alarmWidth, height: CalendarSizes.alarmHeight)
+        TimelineView(.everyMinute) {context  in
+            Text(context.date.formatted(.dateTime).split(separator: ",")[1] + " ")
+                .font(Font.custom("Arial", size: 70))
+                .frame(width: CalendarSizes.alarmWidth, height: CalendarSizes.alarmHeight)
+        }
     }
 }
+
 struct AlarmIcon_Providers: PreviewProvider {
     static var previews: some View {
         AlarmIcon()

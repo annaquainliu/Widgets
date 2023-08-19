@@ -20,7 +20,7 @@ struct ContentView: View {
                 VStack {
                     HStack {
                         MenuButton(title: "Image/GIF", ImageName: "photo.fill", parent:self)
-                        MenuButton(title: "Image Slideshow", ImageName:"photo.stack", parent:self)
+                        MenuButton(title: "Desktop", ImageName:"photo.stack", parent:self)
                         MenuButton(title: "Weather", ImageName:"sun.min", parent:self)
                     }
                     HStack {
