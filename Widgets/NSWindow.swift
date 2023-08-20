@@ -130,16 +130,7 @@ class DesktopWidgetWindow : NSWindow {
                    defer: true)
         self.contentView = makeRoundedCornerView()
         if widgetInfo.imageURLs.count > 0 {
-            let relativePath = widgetInfo.imageURLs[0].relativePath
-            if !FileManager.default.fileExists(atPath: relativePath) {
-                _ = alertMessage(question: "\(widgetInfo.imageURLs[0].relativePath) does not exist.", text: "")
-                self.close()
-                return
-            }
-            let image = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
-            image.frame = NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width, height: widgetInfo.widgetSize.height)
-            image.imageScaling = .scaleAxesIndependently
-            self.contentView?.addSubview(image)
+            startSlideShowTimer()
         }
         self.backgroundColor = NSColor.clear
         self.aspectRatio = widgetInfo.widgetSize
@@ -148,6 +139,27 @@ class DesktopWidgetWindow : NSWindow {
         self.titleVisibility = .hidden
         self.hasShadow = true
         self.isMovableByWindowBackground = true
+    }
+    
+    func startSlideShowTimer() {
+        var index: Int = 0
+        if widgetInfo.slideshow.random {
+            index = Int.random(in: 0..<widgetInfo.imageURLs.count)
+        }
+        let relativePath = widgetInfo.imageURLs[index].relativePath
+        if !FileManager.default.fileExists(atPath: relativePath) {
+            _ = alertMessage(question: "\(relativePath) does not exist.", text: "")
+            self.close()
+            return
+        }
+        let image = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
+        image.frame = NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width, height: widgetInfo.widgetSize.height)
+        image.imageScaling = .scaleAxesIndependently
+        self.contentView?.addSubview(image)
+    }
+    
+    func setImageBackground() {
+        
     }
     
     override var canBecomeKey: Bool {
