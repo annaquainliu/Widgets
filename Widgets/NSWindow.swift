@@ -72,8 +72,9 @@ class WidgetNSWindow : NSWindow {
         self.hasShadow = false
         self.center()
     }
+    
     func makeButton() -> NSButton {
-        let button = NSButton(frame: NSRect(x: self.windowSize.width - 60, y: 10, width: 50, height: 20))
+        let button = NSButton(frame: NSRect(x: 10, y: 10, width: 50, height: 20))
         button.isBordered = false
         button.wantsLayer = true
         button.attributedTitle = NSMutableAttributedString(string: "Save", attributes: [NSAttributedString.Key.foregroundColor: NSColor.white, NSAttributedString.Key.font: NSFont.systemFont(ofSize: 15)])

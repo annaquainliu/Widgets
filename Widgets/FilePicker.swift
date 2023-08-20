@@ -65,6 +65,8 @@ struct ImportFile : View, Hashable {
     @State var hover = false
     @State var filename : URL? = nil
     @Binding var files : [URL]
+    @State var index : Int? = nil
+    
     var id = UUID()
     
     func removeFile() {
@@ -107,8 +109,14 @@ struct ImportFile : View, Hashable {
                     _ = alertMessage(question: "Your file cannot be from your Documents folder", text: "")
                     return
                 }
-                files.insert(filename!, at: files.count)
-                fileSelected = true
+                if fileSelected {
+                    files[index!] = filename!
+                }
+                else {
+                    index = files.count
+                    files.insert(filename!, at: files.count)
+                    fileSelected = true
+                }
             }
         }
     }
