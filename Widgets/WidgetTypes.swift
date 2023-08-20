@@ -21,7 +21,8 @@ class WidgetInfo : Codable {
     var xCoord : Double = 0
     var yCoord : Double = 0
     var widgetSize : NSSize
-    var imageName : [URL]
+    var imageURLs : [URL]
+    var slideshow : SlideshowInfo
     private var id = UUID()
     
     enum types : Int, Codable {
@@ -30,15 +31,16 @@ class WidgetInfo : Codable {
     
     init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,
          staticTimeFrame: StaticTimeFrame?, imageName: [URL], type: WidgetInfo.types,
-         info: WidgetTypeInfo) {
+         info: WidgetTypeInfo, slideshow : SlideshowInfo) {
         self.triggerType = triggerType
         self.weather = weather
         self.timeFrame = timeFrame
         self.staticTimeFrame = staticTimeFrame
-        self.imageName = imageName
+        self.imageURLs = imageName
         self.type = type
         self.widgetSize = NSSize()
         self.info = info
+        self.slideshow = slideshow
     }
     
     func initCoordsAndSize(xCoord : Double, yCoord : Double, size : NSSize) {
@@ -65,6 +67,11 @@ struct WidgetTypeInfo : Codable {
         self.weatherType = weatherType
         self.text = text
     }
+}
+
+struct SlideshowInfo : Codable {
+    var random : Bool
+    var interval : Int
 }
 
 struct WeatherOptionInfo : Hashable {
