@@ -23,9 +23,12 @@ struct FilePicker: View {
                 }
                 FileTools(image: "minus.circle.fill").onTapGesture {
                     if importFiles.count > 0 {
+                        if importFiles.count == files.count {
+                            files.removeLast()
+                        }
                         importFiles.removeLast()
-                        files.removeLast()
                     }
+                    print(files)
                 }
             }
         }.frame(width: 190)
@@ -50,9 +53,7 @@ struct FileTools : View {
 
 struct ImportFile : View, Hashable {
     static func == (lhs: ImportFile, rhs: ImportFile) -> Bool {
-        return lhs.fileSelected == rhs.fileSelected &&
-                lhs.filename == rhs.filename &&
-                lhs.files == rhs.files
+        return lhs.id == rhs.id
     }
     
     func hash(into hasher: inout Hasher) {
@@ -64,6 +65,15 @@ struct ImportFile : View, Hashable {
     @State var hover = false
     @State var filename : URL? = nil
     @Binding var files : [URL]
+    var id = UUID()
+    
+    func removeFile() {
+        
+        if fileSelected {
+            print("removed")
+            files.removeLast()
+        }
+    }
     
     var body : some View {
         VStack {
