@@ -23,7 +23,7 @@ class WidgetNSWindow : NSWindow {
         self.widgetInfo = widgetInfo
         self.store = widgetStore
         self.displayDesktop = displayDesktop
-        let image = NSImage(contentsOf: widgetInfo.imageName!)
+        let image = NSImage(contentsOf: widgetInfo.imageName[0])
         self.windowSize = image!.size
         super.init(contentRect: NSRect(x: 0, y: 0, width: image!.size.width, height: image!.size.height),
                    styleMask: [.resizable, .titled, .closable, .fullSizeContentView],
@@ -46,8 +46,8 @@ class WidgetNSWindow : NSWindow {
                    styleMask: [.titled, .closable, .fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
-        if widgetInfo.imageName != nil {
-            let image = NSImage(contentsOf: widgetInfo.imageName!)!
+        if widgetInfo.imageName.count > 0 {
+            let image = NSImage(contentsOf: widgetInfo.imageName[0])!
             let imageView = NSImageView(image: image)
             imageView.imageScaling = .scaleAxesIndependently
             self.contentView = imageView
@@ -128,10 +128,10 @@ class DesktopWidgetWindow : NSWindow {
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
         self.contentView = makeRoundedCornerView()
-        if widgetInfo.imageName != nil {
-            let relativePath = widgetInfo.imageName!.relativePath
+        if widgetInfo.imageName.count > 0 {
+            let relativePath = widgetInfo.imageName[0].relativePath
             if !FileManager.default.fileExists(atPath: relativePath) {
-                _ = alertMessage(question: "\(widgetInfo.imageName!.relativePath) does not exist.", text: "")
+                _ = alertMessage(question: "\(widgetInfo.imageName[0].relativePath) does not exist.", text: "")
                 self.close()
                 return
             }

@@ -21,7 +21,7 @@ class WidgetInfo : Codable {
     var xCoord : Double = 0
     var yCoord : Double = 0
     var widgetSize : NSSize
-    var imageName : URL?
+    var imageName : [URL]
     private var id = UUID()
     
     enum types : Int, Codable {
@@ -29,7 +29,7 @@ class WidgetInfo : Codable {
     }
     
     init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,
-         staticTimeFrame: StaticTimeFrame?, imageName: URL?, type: WidgetInfo.types,
+         staticTimeFrame: StaticTimeFrame?, imageName: [URL], type: WidgetInfo.types,
          info: WidgetTypeInfo) {
         self.triggerType = triggerType
         self.weather = weather

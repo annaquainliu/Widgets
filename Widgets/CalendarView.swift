@@ -11,7 +11,7 @@ import SwiftUI
 struct CalendarView : View {
     
     @EnvironmentObject var store : WidgetStore
-    @State var fileName : URL? = nil
+    @State var fileName : [URL] = []
     @State var selection : Date = Date()
     @State var backButtonPressed : Bool = false
     @State var info = WidgetTypeInfo(calendarType: CalendarSizes.types.calendar)
@@ -37,13 +37,13 @@ struct CalendarView : View {
                         Spacer().frame(width: width / 6)
                         VStack {
                             Text("Background").font(.title)
-                            FilePicker(filename: $fileName)
+                            FilePicker(files: $fileName)
                         }
                     }.frame(width: width)
                     Spacer().frame(height: 30)
                     HStack {
                         Spacer(minLength: 40)
-                        WidgetMenu(type: WidgetInfo.types.calendar, info: $info, fileName: $fileName)
+                        WidgetMenu(type: WidgetInfo.types.calendar, info: $info, fileNames: $fileName)
                     }.padding()
                 }.padding()
             }.frame(width: width, height: height)

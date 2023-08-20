@@ -11,7 +11,7 @@ import SwiftUI
 struct ImageOrGifView : View {
     
     @EnvironmentObject var store : WidgetStore
-    @State var fileName : URL? = nil
+    @State var fileName : [URL] = []
     @State var backButtonPressed = false
     @State var info = WidgetTypeInfo()
     
@@ -23,9 +23,9 @@ struct ImageOrGifView : View {
                 WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Image/Gif")
                 Spacer().frame(height: 30)
                 HStack {
-                    FilePicker(filename: $fileName)
+                    FilePicker(files: $fileName)
                     Spacer(minLength: 40)
-                    WidgetMenu(type: WidgetInfo.types.image, info: $info, fileName: $fileName)
+                    WidgetMenu(type: WidgetInfo.types.image, info: $info, fileNames: $fileName)
                 }.padding()
             }.padding()
              .frame(width: 1200, height: 700)

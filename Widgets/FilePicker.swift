@@ -9,61 +9,110 @@ import Foundation
 import SwiftUI
 
 struct FilePicker: View {
-    @Binding var filename : URL?
-    @State var showFileChooser = false
-    @State var fileSelected = false
-    @State var hover = false
+    @Binding var files : [URL]
+    @State var importFiles : [ImportFile] = []
     
     var body: some View {
-        HStack {
-            VStack {
-                if fileSelected && filename != nil {
-                    Image(nsImage: NSImage(contentsOf: filename!)!)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                } else {
-                    Text("Import a photo/gif").font(.headline)
-                    Image(systemName: "photo.fill")
-                        .font(.system(size: hover ? 30 : 20))
-                        .scaledToFit()
-                        .frame(width: 32.0, height: 32.0)
-                }
-            }.frame(width: 150, height: 150)
-                .overlay(RoundedRectangle(cornerRadius: 16).stroke(.white, lineWidth: fileSelected ? 0 : 2))
-            .animation(.default, value: hover)
-            .onHover { over in
-                hover = over
+        List {
+            ForEach(importFiles, id: \.self) { view in
+                view
             }
-            .cornerRadius(16)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                let panel = NSOpenPanel()
-                panel.allowsMultipleSelection = false
-                panel.canChooseDirectories = true
-                panel.directoryURL = URL.downloadsDirectory
-                if panel.runModal() == .OK {
-                    self.filename = panel.url ?? nil
-                    if filename != nil && filename!.absoluteString.contains("file:///Users/\(NSUserName())/Documents/") {
-                        _ = alertMessage(question: "Your file cannot be from your Documents folder", text: "")
-                        return 
-                    }
-                    
-                    fileSelected = true
+            HStack {
+                FileTools(image: "plus.rectangle.fill.on.rectangle.fill").onTapGesture {
+                    importFiles.insert(ImportFile(files: $files), at: importFiles.count)
                 }
+                FileTools(image: "minus.circle.fill").onTapGesture {
+                    if importFiles.count > 0 {
+                        importFiles.removeLast()
+                        files.removeLast()
+                    }
+                }
+            }
+        }.frame(width: 190)
+          .task {
+            importFiles.insert(ImportFile(files: $files), at: importFiles.count)
+         }
+        .cornerRadius(15)
+    }
+}
+
+struct FileTools : View {
+    var image : String
+    var body : some View {
+        HStack {
+            Image(systemName: image)
+            .font(.system(size: 30))
+            .multilineTextAlignment(.center)
+        }.frame(width: 75, height: 100)
+         .contentShape(Rectangle())
+    }
+}
+
+struct ImportFile : View, Hashable {
+    static func == (lhs: ImportFile, rhs: ImportFile) -> Bool {
+        return lhs.fileSelected == rhs.fileSelected &&
+                lhs.filename == rhs.filename &&
+                lhs.files == rhs.files
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(fileSelected)
+        hasher.combine(filename)
+    }
+    
+    @State var fileSelected = false
+    @State var hover = false
+    @State var filename : URL? = nil
+    @Binding var files : [URL]
+    
+    var body : some View {
+        VStack {
+            if fileSelected && filename != nil {
+                Image(nsImage: NSImage(contentsOf: filename!)!)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } else {
+                Text("Import a photo/gif").font(.headline)
+                Image(systemName: "photo.fill")
+                    .font(.system(size: hover ? 30 : 20))
+                    .scaledToFit()
+                    .frame(width: 32.0, height: 32.0)
+            }
+        }.frame(width: 150, height: 150)
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(.white, lineWidth: fileSelected ? 0 : 2))
+        .animation(.default, value: hover)
+        .onHover { over in
+            hover = over
+        }
+        .cornerRadius(16)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            let panel = NSOpenPanel()
+            panel.allowsMultipleSelection = false
+            panel.canChooseDirectories = true
+            panel.directoryURL = URL.downloadsDirectory
+            if panel.runModal() == .OK {
+                self.filename = panel.url ?? nil
+                if filename != nil && filename!.absoluteString.contains("file:///Users/\(NSUserName())/Documents/") {
+                    _ = alertMessage(question: "Your file cannot be from your Documents folder", text: "")
+                    return
+                }
+                files.insert(filename!, at: files.count)
+                fileSelected = true
             }
         }
     }
 }
 
-//struct FilePicker_Previews : PreviewProvider {
-//    static var previews : some View {
-//        FilePickerView()
-//    }
-//}
+struct FilePicker_Previews : PreviewProvider {
+    static var previews : some View {
+        FilePickerView()
+    }
+}
 struct FilePickerView : View {
-    @State var url : URL? = nil
+    @State var url : [URL] = []
     
     var body: some View {
-        FilePicker(filename: $url)
+        FilePicker(files: $url)
     }
 }

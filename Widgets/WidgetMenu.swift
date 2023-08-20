@@ -27,7 +27,7 @@ struct WidgetMenu : View {
     @State private var alerts = Alerts()
     
     @Binding var info : WidgetTypeInfo
-    @Binding var fileName : URL?
+    @Binding var fileNames : [URL]
     
     @EnvironmentObject var store : WidgetStore
     @EnvironmentObject var displayDesktop: DisplayDesktopWidgets
@@ -164,7 +164,7 @@ struct WidgetMenu : View {
                             alerts.alertInvalidTimeFrame = true
                             return
                         }
-                        if fileName == nil && type == WidgetInfo.types.image {
+                        if fileNames.count == 0 && type == WidgetInfo.types.image {
                             alerts.nullFileName = true
                             return
                         }
@@ -181,7 +181,7 @@ struct WidgetMenu : View {
                                                     weather:  triggerSelection == Triggers.weather ? weatherSelection.title : nil,
                                                     timeFrame: timeFrame,
                                                     staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
-                                                    imageName: fileName,
+                                                    imageName: fileNames,
                                                     type: type,
                                                     info: info)
                         
