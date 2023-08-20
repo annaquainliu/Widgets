@@ -15,7 +15,7 @@ struct CalendarView : View {
     @State var selection : Date = Date()
     @State var backButtonPressed : Bool = false
     @State var info = WidgetTypeInfo(calendarType: CalendarSizes.types.calendar)
-    let width : CGFloat = 1300
+    let width : CGFloat = 1100
     let height : CGFloat = 700
     
     var body: some View {
@@ -34,15 +34,10 @@ struct CalendarView : View {
                                 makeCalendarButton(view: Image(systemName: "textformat").font(.system(size: 90)), type: CalendarSizes.types.text)
                             }
                         }
-                        Spacer().frame(width: width / 6)
-                        VStack {
-                            Text("Background").font(.title)
-                            FilePicker(files: $fileName)
-                        }
                     }.frame(width: width)
                     Spacer().frame(height: 30)
                     HStack {
-                        Spacer(minLength: 40)
+                        FilePicker(files: $fileName)
                         WidgetMenu(type: WidgetInfo.types.calendar, info: $info, fileNames: $fileName)
                     }.padding()
                 }.padding()

@@ -187,13 +187,6 @@ struct Triggers {
     static var weather = "Weather"
     static var timeFrame = "TimeFrame"
     static var staticTimeFrame = "staticTimeFrame"
-    
-    static func triggerDescription() -> some View {
-        return HStack {
-            Text("Triggers").font(.title).padding()
-            Text("*When should the widget be visible?*").font(.title3)
-        }
-    }
 }
 
 struct StaticTimeFrame : Codable {

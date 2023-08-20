@@ -157,6 +157,7 @@ struct WidgetMenu : View {
     @State var monthSelection = MonthTimeFrame()
     @State var staticTimeFrame = StaticTimeFrame(timeStart: Date(), timeEnd: Date())
     @State private var alerts = Alerts()
+    @State private var slideshowOptions = SlideshowInfo(random: false, interval: 0)
     
     @Binding var info : WidgetTypeInfo
     @Binding var fileNames : [URL]
@@ -166,7 +167,14 @@ struct WidgetMenu : View {
     
     var body : some View {
         VStack(alignment: .leading) {
-            Triggers.triggerDescription()
+//            if fileNames.count > 1 {
+//                SlideShowView(options: $slideshowOptions)
+//            }
+            SlideShowView(options: $slideshowOptions)
+            HStack {
+                Text("Triggers").font(.title).padding()
+                Text("*When should the widget be visible?*").font(.title3)
+            }
             TriggersView(triggerSelection: $triggerSelection, weatherSelection: $weatherSelection, staticTimeFrame: $staticTimeFrame,
                          hourSelection: $hourSelection, daySelection: $daySelection, dateSelection: $dateSelection, monthSelection: $monthSelection, timeFrameSelection: $timeFrameSelection)
             VStack {
@@ -199,7 +207,7 @@ struct WidgetMenu : View {
                                                     imageName: fileNames,
                                                     type: type,
                                                     info: info,
-                                                    slideshow: SlideshowInfo(random: false, interval: 1))
+                                                    slideshow: slideshowOptions)
                         
                         _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
                         alerts.alertInstructions = true
@@ -216,6 +224,31 @@ struct WidgetMenu : View {
                     }
                 }
             }
+        }
+    }
+}
+
+struct SlideShowView : View {
+    @Binding var options : SlideshowInfo
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Slideshow Options").font(.title).padding()
+            HStack {
+                Text("Order").font(.title2)
+                Picker("", selection: $options.random) {
+                    Text("Random").font(.title2).padding(5).tag(true)
+                    Text("In Order").font(.title2).padding(5).tag(false)
+                }.pickerStyle(.radioGroup)
+                Spacer().frame(width: 100)
+                HStack {
+                    Text("Interval").font(.title2).padding(.trailing)
+                    Text("Every")
+                    TextField("", value: $options.interval, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                    Text("Minute")
+                }.frame(width: 300)
+            }.padding(.leading)
         }
     }
 }
