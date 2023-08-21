@@ -12,6 +12,7 @@ struct Alerts {
     var alertInvalidTimeFrame = false
     var alertInstructions = false
     var nullFileName = false
+    var invalidInterval = false
 }
 
 struct TriggersView : View {
@@ -157,7 +158,7 @@ struct WidgetMenu : View {
     @State var monthSelection = MonthTimeFrame()
     @State var staticTimeFrame = StaticTimeFrame(timeStart: Date(), timeEnd: Date())
     @State private var alerts = Alerts()
-    @State private var slideshowOptions = SlideshowInfo(random: false, interval: 0)
+    @State private var slideshowOptions = SlideshowInfo(random: false, interval: 1)
     
     @Binding var info : WidgetTypeInfo
     @Binding var fileNames : [URL]
@@ -190,6 +191,9 @@ struct WidgetMenu : View {
                             alerts.nullFileName = true
                             return
                         }
+                        if slideshowOptions.interval == 0 {
+                            alerts.invalidInterval = true
+                        }
                         var timeFrame : TimeFrameInfo? = nil
                         if triggerSelection == Triggers.timeFrame {
                             let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
@@ -220,6 +224,9 @@ struct WidgetMenu : View {
                     }
                     .alert("Please import a photo", isPresented: $alerts.nullFileName) {
                         Button("OK", role: .cancel) { }
+                    }
+                    .alert("The interval cannot be 0.", isPresented: $alerts.invalidInterval) {
+                        Button("OK", role: .cancel) {}
                     }
                 }
             }
