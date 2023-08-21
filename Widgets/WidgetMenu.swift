@@ -158,7 +158,7 @@ struct WidgetMenu : View {
     @State var monthSelection = MonthTimeFrame()
     @State var staticTimeFrame = StaticTimeFrame(timeStart: Date(), timeEnd: Date())
     @State private var alerts = Alerts()
-    @State private var slideshowOptions = SlideshowInfo(random: false, interval: 1)
+    @State private var slideshowOptions = SlideshowInfo(interval: 1)
     
     @Binding var info : WidgetTypeInfo
     @Binding var fileNames : [URL]
@@ -191,8 +191,10 @@ struct WidgetMenu : View {
                             alerts.nullFileName = true
                             return
                         }
+                        print(slideshowOptions.interval)
                         if slideshowOptions.interval == 0 {
                             alerts.invalidInterval = true
+                            return
                         }
                         var timeFrame : TimeFrameInfo? = nil
                         if triggerSelection == Triggers.timeFrame {
@@ -239,14 +241,11 @@ struct SlideShowView : View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Slideshow Options").font(.title).padding()
             HStack {
-                Text("Order").font(.title2)
-                Picker("", selection: $options.random) {
-                    Text("Random").font(.title2).padding(5).tag(true)
-                    Text("In Order").font(.title2).padding(5).tag(false)
-                }.pickerStyle(.radioGroup)
-                Spacer().frame(width: 100)
+                Text("Slideshow Options").font(.title).padding()
+                Text("*How often should the background change?*").font(.title3).padding()
+            }
+            HStack {
                 HStack {
                     Text("Interval").font(.title2).padding(.trailing)
                     Text("Every")

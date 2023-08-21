@@ -70,7 +70,6 @@ struct WidgetTypeInfo : Codable {
 }
 
 struct SlideshowInfo : Codable {
-    var random : Bool
     var interval : Int
 }
 

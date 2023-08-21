@@ -135,19 +135,12 @@ class DesktopWidgetWindow : NSWindow {
         }
         else if count > 1 {
             let interval = Double(widgetInfo.slideshow!.interval * 60)
-            var timer : Timer
-            if widgetInfo.slideshow!.random {
-                timer = Timer(fire: Date(), interval: interval, repeats: true) { timer in
-                    let index = Int.random(in: 0..<count)
-                    self.setImageBackground(index: index)
-                }
-            } else {
-                var index = 0
-                timer = Timer(fire: Date(), interval: interval, repeats: true) { timer in
-                    self.setImageBackground(index: index)
-                    index = (index + 1) % count
-                }
+            let index = Int.random(in: 0..<count)
+            let timer = Timer(timeInterval: interval, repeats: true) { timer in
+                let index = Int.random(in: 0..<count)
+                self.setImageBackground(index: index)
             }
+            self.setImageBackground(index: index)
             RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
         }
         self.backgroundColor = NSColor.clear
@@ -160,6 +153,7 @@ class DesktopWidgetWindow : NSWindow {
     }
     
     func setImageBackground(index: Int) {
+        print("set image background, index: \(index)")
         let relativePath = widgetInfo.imageURLs[index].relativePath
         if !FileManager.default.fileExists(atPath: relativePath) {
             _ = alertMessage(question: "\(relativePath) does not exist.", text: "")
@@ -169,7 +163,12 @@ class DesktopWidgetWindow : NSWindow {
         let image = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
         image.frame = NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width, height: widgetInfo.widgetSize.height)
         image.imageScaling = .scaleAxesIndependently
-        self.contentView?.addSubview(image)
+        if self.contentView!.subviews.count == 0 {
+            self.contentView?.addSubview(image)
+        }
+        else if self.contentView!.subviews.count > 0 {
+            self.contentView?.replaceSubview((self.contentView?.subviews[0])!, with: image)
+        }
     }
     
     override var canBecomeKey: Bool {
