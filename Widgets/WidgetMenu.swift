@@ -65,7 +65,7 @@ struct TriggersView : View {
                                 view: HStack {
                                 VStack(alignment: .leading) {
                                     TriggerCategoryText(text: "Time Frame")
-                                    Text("(Static)").padding(.bottom)
+                                    Text("(Static)").foregroundColor(.gray).padding(.bottom)
                                 }
                                  DatePicker("From", selection: $staticTimeFrame.timeStart, displayedComponents: [.hourAndMinute, .date])
                                 DatePicker("To", selection: $staticTimeFrame.timeEnd, displayedComponents: [.hourAndMinute, .date])
@@ -76,10 +76,10 @@ struct TriggersView : View {
                     view: HStack {
                         VStack(alignment: .leading) {
                             TriggerCategoryText(text: "Time Frame")
-                            Text("(Repeated)").padding(.bottom)
+                            Text("(Repeated)").foregroundColor(.gray).padding(.bottom)
                         }
                         List {
-                            Text("Note: All selected time frames will repeat.")
+                            Text("Note: All selected time frames will repeat.").foregroundColor(.gray)
                             HStack {
                                 makeToggle(selected: $hourSelection.selected, tag: TimeFrame.hour)
                                 HStack {
@@ -168,9 +168,10 @@ struct WidgetMenu : View {
     
     var body : some View {
         VStack(alignment: .leading) {
-            if fileNames.count > 1 {
-                SlideShowView(options: $slideshowOptions)
-            }
+//            if fileNames.count > 1 {
+//                SlideShowView(options: $slideshowOptions)
+//            }
+            SlideShowView(options: $slideshowOptions)
             HStack {
                 Text("Triggers").font(.title).padding()
                 Text("*When should the widget be visible?*").font(.title3)
@@ -245,7 +246,8 @@ struct SlideShowView : View {
                 Text("Slideshow Options").font(.title).padding()
                 Text("*How often should the background change?*").font(.title3).padding()
             }
-            HStack {
+            VStack(alignment: .leading) {
+                Text("Note: Images are selected randomly.").foregroundColor(.gray)
                 HStack {
                     Text("Interval").font(.title2).padding(.trailing)
                     Text("Every")
