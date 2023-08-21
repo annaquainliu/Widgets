@@ -168,10 +168,9 @@ struct WidgetMenu : View {
     
     var body : some View {
         VStack(alignment: .leading) {
-//            if fileNames.count > 1 {
-//                SlideShowView(options: $slideshowOptions)
-//            }
-            SlideShowView(options: $slideshowOptions)
+            if fileNames.count > 1 {
+                SlideShowView(options: $slideshowOptions)
+            }
             HStack {
                 Text("Triggers").font(.title).padding()
                 Text("*When should the widget be visible?*").font(.title3)

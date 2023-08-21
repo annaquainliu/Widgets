@@ -15,11 +15,13 @@ struct FilePicker: View {
     var body: some View {
         List {
             ForEach(importFiles, id: \.self) { view in
-                view
+               view
             }
             HStack {
                 FileTools(image: "plus.rectangle.fill.on.rectangle.fill").onTapGesture {
-                    importFiles.insert(ImportFile(files: $files), at: importFiles.count)
+                    if importFiles.count == files.count {
+                        importFiles.insert(ImportFile(files: $files, index: files.count), at: importFiles.count)
+                    }
                 }
                 FileTools(image: "minus.circle.fill").onTapGesture {
                     if importFiles.count > 0 {
@@ -33,7 +35,7 @@ struct FilePicker: View {
             }
         }.frame(width: 190)
           .task {
-            importFiles.insert(ImportFile(files: $files), at: importFiles.count)
+              importFiles.insert(ImportFile(files: $files, index: files.count), at: importFiles.count)
          }
         .cornerRadius(15)
     }
@@ -65,17 +67,8 @@ struct ImportFile : View, Hashable {
     @State var hover = false
     @State var filename : URL? = nil
     @Binding var files : [URL]
-    @State var index : Int? = nil
-    
+    var index : Int
     var id = UUID()
-    
-    func removeFile() {
-        
-        if fileSelected {
-            print("removed")
-            files.removeLast()
-        }
-    }
     
     var body : some View {
         VStack {
@@ -110,10 +103,9 @@ struct ImportFile : View, Hashable {
                     return
                 }
                 if fileSelected {
-                    files[index!] = filename!
+                    files[index] = filename!
                 }
                 else {
-                    index = files.count
                     files.insert(filename!, at: files.count)
                     fileSelected = true
                 }
