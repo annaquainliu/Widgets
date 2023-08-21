@@ -129,8 +129,26 @@ class DesktopWidgetWindow : NSWindow {
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
         self.contentView = makeRoundedCornerView()
-        if widgetInfo.imageURLs.count > 0 {
-            startSlideShowTimer()
+        let count = widgetInfo.imageURLs.count
+        if count == 1 {
+            self.setImageBackground(index: 0)
+        }
+        else if count > 1 {
+            let interval = Double(widgetInfo.slideshow!.interval * 60)
+            var timer : Timer
+            if widgetInfo.slideshow!.random {
+                timer = Timer(fire: Date(), interval: interval, repeats: true) { timer in
+                    let index = Int.random(in: 0..<count)
+                    self.setImageBackground(index: index)
+                }
+            } else {
+                var index = 0
+                timer = Timer(fire: Date(), interval: interval, repeats: true) { timer in
+                    self.setImageBackground(index: index)
+                    index = (index + 1) % count
+                }
+            }
+            RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
         }
         self.backgroundColor = NSColor.clear
         self.aspectRatio = widgetInfo.widgetSize
@@ -141,11 +159,7 @@ class DesktopWidgetWindow : NSWindow {
         self.isMovableByWindowBackground = true
     }
     
-    func startSlideShowTimer() {
-        var index: Int = 0
-        if widgetInfo.slideshow.random {
-            index = Int.random(in: 0..<widgetInfo.imageURLs.count)
-        }
+    func setImageBackground(index: Int) {
         let relativePath = widgetInfo.imageURLs[index].relativePath
         if !FileManager.default.fileExists(atPath: relativePath) {
             _ = alertMessage(question: "\(relativePath) does not exist.", text: "")
@@ -156,10 +170,6 @@ class DesktopWidgetWindow : NSWindow {
         image.frame = NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width, height: widgetInfo.widgetSize.height)
         image.imageScaling = .scaleAxesIndependently
         self.contentView?.addSubview(image)
-    }
-    
-    func setImageBackground() {
-        
     }
     
     override var canBecomeKey: Bool {

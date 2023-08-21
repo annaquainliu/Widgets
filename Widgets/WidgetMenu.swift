@@ -206,7 +206,7 @@ struct WidgetMenu : View {
                                                     imageName: fileNames,
                                                     type: type,
                                                     info: info,
-                                                    slideshow: slideshowOptions)
+                                                    slideshow: fileNames.count > 1 ? slideshowOptions : nil)
                         
                         _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
                         alerts.alertInstructions = true
