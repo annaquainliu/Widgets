@@ -218,7 +218,7 @@ struct WidgetMenu : View {
                         alerts.alertInstructions = true
                     }
                     .padding(40)
-                    .alert("You can click on the widget to drag it or resize it. \n\n To delete the widget, press the x mark on the top left. \n\n To save changes, press the 'Save Changes' button.", isPresented: $alerts.alertInstructions) {
+                    .alert("You can click on the widget to drag it or resize it (resizing is only available for image/gif widgets). \n\n To delete the widget, press the x mark on the top left. \n\n To save changes, press the 'Save Changes' button.", isPresented: $alerts.alertInstructions) {
                         Button("OK", role: .cancel) { }
                     }
                     .alert("The start time for the Static Time Frame should be before the end time.", isPresented: $alerts.alertInvalidTimeFrame) {
