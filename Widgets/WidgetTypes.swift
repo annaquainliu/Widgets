@@ -26,7 +26,7 @@ class WidgetInfo : Codable {
     private var id = UUID()
     
     enum types : Int, Codable {
-        case image, calendar, desktop, weather, slideshow
+        case image, calendar, desktop, weather, countdown
     }
     
     init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,

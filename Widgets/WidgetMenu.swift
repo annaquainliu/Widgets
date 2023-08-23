@@ -214,7 +214,7 @@ struct WidgetMenu : View {
                                                     info: info,
                                                     slideshow: fileNames.count > 1 ? slideshowOptions : nil)
                         
-                        _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
+                        _ = WidgetController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
                         alerts.alertInstructions = true
                     }
                     .padding(40)

@@ -237,6 +237,24 @@ class EditCalendarWidget: WidgetNSWindow {
     }
 }
 
+class ScreenSaverWidget {
+    
+    init(widgetInfo: WidgetInfo, widgetStore: WidgetStore? = nil, displayDesktop: DisplayDesktopWidgets? = nil) {
+        do {
+            if let screen = NSScreen.main {
+                try NSWorkspace.shared.setDesktopImageURL(widgetInfo.imageURLs[0], for: screen, options: [:])
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    func close() {
+        
+    }
+    
+}
+
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
     init(window : NSWindow) {
         super.init(window: window)
@@ -250,10 +268,9 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
         switch widget.type {
             case WidgetInfo.types.calendar:
                 window = EditCalendarWidget(widget: widget, displayDesktop: displayDesktop, store: store)
-                break
+                break;
             default:
                 window = WidgetNSWindow(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
-                break
         }
         super.init(window: window)
         self.window?.makeKeyAndOrderFront(self)
@@ -280,3 +297,36 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
     }
 }
 
+class WidgetController {
+    
+    var NSController : ScreenWindowController? = nil
+    var NSScreenSaver : ScreenSaverWidget? = nil
+    
+    init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
+        if widget.type == WidgetInfo.types.desktop {
+            self.NSScreenSaver = ScreenSaverWidget(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
+        } else {
+            self.NSController = ScreenWindowController(widget: widget, displayDesktop: displayDesktop, store: store)
+        }
+    }
+    
+    init(widget: WidgetInfo) {
+        if widget.type == WidgetInfo.types.desktop {
+            self.NSScreenSaver = ScreenSaverWidget(widgetInfo: widget)
+        } else {
+            self.NSController = ScreenWindowController(widget: widget)
+        }
+    }
+    
+    func closeWidget() {
+        if self.NSController == nil && self.NSScreenSaver == nil {
+            fatalError("Both NSController and NSScreenSaver is null.")
+        }
+        else if self.NSController != nil {
+            NSController!.window?.close()
+        } else {
+            
+        }
+    }
+
+}

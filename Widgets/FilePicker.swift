@@ -96,6 +96,7 @@ struct ImportFile : View, Hashable {
             panel.allowsMultipleSelection = false
             panel.canChooseDirectories = true
             panel.directoryURL = URL.downloadsDirectory
+            panel.allowedContentTypes = [.gif, .png, .jpeg, .heic]
             if panel.runModal() == .OK {
                 self.filename = panel.url ?? nil
                 if filename != nil && filename!.absoluteString.contains("file:///Users/\(NSUserName())/Documents/") {
