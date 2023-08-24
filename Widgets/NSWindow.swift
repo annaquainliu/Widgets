@@ -218,66 +218,85 @@ extension NSWindow {
         }
     }
     
-    func startGifAnimation(with url: URL?, in layer: CALayer?) {
+    func startGifAnimation(with url: URL, in layer: CALayer?) {
         let animation: CAKeyframeAnimation? = animationForGif(with: url)
         if let animation = animation {
             layer?.add(animation, forKey: "contents")
         }
     }
         
-    func animationForGif(with url: URL?) -> CAKeyframeAnimation? {
+    func animationForGif(with url: URL) -> CAKeyframeAnimation? {
+        guard let src = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
+        let frameCount = CGImageSourceGetCount(src)
 
+        // Total loop time
+        var time : Float = 0
+
+        // Arrays
+        var framesArray = [AnyObject]()
+        var tempTimesArray = [NSNumber]()
+
+        // Loop
+        for i in 0..<frameCount {
+
+            // Frame default duration
+            var frameDuration : Float = 0.1;
+
+            let cfFrameProperties = CGImageSourceCopyPropertiesAtIndex(src, i, nil)
+            guard let framePrpoerties = cfFrameProperties as? [String:AnyObject] else {return nil}
+            guard let gifProperties = framePrpoerties[kCGImagePropertyGIFDictionary as String] as? [String:AnyObject]
+                else { return nil }
+
+            // Use kCGImagePropertyGIFUnclampedDelayTime or kCGImagePropertyGIFDelayTime
+            if let delayTimeUnclampedProp = gifProperties[kCGImagePropertyGIFUnclampedDelayTime as String] as? NSNumber {
+                frameDuration = delayTimeUnclampedProp.floatValue
+            } else {
+                if let delayTimeProp = gifProperties[kCGImagePropertyGIFDelayTime as String] as? NSNumber {
+                    frameDuration = delayTimeProp.floatValue
+                }
+            }
+
+            // Make sure its not too small
+            if frameDuration < 0.011 {
+                frameDuration = 0.100;
+            }
+
+            // Add frame to array of frames
+            if let frame = CGImageSourceCreateImageAtIndex(src, i, nil) {
+                tempTimesArray.append(NSNumber(value: frameDuration))
+                framesArray.append(frame)
+            }
+
+            // Compile total loop time
+            time = time + frameDuration
+        }
+
+        var timesArray = [NSNumber]()
+        var base : Float = 0
+        for duration in tempTimesArray {
+            timesArray.append(NSNumber(value: base))
+            base += ( duration.floatValue / time )
+        }
+        // From documentation of 'CAKeyframeAnimation':
+        // the first value in the array must be 0.0 and the last value must be 1.0.
+        // The array should have one more entry than appears in the values array.
+        // For example, if there are two values, there should be three key times.
+        timesArray.append(NSNumber(value: 1.0))
+
+        // Create animation
         let animation = CAKeyframeAnimation(keyPath: "contents")
 
-        var frames = [CGImage]()
-        var delayTimes = [NSNumber]()
-
-        var totalTime: Float = 0.0
-    //        var gifWidth: Float
-    //        var gifHeight: Float
-        let gifSource = CGImageSourceCreateWithURL(url! as CFURL, nil)
-        // get frame count
-        let frameCount = CGImageSourceGetCount(gifSource!)
-        for i in 0..<frameCount {
-            // get each frame
-            let frame = CGImageSourceCreateImageAtIndex(gifSource!, i, nil)
-            if let frame = frame {
-                frames.append(frame)
-            }
-            // get gif info with each frame
-            let dict = CGImageSourceCopyPropertiesAtIndex(gifSource!, i, nil) as? [CFString: AnyObject]
-            let gifDict = dict?[kCGImagePropertyGIFDictionary]
-            if let value = gifDict?[kCGImagePropertyGIFDelayTime] as? NSNumber {
-                delayTimes.append(value)
-            }
-            totalTime = totalTime + (((gifDict?[kCGImagePropertyGIFDelayTime] as? NSNumber)?.floatValue)!)
-
-        }
-
-        var times = [AnyHashable](repeating: 0, count: 3)
-        var currentTime: Float = 0
-        let count: Int = delayTimes.count
-        for i in 0..<count {
-            times.append(NSNumber(value: Float((currentTime / totalTime))))
-            currentTime += Float(truncating: delayTimes[i])
-        }
-
-        var images = [AnyHashable](repeating: 0, count: 3)
-        for i in 0..<count {
-            images.append(frames[i])
-        }
-
-        animation.keyTimes = times as? [NSNumber]
-        animation.values = images
-        animation.timingFunction = CAMediaTimingFunction(name: .linear)
-        animation.duration = CFTimeInterval(totalTime)
-        animation.repeatCount = Float.infinity
-
         animation.beginTime = AVCoreAnimationBeginTimeAtZero
+        animation.duration = CFTimeInterval(time)
+        animation.repeatCount = Float.greatestFiniteMagnitude;
         animation.isRemovedOnCompletion = false
+        animation.fillMode = CAMediaTimingFillMode.forwards
+        animation.values = framesArray
+        animation.keyTimes = timesArray
+        //animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+        animation.calculationMode = CAAnimationCalculationMode.discrete
 
-        return animation
-
+        return animation;
     }
 
 }
