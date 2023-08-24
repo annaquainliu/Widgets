@@ -7,8 +7,17 @@
 
 import Foundation
 import AppKit
-import Cocoa
 import SwiftUI
+import AVFoundation
+
+extension NSImage {
+    func calcMaxRatio(windowSize: NSSize) -> NSSize {
+        let widthRatio = windowSize.width / self.size.width
+        let heightRatio = windowSize.height / self.size.height
+        let ratio = max(widthRatio, heightRatio);
+        return NSSize(width: self.size.width * ratio, height: self.size.height * ratio);
+    }
+}
 
 class WidgetNSWindow : NSWindow {
     
@@ -47,10 +56,8 @@ class WidgetNSWindow : NSWindow {
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
         if widgetInfo.imageURLs.count > 0 {
-            let image = NSImage(contentsOf: widgetInfo.imageURLs[0])!
-            let imageView = NSImageView(image: image)
-            imageView.imageScaling = .scaleAxesIndependently
-            self.contentView = imageView
+            self.contentView = NSView(frame: bounds)
+            self.setMediaToFillWindow(url: widgetInfo.imageURLs[0])
         }
         self.adjustWidgetWindow()
     }
@@ -121,14 +128,15 @@ class DesktopWidgetWindow : NSWindow {
     
     init(widgetInfo: WidgetInfo) {
         self.widgetInfo = widgetInfo
-        super.init(contentRect: NSRect(x: widgetInfo.xCoord,
-                                       y: widgetInfo.yCoord,
-                                       width: widgetInfo.widgetSize.width,
-                                       height: widgetInfo.widgetSize.height),
+        let bounds = NSRect(x: widgetInfo.xCoord,
+                            y: widgetInfo.yCoord,
+                            width: widgetInfo.widgetSize.width,
+                            height: widgetInfo.widgetSize.height)
+        super.init(contentRect: bounds,
                    styleMask: [.fullSizeContentView],
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
-        self.contentView = makeRoundedCornerView()
+        self.contentView = NSView(frame: bounds)
         let count = widgetInfo.imageURLs.count
         if count == 1 {
             self.setImageBackground(index: 0)
@@ -160,15 +168,7 @@ class DesktopWidgetWindow : NSWindow {
             self.close()
             return
         }
-        let image = NSImageView(image: NSImage(contentsOfFile: relativePath)!)
-        image.frame = NSRect(x: 0, y: 0, width: widgetInfo.widgetSize.width, height: widgetInfo.widgetSize.height)
-        image.imageScaling = .scaleAxesIndependently
-        if self.contentView!.subviews.count == 0 {
-            self.contentView?.addSubview(image)
-        }
-        else if self.contentView!.subviews.count > 0 {
-            self.contentView?.replaceSubview((self.contentView?.subviews[0])!, with: image)
-        }
+        self.setMediaToFillWindow(url: widgetInfo.imageURLs[index])
     }
     
     override var canBecomeKey: Bool {
@@ -181,6 +181,18 @@ class DesktopWidgetWindow : NSWindow {
 }
 
 extension NSWindow {
+    
+    func setMediaToFillWindow(url: URL) {
+        self.contentView?.wantsLayer = true
+        self.contentView!.layer = CALayer()
+        self.contentView!.layer?.cornerRadius = 14
+        self.contentView!.layer?.contentsGravity = .resizeAspectFill
+        if url.pathExtension == "gif" {
+            self.startGifAnimation(with: url, in: self.contentView!.layer)
+        } else {
+            self.contentView!.layer?.contents = NSImage(contentsOf: url)
+        }
+    }
     
     func makeTimeLayer(defaultWidth: Double, defaultHeight: Double, view: NSHostingView<some View>) {
         view.frame = NSRect(origin: CGPoint(x: (self.frame.width - defaultWidth) / 2,
@@ -206,14 +218,68 @@ extension NSWindow {
         }
     }
     
-    func makeRoundedCornerView() -> NSView {
-        let roundedCorners = NSView(frame: NSRect(x: 0, y: 0, width: self.frame.width,
-                                                  height: self.frame.height))
-        roundedCorners.wantsLayer = true
-        roundedCorners.layer!.cornerRadius = 15
-        roundedCorners.layer!.backgroundColor = CGColor.clear
-        return roundedCorners
+    func startGifAnimation(with url: URL?, in layer: CALayer?) {
+        let animation: CAKeyframeAnimation? = animationForGif(with: url)
+        if let animation = animation {
+            layer?.add(animation, forKey: "contents")
+        }
     }
+        
+    func animationForGif(with url: URL?) -> CAKeyframeAnimation? {
+
+        let animation = CAKeyframeAnimation(keyPath: "contents")
+
+        var frames = [CGImage]()
+        var delayTimes = [NSNumber]()
+
+        var totalTime: Float = 0.0
+    //        var gifWidth: Float
+    //        var gifHeight: Float
+        let gifSource = CGImageSourceCreateWithURL(url! as CFURL, nil)
+        // get frame count
+        let frameCount = CGImageSourceGetCount(gifSource!)
+        for i in 0..<frameCount {
+            // get each frame
+            let frame = CGImageSourceCreateImageAtIndex(gifSource!, i, nil)
+            if let frame = frame {
+                frames.append(frame)
+            }
+            // get gif info with each frame
+            let dict = CGImageSourceCopyPropertiesAtIndex(gifSource!, i, nil) as? [CFString: AnyObject]
+            let gifDict = dict?[kCGImagePropertyGIFDictionary]
+            if let value = gifDict?[kCGImagePropertyGIFDelayTime] as? NSNumber {
+                delayTimes.append(value)
+            }
+            totalTime = totalTime + (((gifDict?[kCGImagePropertyGIFDelayTime] as? NSNumber)?.floatValue)!)
+
+        }
+
+        var times = [AnyHashable](repeating: 0, count: 3)
+        var currentTime: Float = 0
+        let count: Int = delayTimes.count
+        for i in 0..<count {
+            times.append(NSNumber(value: Float((currentTime / totalTime))))
+            currentTime += Float(truncating: delayTimes[i])
+        }
+
+        var images = [AnyHashable](repeating: 0, count: 3)
+        for i in 0..<count {
+            images.append(frames[i])
+        }
+
+        animation.keyTimes = times as? [NSNumber]
+        animation.values = images
+        animation.timingFunction = CAMediaTimingFunction(name: .linear)
+        animation.duration = CFTimeInterval(totalTime)
+        animation.repeatCount = Float.infinity
+
+        animation.beginTime = AVCoreAnimationBeginTimeAtZero
+        animation.isRemovedOnCompletion = false
+
+        return animation
+
+    }
+
 }
 
 class CalendarWidget: DesktopWidgetWindow {
@@ -235,24 +301,6 @@ class EditCalendarWidget: WidgetNSWindow {
         self.contentView?.subviews[amnt - 1].frame.origin.y += 10
         self.contentView?.addSubview(makeButton())
     }
-}
-
-class ScreenSaverWidget {
-    
-    init(widgetInfo: WidgetInfo, widgetStore: WidgetStore? = nil, displayDesktop: DisplayDesktopWidgets? = nil) {
-        do {
-            if let screen = NSScreen.main {
-                try NSWorkspace.shared.setDesktopImageURL(widgetInfo.imageURLs[0], for: screen, options: [:])
-            }
-        } catch {
-            print(error)
-        }
-    }
-    
-    func close() {
-        
-    }
-    
 }
 
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
@@ -295,38 +343,4 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
-
-class WidgetController {
-    
-    var NSController : ScreenWindowController? = nil
-    var NSScreenSaver : ScreenSaverWidget? = nil
-    
-    init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
-        if widget.type == WidgetInfo.types.desktop {
-            self.NSScreenSaver = ScreenSaverWidget(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
-        } else {
-            self.NSController = ScreenWindowController(widget: widget, displayDesktop: displayDesktop, store: store)
-        }
-    }
-    
-    init(widget: WidgetInfo) {
-        if widget.type == WidgetInfo.types.desktop {
-            self.NSScreenSaver = ScreenSaverWidget(widgetInfo: widget)
-        } else {
-            self.NSController = ScreenWindowController(widget: widget)
-        }
-    }
-    
-    func closeWidget() {
-        if self.NSController == nil && self.NSScreenSaver == nil {
-            fatalError("Both NSController and NSScreenSaver is null.")
-        }
-        else if self.NSController != nil {
-            NSController!.window?.close()
-        } else {
-            
-        }
-    }
-
 }
