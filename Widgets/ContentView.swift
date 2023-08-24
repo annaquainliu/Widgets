@@ -20,7 +20,7 @@ struct ContentView: View {
                 VStack {
                     HStack {
                         MenuButton(title: "Image/GIF", ImageName: "photo.fill", parent:self)
-                        MenuButton(title: "Desktop", ImageName:"photo.stack", parent:self)
+                        MenuButton(title: "Desktop", ImageName:"desktopcomputer", parent:self)
                         MenuButton(title: "Weather", ImageName:"sun.min", parent:self)
                     }
                     HStack {
@@ -35,6 +35,8 @@ struct ContentView: View {
             switch tab {
                 case "Calendar":
                     CalendarView()
+                case "Desktop":
+                    ScreenSaverView()
                 default:
                     ImageOrGifView()
             }

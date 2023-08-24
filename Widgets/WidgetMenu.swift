@@ -245,7 +245,6 @@ struct SlideShowView : View {
                 Text("*How often should the background change?*").font(.title3).padding()
             }
             VStack(alignment: .leading) {
-                Text("Note: Images are selected randomly.").foregroundColor(.gray)
                 HStack {
                     Text("Interval").font(.title2).padding(.trailing)
                     Text("Every")

@@ -39,7 +39,7 @@ class WidgetNSWindow : NSWindow {
                    backing: NSWindow.BackingStoreType.buffered,
                    defer: true)
         self.contentView = NSImageView(image: image!)
-        self.contentView?.addSubview(makeButton())
+        self.contentView?.addSubview(WidgetNSWindow.makeButton())
         adjustWidgetWindow()
     }
     
@@ -80,7 +80,7 @@ class WidgetNSWindow : NSWindow {
         self.center()
     }
     
-    func makeButton() -> NSButton {
+    static func makeButton() -> NSButton {
         let button = NSButton(frame: NSRect(x: 10, y: 10, width: 50, height: 20))
         button.isBordered = false
         button.wantsLayer = true
@@ -120,6 +120,7 @@ class WidgetNSWindow : NSWindow {
     override var canBecomeKey: Bool {
         return true
     }
+
 }
 
 class DesktopWidgetWindow : NSWindow {
@@ -138,19 +139,16 @@ class DesktopWidgetWindow : NSWindow {
                    defer: true)
         self.contentView = NSView(frame: bounds)
         let count = widgetInfo.imageURLs.count
-        if count == 1 {
-            self.setImageBackground(index: 0)
-        }
-        else if count > 1 {
+        var index = 0
+        if count > 1 {
             let interval = Double(widgetInfo.slideshow!.interval * 60)
-            let index = Int.random(in: 0..<count)
             let timer = Timer(timeInterval: interval, repeats: true) { timer in
-                let index = Int.random(in: 0..<count)
+                index = (index + 1) % count
                 self.setImageBackground(index: index)
             }
-            self.setImageBackground(index: index)
             RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
         }
+        self.setImageBackground(index: index)
         self.backgroundColor = NSColor.clear
         self.aspectRatio = widgetInfo.widgetSize
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.backstopMenu)))
@@ -185,7 +183,7 @@ extension NSWindow {
     func setMediaToFillWindow(url: URL) {
         self.contentView?.wantsLayer = true
         self.contentView!.layer = CALayer()
-        self.contentView!.layer?.cornerRadius = 14
+        self.contentView!.layer?.cornerRadius = 13
         self.contentView!.layer?.contentsGravity = .resizeAspectFill
         if url.pathExtension == "gif" {
             self.startGifAnimation(with: url, in: self.contentView!.layer)
@@ -318,8 +316,32 @@ class EditCalendarWidget: WidgetNSWindow {
         self.makeCalendarView(type: widget.info.calendarType!)
         let amnt = self.contentView!.subviews.count
         self.contentView?.subviews[amnt - 1].frame.origin.y += 10
-        self.contentView?.addSubview(makeButton())
+        self.contentView?.addSubview(WidgetNSWindow.makeButton())
     }
+}
+
+class ScreenSaverWidget: DesktopWidgetWindow {
+    
+    init(widget: WidgetInfo) {
+        super.init(widgetInfo: widget)
+        self.contentView?.layer?.cornerRadius = 0
+        self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
+        self.ignoresMouseEvents = true
+    }
+
+}
+
+class EditScreenWidget {
+    init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
+        var size = NSScreen.main?.frame.size ?? NSSize(width: 1200, height: 700)
+        size.height -= NSMenu().menuBarHeight
+        widget.initCoordsAndSize(xCoord: 0, yCoord: 0, size: size)
+        Task {
+            await store.addWidget(widget: widget)
+        }
+        displayDesktop.displayWidget(widget: widget)
+    }
+
 }
 
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
@@ -336,6 +358,12 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
             case WidgetInfo.types.calendar:
                 window = EditCalendarWidget(widget: widget, displayDesktop: displayDesktop, store: store)
                 break;
+            case WidgetInfo.types.desktop:
+                _ = EditScreenWidget(widget: widget, displayDesktop: displayDesktop, store: store)
+                window = NSWindow()
+                super.init(window: window)
+                self.window?.close()
+                return
             default:
                 window = WidgetNSWindow(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
         }
@@ -351,6 +379,9 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
             case WidgetInfo.types.calendar:
                 window = CalendarWidget(widget: widget)
                 break
+            case WidgetInfo.types.desktop:
+                window = ScreenSaverWidget(widget: widget)
+                break;
             default:
                 window = DesktopWidgetWindow(widgetInfo: widget)
         }
