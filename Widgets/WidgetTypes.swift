@@ -581,11 +581,55 @@ struct AlarmIcon : View {
     }
 }
 
-struct AlarmIcon_Providers: PreviewProvider {
+struct Countdown : View {
+    
+    var end : Date
+    var corderRadius : CGFloat = 3
+    var desc : String
+    
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { timeline in
+            let diff = Calendar.current.dateComponents([.hour, .day, .minute, .second], from: timeline.date, to: end)
+            VStack {
+                HStack {
+                    VStack {
+                        Text("\(diff.day!)").font(.system(size: 30, weight: .thin))
+                        Text("Day").font(.system(size: 10, weight: .thin))
+                    }
+                    Text(":").font(Font.custom("Arial", size: 30))
+                    VStack {
+                        Text("\(diff.hour!)").font(.system(size: 30, weight: .thin))
+                        Text("Hour").font(.system(size: 10, weight: .thin))
+                    }
+                    Text(":").font(Font.custom("Arial", size: 30))
+                    VStack {
+                        Text("\(diff.minute!)").font(.system(size: 30, weight: .thin))
+                        Text("Minute").font(.system(size: 10, weight: .thin))
+                    }
+                    Text(":").font(Font.custom("Arial", size: 30))
+                    VStack {
+                        Text("\(diff.second!)").font(.system(size: 30, weight: .thin))
+                        Text("Second").font(.system(size: 10, weight: .thin))
+                    }
+                }
+                Text(desc).font(.system(size: 10, weight: .bold)).frame(height: 2)
+            }.frame(width: 250, height: 90)
+        }
+    }
+
+}
+
+struct Countdown_Providers: PreviewProvider {
     static var previews: some View {
-        AlarmIcon()
+        Countdown(end: TimeFrame.makeDate(year: 2023, month: 8, day: 26), desc: "Until Halloween!")
     }
 }
+
+//struct AlarmIcon_Providers: PreviewProvider {
+//    static var previews: some View {
+//        AlarmIcon()
+//    }
+//}
 
 
 //struct CalendarView_Providers: PreviewProvider {
