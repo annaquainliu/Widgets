@@ -575,8 +575,19 @@ struct AlarmIcon : View {
     var body: some View {
         TimelineView(.everyMinute) {context  in
             Text(context.date.formatted(.dateTime).split(separator: ",")[1] + " ")
-                .font(Font.custom("Arial", size: 70))
+                .font(.custom("Arial", size: 70))
                 .frame(width: CalendarSizes.alarmWidth, height: CalendarSizes.alarmHeight)
+        }.task {
+//          let fontFamilies = NSFontManager.shared.availableFontFamilies.sorted()
+//          for family in fontFamilies {
+//              print(family)
+//              let familyFonts = NSFontManager.shared.availableMembers(ofFontFamily: family)
+//              if let fonts = familyFonts {
+//                  for font in fonts {
+//                    print("\t\(font)")
+//                  }
+//              }
+//          }
         }
     }
 }
@@ -612,18 +623,18 @@ struct Countdown : View {
                         Text("Second").font(.system(size: 10, weight: .thin))
                     }
                 }
-                Text(desc).font(.system(size: 10, weight: .bold)).frame(height: 2)
+                Text(desc).font(.custom("Brush Script MT", size: 20))
             }.frame(width: 250, height: 90)
         }
     }
 
 }
 
-struct Countdown_Providers: PreviewProvider {
-    static var previews: some View {
-        Countdown(end: TimeFrame.makeDate(year: 2023, month: 8, day: 26), desc: "Until Halloween!")
-    }
-}
+//struct Countdown_Providers: PreviewProvider {
+//    static var previews: some View {
+//        Countdown(end: TimeFrame.makeDate(year: 2023, month: 8, day: 26), desc: "Until Halloween!")
+//    }
+//}
 
 //struct AlarmIcon_Providers: PreviewProvider {
 //    static var previews: some View {

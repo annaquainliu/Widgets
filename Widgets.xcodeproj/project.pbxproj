@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		30023F612A8ECA7300C03E5C /* WidgetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4E6CD2A75BD0700EBA9CD /* WidgetTypes.swift */; };
-		30023F632A8ECB6E00C03E5C /* Seven Segment.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 300E053F2A8EC6C800988473 /* Seven Segment.ttf */; };
+		30523F142A9950C400E0D6EF /* Precious.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30523F132A9950C400E0D6EF /* Precious.ttf */; };
 		305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305EC7F02A772527009A24F8 /* NSWindow.swift */; };
 		306829B42A8BF9BB003478A4 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306829B32A8BF9BB003478A4 /* CalendarView.swift */; };
 		306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FAA542A8574760097CE04 /* WeatherAPI.swift */; };
@@ -46,10 +46,9 @@
 		300E053B2A8EBE2200988473 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = .;
+			dstPath = fonts;
 			dstSubfolderSpec = 7;
 			files = (
-				30023F632A8ECB6E00C03E5C /* Seven Segment.ttf in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,7 +66,7 @@
 
 /* Begin PBXFileReference section */
 		300E053D2A8EBFD800988473 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		300E053F2A8EC6C800988473 /* Seven Segment.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Seven Segment.ttf"; sourceTree = "<group>"; };
+		30523F132A9950C400E0D6EF /* Precious.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Precious.ttf; sourceTree = "<group>"; };
 		305EC7F02A772527009A24F8 /* NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
 		306829B32A8BF9BB003478A4 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		306FAA542A8574760097CE04 /* WeatherAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAPI.swift; sourceTree = "<group>"; };
@@ -157,8 +156,8 @@
 		30BDD9262A71CD2D007E5F3B /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				30523F132A9950C400E0D6EF /* Precious.ttf */,
 				300E053D2A8EBFD800988473 /* Info.plist */,
-				300E053F2A8EC6C800988473 /* Seven Segment.ttf */,
 				30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */,
 				30F1B1D12A7362A500A1F2BE /* ContentView.swift */,
 				30BDD92B2A71CD2E007E5F3B /* Assets.xcassets */,
@@ -313,6 +312,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30523F142A9950C400E0D6EF /* Precious.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

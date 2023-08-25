@@ -344,6 +344,27 @@ class EditScreenWidget {
 
 }
 
+class EditCountdownWidget : WidgetNSWindow {
+    
+    init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
+        super.init(widgetInfo: widget, widgetStore: store,
+                   displayDesktop: displayDesktop,
+                   windowSize: NSSize(width: 250, height: 90))
+        self.contentView?.addSubview(NSHostingView(rootView: Countdown(end: TimeFrame.makeDate(year: 2023, month: 12, day: 25),
+                                                                       desc: "Christmas")))
+        self.contentView?.addSubview(WidgetNSWindow.makeButton())
+    }
+}
+
+class CountdownWidget: DesktopWidgetWindow {
+    
+    init(widget: WidgetInfo) {
+        super.init(widgetInfo: widget)
+        self.contentView?.addSubview(NSHostingView(rootView: Countdown(end: TimeFrame.makeDate(year: 2023, month: 12, day: 25),
+                                                                       desc: "Christmas")))
+    }
+}
+
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
     init(window : NSWindow) {
         super.init(window: window)
@@ -364,6 +385,9 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
                 super.init(window: window)
                 self.window?.close()
                 return
+            case WidgetInfo.types.countdown:
+                window = EditCountdownWidget(widget: widget, displayDesktop: displayDesktop, store: store)
+                break;
             default:
                 window = WidgetNSWindow(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
         }
@@ -381,6 +405,9 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
                 break
             case WidgetInfo.types.desktop:
                 window = ScreenSaverWidget(widget: widget)
+                break;
+            case WidgetInfo.types.countdown:
+                window = CountdownWidget(widget: widget)
                 break;
             default:
                 window = DesktopWidgetWindow(widgetInfo: widget)
