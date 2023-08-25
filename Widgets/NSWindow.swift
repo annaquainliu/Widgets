@@ -349,9 +349,10 @@ class EditCountdownWidget : WidgetNSWindow {
     init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
         super.init(widgetInfo: widget, widgetStore: store,
                    displayDesktop: displayDesktop,
-                   windowSize: NSSize(width: 250, height: 90))
-        self.contentView?.addSubview(NSHostingView(rootView: Countdown(end: TimeFrame.makeDate(year: 2023, month: 12, day: 25),
-                                                                       desc: "Christmas")))
+                   windowSize: NSSize(width: Countdown.width, height: Countdown.height))
+        let view = NSHostingView(rootView: Countdown(end: TimeFrame.makeDate(year: 2023, month: 12, day: 25), desc: "Christmas"))
+        view.frame = NSRect(x: 0, y: 0, width: Countdown.width, height: Countdown.height)
+        self.contentView?.addSubview(view)
         self.contentView?.addSubview(WidgetNSWindow.makeButton())
     }
 }
@@ -360,8 +361,9 @@ class CountdownWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
         super.init(widgetInfo: widget)
-        self.contentView?.addSubview(NSHostingView(rootView: Countdown(end: TimeFrame.makeDate(year: 2023, month: 12, day: 25),
-                                                                       desc: "Christmas")))
+        let view = NSHostingView(rootView: Countdown(end: TimeFrame.makeDate(year: 2023, month: 12, day: 25), desc: "Christmas"))
+        view.frame = NSRect(x: 0, y: 0, width: Countdown.width, height: Countdown.height)
+        self.contentView?.addSubview(view)
     }
 }
 
