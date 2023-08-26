@@ -597,11 +597,11 @@ struct Countdown : View {
     var end : Date
     var corderRadius : CGFloat = 3
     var desc : String
-    static var largeFont : CGFloat = 30 * Countdown.scale
-    static var smallFont : CGFloat = 8 * Countdown.scale
-    static var descFont : CGFloat = 20 * Countdown.scale
-    static var width : CGFloat = 200 * Countdown.scale
-    static var height : CGFloat = 90 * Countdown.scale
+    var largeFont : CGFloat = 30 * Countdown.scale
+    var smallFont : CGFloat = 11 * Countdown.scale
+    var descFont : CGFloat = 20 * Countdown.scale
+    static var width : CGFloat = 220 * Countdown.scale
+    static var height : CGFloat = 95 * Countdown.scale
     static var scale = 1.5
     
     var body: some View {
@@ -610,26 +610,26 @@ struct Countdown : View {
             VStack {
                 HStack {
                     VStack {
-                        Text("\(diff.day!)").font(.system(size: Countdown.largeFont, weight: .thin))
-                        Text("Day").font(.system(size: Countdown.smallFont, weight: .thin))
+                        Text("\(diff.day!)").font(.system(size: largeFont, weight: .thin))
+                        Text("Day").font(.system(size: smallFont, weight: .thin))
                     }
-                    Text(":").font(Font.custom("Arial", size: Countdown.largeFont))
+                    Text(":").font(Font.custom("Arial", size: largeFont))
                     VStack {
-                        Text("\(diff.hour!)").font(.system(size: Countdown.largeFont, weight: .thin))
-                        Text("Hour").font(.system(size: Countdown.smallFont, weight: .thin))
+                        Text("\(diff.hour!)").font(.system(size: largeFont, weight: .thin))
+                        Text("Hour").font(.system(size: smallFont, weight: .thin))
                     }
-                    Text(":").font(Font.custom("Arial", size: Countdown.largeFont))
+                    Text(":").font(Font.custom("Arial", size: largeFont))
                     VStack {
-                        Text("\(diff.minute!)").font(.system(size: Countdown.largeFont, weight: .thin))
-                        Text("Minute").font(.system(size: Countdown.smallFont, weight: .thin))
+                        Text("\(diff.minute!)").font(.system(size: largeFont, weight: .thin))
+                        Text("Minute").font(.system(size: smallFont, weight: .thin))
                     }
-                    Text(":").font(Font.custom("Arial", size: Countdown.largeFont))
+                    Text(":").font(Font.custom("Arial", size: largeFont))
                     VStack {
-                        Text("\(diff.second!)").font(.system(size: Countdown.largeFont, weight: .thin))
-                        Text("Second").font(.system(size: Countdown.smallFont, weight: .thin))
+                        Text("\(diff.second!)").font(.system(size: largeFont, weight: .thin))
+                        Text("Second").font(.system(size: smallFont, weight: .thin))
                     }
                 }
-                Text(desc).font(.custom("Brush Script MT", size: Countdown.descFont))
+                Text(desc).font(.custom("Brush Script MT", size: descFont))
             }.frame(width: Countdown.width, height: Countdown.height)
         }
     }
@@ -638,7 +638,7 @@ struct Countdown : View {
 
 struct Countdown_Providers: PreviewProvider {
     static var previews: some View {
-        Countdown(end: TimeFrame.makeDate(year: 2023, month: 8, day: 26), desc: "Until Halloween!")
+        Countdown(end: TimeFrame.makeDate(year: 2023, month: 10, day: 31), desc: "Until Halloween!")
     }
 }
 
