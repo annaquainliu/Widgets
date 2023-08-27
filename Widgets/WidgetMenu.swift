@@ -210,7 +210,7 @@ struct WidgetMenu : View {
                                                     timeFrame: timeFrame,
                                                     staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
                                                     imageName: fileNames,
-                                                    type: WidgetInfo.types.countdown,
+                                                    type: type,
                                                     info: info,
                                                     slideshow: fileNames.count > 1 ? slideshowOptions : nil)
                         _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)

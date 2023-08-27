@@ -10,7 +10,6 @@
 		30023F612A8ECA7300C03E5C /* WidgetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4E6CD2A75BD0700EBA9CD /* WidgetTypes.swift */; };
 		30523F142A9950C400E0D6EF /* Precious.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30523F132A9950C400E0D6EF /* Precious.ttf */; };
 		305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305EC7F02A772527009A24F8 /* NSWindow.swift */; };
-		306829B42A8BF9BB003478A4 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306829B32A8BF9BB003478A4 /* CalendarView.swift */; };
 		306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FAA542A8574760097CE04 /* WeatherAPI.swift */; };
 		30B14F332A73777F007A1672 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B14F322A73777F007A1672 /* Utilities.swift */; };
 		30B79BB22A7701F0002C79E7 /* DisplayDesktop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* DisplayDesktop.swift */; };
@@ -20,7 +19,7 @@
 		30BDD9462A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9452A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift */; };
 		30C01BFC2A88790A002BE9EC /* FilePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C01BFB2A88790A002BE9EC /* FilePicker.swift */; };
 		30CD4C6C2A79D74B008B830B /* WidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CD4C6B2A79D74B008B830B /* WidgetStore.swift */; };
-		30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */; };
+		30F1B1CE2A7317EC00A1F2BE /* WidgetOptionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1CD2A7317EC00A1F2BE /* WidgetOptionViews.swift */; };
 		30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1B1D12A7362A500A1F2BE /* ContentView.swift */; };
 		30F4E6D02A76035700EBA9CD /* WidgetMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */; };
 /* End PBXBuildFile section */
@@ -68,7 +67,6 @@
 		300E053D2A8EBFD800988473 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		30523F132A9950C400E0D6EF /* Precious.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Precious.ttf; sourceTree = "<group>"; };
 		305EC7F02A772527009A24F8 /* NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
-		306829B32A8BF9BB003478A4 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		306FAA542A8574760097CE04 /* WeatherAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAPI.swift; sourceTree = "<group>"; };
 		30B14F322A73777F007A1672 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		30B79BB12A7701F0002C79E7 /* DisplayDesktop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayDesktop.swift; sourceTree = "<group>"; };
@@ -85,7 +83,7 @@
 		30BDD9452A71CD2E007E5F3B /* WidgetsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		30C01BFB2A88790A002BE9EC /* FilePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePicker.swift; sourceTree = "<group>"; };
 		30CD4C6B2A79D74B008B830B /* WidgetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetStore.swift; sourceTree = "<group>"; };
-		30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOrGifView.swift; sourceTree = "<group>"; };
+		30F1B1CD2A7317EC00A1F2BE /* WidgetOptionViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetOptionViews.swift; sourceTree = "<group>"; };
 		30F1B1D12A7362A500A1F2BE /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		30F4E6CD2A75BD0700EBA9CD /* WidgetTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTypes.swift; sourceTree = "<group>"; };
 		30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetMenu.swift; sourceTree = "<group>"; };
@@ -163,7 +161,7 @@
 				30BDD92B2A71CD2E007E5F3B /* Assets.xcassets */,
 				30BDD9302A71CD2E007E5F3B /* Widgets.entitlements */,
 				30BDD92D2A71CD2E007E5F3B /* Preview Content */,
-				30F1B1CD2A7317EC00A1F2BE /* ImageOrGifView.swift */,
+				30F1B1CD2A7317EC00A1F2BE /* WidgetOptionViews.swift */,
 				30B14F322A73777F007A1672 /* Utilities.swift */,
 				30F4E6CD2A75BD0700EBA9CD /* WidgetTypes.swift */,
 				30F4E6CF2A76035700EBA9CD /* WidgetMenu.swift */,
@@ -172,7 +170,6 @@
 				30CD4C6B2A79D74B008B830B /* WidgetStore.swift */,
 				306FAA542A8574760097CE04 /* WeatherAPI.swift */,
 				30C01BFB2A88790A002BE9EC /* FilePicker.swift */,
-				306829B32A8BF9BB003478A4 /* CalendarView.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -340,8 +337,7 @@
 				30CD4C6C2A79D74B008B830B /* WidgetStore.swift in Sources */,
 				30023F612A8ECA7300C03E5C /* WidgetTypes.swift in Sources */,
 				30F4E6D02A76035700EBA9CD /* WidgetMenu.swift in Sources */,
-				306829B42A8BF9BB003478A4 /* CalendarView.swift in Sources */,
-				30F1B1CE2A7317EC00A1F2BE /* ImageOrGifView.swift in Sources */,
+				30F1B1CE2A7317EC00A1F2BE /* WidgetOptionViews.swift in Sources */,
 				305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */,
 				30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */,
 				30B14F332A73777F007A1672 /* Utilities.swift in Sources */,
