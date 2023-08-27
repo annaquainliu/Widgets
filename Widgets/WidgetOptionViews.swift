@@ -94,14 +94,69 @@ struct CalendarView : View {
     }
 }
 
-struct CalendarView_Previews : PreviewProvider {
-    static var previews: some View {
-        CalendarView()
+struct CountdownView : View {
+    @EnvironmentObject var store : WidgetStore
+    @State var fileNames : [URL] = []
+    @State var backButtonPressed : Bool = false
+    @State var info = WidgetTypeInfo()
+    @State var countdown = CountdownInfo(time: Date(), desc: "")
+    let width : CGFloat = 1100
+    let height : CGFloat = 700
+    
+    var body: some View {
+        if backButtonPressed {
+            ContentView()
+        } else {
+            ScrollView {
+                VStack(alignment: .leading) {
+                    WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Countdown")
+                    VStack {
+                        VStack {
+                            HStack {
+                                Text("Date End").font(.title).padding()
+                                DatePicker(
+                                    "",
+                                    selection: $countdown.time,
+                                    displayedComponents: [.date]
+                                ).font(.title)
+                                .padding()
+                            }
+                            HStack {
+                                Text("Description").font(.title).padding()
+                                TextField(text: $countdown.desc, prompt: Text("Description of Countdown")) {
+                                }
+                            }
+                        }.frame(width: 700)
+                        Spacer(minLength: 30)
+                        HStack {
+                            FilePicker(files: $fileNames)
+                            WidgetMenu(type: WidgetInfo.types.countdown, info: $info, fileNames: $fileNames)
+                        }
+                    }.padding()
+                }
+            }.frame(width: width, height: height)
+            .task {
+                info.countdown = countdown
+            }
+        }
     }
 }
 
-struct WidgetOption_Providers: PreviewProvider {
+struct CountdownView_Previews : PreviewProvider {
     static var previews: some View {
-        ImageOrGifView()
+        CountdownView()
     }
 }
+
+//
+//struct CalendarView_Previews : PreviewProvider {
+//    static var previews: some View {
+//        CalendarView()
+//    }
+//}
+//
+//struct WidgetOption_Providers: PreviewProvider {
+//    static var previews: some View {
+//        ImageOrGifView()
+//    }
+//}

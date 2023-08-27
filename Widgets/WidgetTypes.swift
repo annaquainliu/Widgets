@@ -56,17 +56,22 @@ class WidgetInfo : Codable {
 
 struct WidgetTypeInfo : Codable {
     var calendarType : CalendarSizes.types?
-    var countdownTime : Date?
+    var countdown : CountdownInfo?
     var weatherType : String?
     var text : String?
     
-    init(calendarType: CalendarSizes.types? = nil, countdownTime: Date? = nil,
+    init(calendarType: CalendarSizes.types? = nil, countdown : CountdownInfo? = nil,
          weatherType: String? = nil, text: String? = nil) {
         self.calendarType = calendarType
-        self.countdownTime = countdownTime
+        self.countdown = countdown
         self.weatherType = weatherType
         self.text = text
     }
+}
+
+struct CountdownInfo : Codable {
+    var time : Date
+    var desc : String
 }
 
 struct SlideshowInfo : Codable {
