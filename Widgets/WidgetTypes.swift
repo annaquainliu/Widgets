@@ -58,15 +58,20 @@ struct WidgetTypeInfo : Codable {
     var calendarType : CalendarSizes.types?
     var countdown : CountdownInfo?
     var weatherType : String?
-    var text : String?
+    var text : TextInfo?
     
     init(calendarType: CalendarSizes.types? = nil, countdown : CountdownInfo? = nil,
-         weatherType: String? = nil, text: String? = nil) {
+         weatherType: String? = nil, text: TextInfo? = nil) {
         self.calendarType = calendarType
         self.countdown = countdown
         self.weatherType = weatherType
         self.text = text
     }
+}
+
+struct TextInfo : Codable {
+    var text: String
+    var font: String
 }
 
 struct CountdownInfo : Codable {
@@ -582,17 +587,6 @@ struct AlarmIcon : View {
             Text(context.date.formatted(.dateTime).split(separator: ",")[1] + " ")
                 .font(.custom("Arial", size: 70))
                 .frame(width: CalendarSizes.alarmWidth, height: CalendarSizes.alarmHeight)
-        }.task {
-//          let fontFamilies = NSFontManager.shared.availableFontFamilies.sorted()
-//          for family in fontFamilies {
-//              print(family)
-//              let familyFonts = NSFontManager.shared.availableMembers(ofFontFamily: family)
-//              if let fonts = familyFonts {
-//                  for font in fonts {
-//                    print("\t\(font)")
-//                  }
-//              }
-//          }
         }
     }
 }

@@ -38,6 +38,8 @@ struct ContentView: View {
                     ScreenSaverView()
                 case "Countdown":
                     CountdownView()
+                case "Text":
+                    TextWidgetView()
                 default:
                     ImageOrGifView()
             }

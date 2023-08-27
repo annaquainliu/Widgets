@@ -145,7 +145,7 @@ struct TextWidgetView : View {
     let width : CGFloat = 1100
     let height : CGFloat = 700
     @State var backButtonPressed : Bool = false
-    @State var info = WidgetTypeInfo(text: "")
+    @State var info = WidgetTypeInfo(text: TextInfo(text: "", font: "Arial"))
     
     var body: some View {
         if backButtonPressed {
@@ -158,8 +158,13 @@ struct TextWidgetView : View {
                     VStack {
                         HStack {
                             Text("Text: ").font(.title2)
-                            TextField(text: Binding<String>(get: {info.text!}, set: {info.text = $0}), prompt: Text("Your Text")) {
+                            TextField(text: Binding<String>(get: {info.text!.text}, set: {info.text!.text = $0}), prompt: Text("Your Text")) {
                             }.padding()
+                            Picker("Font: ", selection: Binding<String>(get: {info.text!.font}, set: {info.text!.font = $0})) {
+                                ForEach(getAllFonts(), id: \.self) {
+                                    Text($0).font(.custom($0, size: 12))
+                                }
+                            }.font(.title2)
                         }.frame(width: 700)
                         Spacer(minLength: 30)
                         HStack {
@@ -170,6 +175,11 @@ struct TextWidgetView : View {
                 }
             }.frame(width: width, height: height)
         }
+    }
+    
+    func getAllFonts() -> [String] {
+        let fontFamilies = NSFontManager.shared.availableFontFamilies.sorted()
+        return fontFamilies
     }
 }
 
