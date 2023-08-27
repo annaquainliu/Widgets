@@ -169,10 +169,10 @@ struct TextWidgetView : View {
                         Spacer(minLength: 30)
                         HStack {
                             FilePicker(files: $fileNames)
-                            WidgetMenu(type: WidgetInfo.types.countdown, info: $info, fileNames: $fileNames)
+                            WidgetMenu(type: WidgetInfo.types.text, info: $info, fileNames: $fileNames)
                         }
                     }
-                }
+                }.padding()
             }.frame(width: width, height: height)
         }
     }
@@ -183,11 +183,11 @@ struct TextWidgetView : View {
     }
 }
 
-struct TextView_Providers: PreviewProvider {
-    static var previews: some View {
-        TextWidgetView()
-    }
-}
+//struct TextWidgetView_Providers: PreviewProvider {
+//    static var previews: some View {
+//        TextWidgetView()
+//    }
+//}
 
 //struct CountdownView_Previews : PreviewProvider {
 //    static var previews: some View {

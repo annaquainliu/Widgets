@@ -187,11 +187,10 @@ struct WidgetMenu : View {
                             alerts.alertInvalidTimeFrame = true
                             return
                         }
-                        if fileNames.count == 0 && type == WidgetInfo.types.image {
+                        if fileNames.count == 0 && (type == WidgetInfo.types.image || type == WidgetInfo.types.text ) {
                             alerts.nullFileName = true
                             return
                         }
-                        print(slideshowOptions.interval)
                         if slideshowOptions.interval == 0 {
                             alerts.invalidInterval = true
                             return

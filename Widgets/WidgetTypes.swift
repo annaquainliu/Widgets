@@ -26,7 +26,7 @@ class WidgetInfo : Codable {
     private var id = UUID()
     
     enum types : Int, Codable {
-        case image, calendar, desktop, weather, countdown
+        case image, calendar, desktop, text, countdown
     }
     
     init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,
@@ -634,6 +634,25 @@ struct Countdown : View {
     }
 
 }
+
+struct TextLayerView: View {
+
+    var info : TextInfo
+    var body: some View {
+        Text(info.text)
+            .font(.custom(info.font, size: 20))
+            .multilineTextAlignment(.center)
+            .lineLimit(nil)
+            
+    }
+}
+
+struct TextLayerView_Providers: PreviewProvider {
+    static var previews: some View {
+        TextLayerView(info: TextInfo(text: "WHOOOOO", font: "Arial"))
+    }
+}
+
 
 //struct Countdown_Providers: PreviewProvider {
 //    static var previews: some View {

@@ -22,7 +22,7 @@ extension NSImage {
 class WidgetNSWindow : NSWindow {
     
     private var desktopEditMode = false
-    private var windowSize : NSSize
+    var windowSize : NSSize
     private var store : WidgetStore
     private var displayDesktop : DisplayDesktopWidgets
     var widgetInfo : WidgetInfo
@@ -180,6 +180,17 @@ class DesktopWidgetWindow : NSWindow {
 
 extension NSWindow {
     
+    func makeTextView(widget: WidgetInfo) {
+        let textView = NSHostingView(rootView: TextLayerView(info: widget.info.text!))
+        let size = textView.fittingSize
+        let frame = self.frame
+        textView.frame = NSRect(x: (frame.width - size.width) / 2, y: (frame.height - size.height) / 2, width: size.width, height: size.height)
+        textView.translatesAutoresizingMaskIntoConstraints = true
+        textView.autoresizesSubviews = true
+        textView.autoresizingMask = [.minXMargin, .minYMargin, .maxXMargin, .maxYMargin]
+        self.contentView?.addSubview(textView)
+    }
+    
     func setMediaToFillWindow(url: URL) {
         self.contentView?.wantsLayer = true
         self.contentView!.layer = CALayer()
@@ -222,6 +233,7 @@ extension NSWindow {
             layer?.add(animation, forKey: "contents")
         }
     }
+    
         
     func animationForGif(with url: URL) -> CAKeyframeAnimation? {
         guard let src = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
@@ -367,6 +379,22 @@ class CountdownWidget: DesktopWidgetWindow {
     }
 }
 
+class EditTextWidget: WidgetNSWindow {
+    init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
+        super.init(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
+        self.makeTextView(widget: widget)
+    }
+
+}
+
+class TextWidget: DesktopWidgetWindow {
+    
+    init(widget: WidgetInfo) {
+        super.init(widgetInfo: widget)
+        self.makeTextView(widget: widget)
+    }
+}
+
 class ScreenWindowController : NSWindowController, NSWindowDelegate {
     init(window : NSWindow) {
         super.init(window: window)
@@ -390,6 +418,9 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
             case WidgetInfo.types.countdown:
                 window = EditCountdownWidget(widget: widget, displayDesktop: displayDesktop, store: store)
                 break;
+            case WidgetInfo.types.text:
+                window = EditTextWidget(widget: widget, displayDesktop: displayDesktop, store: store)
+                break
             default:
                 window = WidgetNSWindow(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
         }
@@ -411,6 +442,8 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
             case WidgetInfo.types.countdown:
                 window = CountdownWidget(widget: widget)
                 break;
+            case WidgetInfo.types.text:
+                window = TextWidget(widget: widget)
             default:
                 window = DesktopWidgetWindow(widgetInfo: widget)
         }
