@@ -98,8 +98,7 @@ struct CountdownView : View {
     @EnvironmentObject var store : WidgetStore
     @State var fileNames : [URL] = []
     @State var backButtonPressed : Bool = false
-    @State var info = WidgetTypeInfo()
-    @State var countdown = CountdownInfo(time: Date(), desc: "")
+    @State var info = WidgetTypeInfo(countdown: CountdownInfo(time: Date(), desc: ""))
     let width : CGFloat = 1100
     let height : CGFloat = 700
     
@@ -113,17 +112,17 @@ struct CountdownView : View {
                     VStack {
                         VStack {
                             HStack {
-                                Text("Date End").font(.title).padding()
+                                Text("Date End").font(.title2).padding()
                                 DatePicker(
                                     "",
-                                    selection: $countdown.time,
+                                    selection: Binding<Date>(get: {self.info.countdown!.time }, set: {self.info.countdown!.time = $0}),
                                     displayedComponents: [.date]
                                 ).font(.title)
                                 .padding()
                             }
                             HStack {
-                                Text("Description").font(.title).padding()
-                                TextField(text: $countdown.desc, prompt: Text("Description of Countdown")) {
+                                Text("Description").font(.title2).padding()
+                                TextField(text: Binding<String>(get: {self.info.countdown!.desc }, set: {self.info.countdown!.desc = $0}), prompt: Text("Description of Countdown")) {
                                 }
                             }
                         }.frame(width: 700)
@@ -135,18 +134,16 @@ struct CountdownView : View {
                     }.padding()
                 }
             }.frame(width: width, height: height)
-            .task {
-                info.countdown = countdown
-            }
+            
         }
     }
 }
 
-struct CountdownView_Previews : PreviewProvider {
-    static var previews: some View {
-        CountdownView()
-    }
-}
+//struct CountdownView_Previews : PreviewProvider {
+//    static var previews: some View {
+//        CountdownView()
+//    }
+//}
 
 //
 //struct CalendarView_Previews : PreviewProvider {

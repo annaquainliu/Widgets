@@ -21,13 +21,12 @@ struct ContentView: View {
                     HStack {
                         MenuButton(title: "Image/GIF", ImageName: "photo.fill", parent:self)
                         MenuButton(title: "Desktop", ImageName:"desktopcomputer", parent:self)
-                        MenuButton(title: "Weather", ImageName:"sun.min", parent:self)
+                        MenuButton(title: "Countdown", ImageName: "calendar.badge.clock", parent: self)
                     }
                     HStack {
                         MenuButton(title : "Text", ImageName:
                                     "textformat", parent:self)
                         MenuButton(title: "Calendar", ImageName: "calendar", parent:self)
-                        MenuButton(title: "Countdown", ImageName: "calendar.badge.clock", parent: self)
                     }
                 }.padding(30)
             }.padding([.top, .bottom], 30)
@@ -37,6 +36,8 @@ struct ContentView: View {
                     CalendarView()
                 case "Desktop":
                     ScreenSaverView()
+                case "Countdown":
+                    CountdownView()
                 default:
                     ImageOrGifView()
             }
