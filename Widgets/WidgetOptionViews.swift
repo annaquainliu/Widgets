@@ -139,6 +139,46 @@ struct CountdownView : View {
     }
 }
 
+struct TextWidgetView : View {
+    @EnvironmentObject var store : WidgetStore
+    @State var fileNames : [URL] = []
+    let width : CGFloat = 1100
+    let height : CGFloat = 700
+    @State var backButtonPressed : Bool = false
+    @State var info = WidgetTypeInfo(text: "")
+    
+    var body: some View {
+        if backButtonPressed {
+            ContentView()
+        }
+        else {
+            ScrollView {
+                VStack(alignment: .leading) {
+                    WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Text")
+                    VStack {
+                        HStack {
+                            Text("Text: ").font(.title2)
+                            TextField(text: Binding<String>(get: {info.text!}, set: {info.text = $0}), prompt: Text("Your Text")) {
+                            }.padding()
+                        }.frame(width: 700)
+                        Spacer(minLength: 30)
+                        HStack {
+                            FilePicker(files: $fileNames)
+                            WidgetMenu(type: WidgetInfo.types.countdown, info: $info, fileNames: $fileNames)
+                        }
+                    }
+                }
+            }.frame(width: width, height: height)
+        }
+    }
+}
+
+struct TextView_Providers: PreviewProvider {
+    static var previews: some View {
+        TextWidgetView()
+    }
+}
+
 //struct CountdownView_Previews : PreviewProvider {
 //    static var previews: some View {
 //        CountdownView()
