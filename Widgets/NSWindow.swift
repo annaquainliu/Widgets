@@ -245,6 +245,7 @@ extension NSWindow {
     }
     
     func startGifAnimation(with url: URL, in layer: CALayer?) {
+        print("starting animation")
         let animation: CAKeyframeAnimation? = animationForGif(with: url)
         if let animation = animation {
             layer?.add(animation, forKey: "contents")
@@ -352,6 +353,7 @@ class EditCalendarWidget: WidgetNSWindow {
 class ScreenSaverWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
+        print("Screen saver widget NOT edit mode")
         super.init(widgetInfo: widget)
         self.contentView?.layer?.cornerRadius = 0
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
@@ -463,6 +465,7 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
                 break;
             case WidgetInfo.types.text:
                 window = TextWidget(widget: widget)
+                break;
             default:
                 window = DesktopWidgetWindow(widgetInfo: widget)
         }

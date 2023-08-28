@@ -94,8 +94,8 @@ struct ImportFile : View, Hashable {
         .onTapGesture {
             let panel = NSOpenPanel()
             panel.allowsMultipleSelection = false
-            panel.canChooseDirectories = true
-            panel.directoryURL = URL.downloadsDirectory
+            panel.canChooseDirectories = false
+            panel.directoryURL = URL.picturesDirectory
             panel.allowedContentTypes = [.gif, .png, .jpeg, .heic]
             if panel.runModal() == .OK {
                 self.filename = panel.url ?? nil

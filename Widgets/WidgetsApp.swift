@@ -17,6 +17,7 @@ struct WidgetsApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView().task {
+                NSApp.setActivationPolicy(.accessory)
                 do {
                     try await store.load()
                     displayDesktopWidget.store = store
@@ -27,6 +28,14 @@ struct WidgetsApp: App {
                 }
             }.environmentObject(store)
              .environmentObject(displayDesktopWidget)
+        }
+        MenuBarExtra("App", systemImage: "app.gift.fill") {
+            Button {
+                exit(0)
+            } label: {
+                Text("Close App")
+            }
+
         }
     }
 }
