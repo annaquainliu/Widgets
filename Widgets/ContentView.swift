@@ -14,6 +14,14 @@ struct ContentView: View {
     var body: some View {
         if tab == "Menu" {
             VStack(alignment : .center) {
+                HStack {
+                    Spacer()
+                    Button {
+                       tab = "Library"
+                    } label: {
+                        Text("My Library")
+                    }.padding([.top, .trailing], 20)
+                }
                 TitleText(text: "MacWidgets")
                 Text("Make your own widgets appear based on **triggers**!").padding([.bottom, .leading], 20)
                 Spacer().frame(maxHeight: 10)
@@ -40,6 +48,8 @@ struct ContentView: View {
                     CountdownView()
                 case "Text":
                     TextWidgetView()
+                case "Library":
+                    LibraryView()
                 default:
                     ImageOrGifView()
             }

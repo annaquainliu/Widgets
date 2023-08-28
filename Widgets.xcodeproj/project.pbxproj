@@ -11,6 +11,7 @@
 		30523F142A9950C400E0D6EF /* Precious.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30523F132A9950C400E0D6EF /* Precious.ttf */; };
 		305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305EC7F02A772527009A24F8 /* NSWindow.swift */; };
 		306FAA552A8574760097CE04 /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FAA542A8574760097CE04 /* WeatherAPI.swift */; };
+		309C62042A9D436700CA9054 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309C62032A9D436700CA9054 /* Library.swift */; };
 		30B14F332A73777F007A1672 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B14F322A73777F007A1672 /* Utilities.swift */; };
 		30B79BB22A7701F0002C79E7 /* DisplayDesktop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B79BB12A7701F0002C79E7 /* DisplayDesktop.swift */; };
 		30BDD9282A71CD2D007E5F3B /* WidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BDD9272A71CD2D007E5F3B /* WidgetsApp.swift */; };
@@ -68,6 +69,7 @@
 		30523F132A9950C400E0D6EF /* Precious.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Precious.ttf; sourceTree = "<group>"; };
 		305EC7F02A772527009A24F8 /* NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
 		306FAA542A8574760097CE04 /* WeatherAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAPI.swift; sourceTree = "<group>"; };
+		309C62032A9D436700CA9054 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		30B14F322A73777F007A1672 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		30B79BB12A7701F0002C79E7 /* DisplayDesktop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayDesktop.swift; sourceTree = "<group>"; };
 		30B79BBD2A771BF0002C79E7 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -170,6 +172,7 @@
 				30CD4C6B2A79D74B008B830B /* WidgetStore.swift */,
 				306FAA542A8574760097CE04 /* WeatherAPI.swift */,
 				30C01BFB2A88790A002BE9EC /* FilePicker.swift */,
+				309C62032A9D436700CA9054 /* Library.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -339,6 +342,7 @@
 				30F4E6D02A76035700EBA9CD /* WidgetMenu.swift in Sources */,
 				30F1B1CE2A7317EC00A1F2BE /* WidgetOptionViews.swift in Sources */,
 				305EC7F12A772527009A24F8 /* NSWindow.swift in Sources */,
+				309C62042A9D436700CA9054 /* Library.swift in Sources */,
 				30F1B1D22A7362A500A1F2BE /* ContentView.swift in Sources */,
 				30B14F332A73777F007A1672 /* Utilities.swift in Sources */,
 				30B79BB22A7701F0002C79E7 /* DisplayDesktop.swift in Sources */,

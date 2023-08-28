@@ -70,7 +70,7 @@ class DisplayDesktopWidgets: ObservableObject {
         self.currentWidgets[widget.getID()] = controller
     }
     
-    // removes widget from storage and from desktop
+    // removes widget view from desktop, it does not delete from storach
     private func removeWidget(id: UUID) {
         if self.currentWidgets[id] == nil {
             return
@@ -78,6 +78,14 @@ class DisplayDesktopWidgets: ObservableObject {
         let controller = self.currentWidgets[id]!
         controller.window?.close()
         self.currentWidgets.removeValue(forKey: id)
+    }
+    
+    // deletes widget from storage and from desktop view
+    public func deleteAndRefreshWidget(id: UUID) {
+        removeWidget(id: id)
+        Task {
+            await store?.deleteWidget(id: id)
+        }
     }
     
     @objc private func removeWidgetNoRepeat(sender: Timer) {

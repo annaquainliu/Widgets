@@ -11,7 +11,17 @@ import CoreLocation
 import Quartz
 
 
-class WidgetInfo : Codable {
+class WidgetInfo : Codable, Hashable {
+    static func == (lhs: WidgetInfo, rhs: WidgetInfo) -> Bool {
+        return lhs.getID() == rhs.getID()
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(type)
+        hasher.combine(triggerType)
+    }
+    
     var type : WidgetInfo.types
     var info : WidgetTypeInfo
     var triggerType : String

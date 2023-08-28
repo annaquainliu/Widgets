@@ -187,7 +187,7 @@ struct WidgetMenu : View {
                             alerts.alertInvalidTimeFrame = true
                             return
                         }
-                        if fileNames.count == 0 && (type == WidgetInfo.types.image || type == WidgetInfo.types.text ) {
+                        if fileNames.count == 0 {
                             alerts.nullFileName = true
                             return
                         }
