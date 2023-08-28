@@ -636,20 +636,21 @@ struct Countdown : View {
 }
 
 struct TextLayerView: View {
-
+    var size: NSSize
     var info : TextInfo
     var body: some View {
         Text(info.text)
             .font(.custom(info.font, size: 20))
+            .fixedSize(horizontal: false, vertical: true)
             .multilineTextAlignment(.center)
             .lineLimit(nil)
-            
+            .frame(maxWidth: size.width, maxHeight: size.height)
     }
 }
 
 struct TextLayerView_Providers: PreviewProvider {
     static var previews: some View {
-        TextLayerView(info: TextInfo(text: "WHOOOOO", font: "Arial"))
+        TextLayerView(size: NSSize(width: 300, height: 300), info: TextInfo(text: "SDHFSJDFSDJFDISJFBDSIJFBDSIFIJSBFJSBJFSKJFBSKBDF", font: "Arial"))
     }
 }
 

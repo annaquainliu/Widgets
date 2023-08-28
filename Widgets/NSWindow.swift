@@ -178,13 +178,30 @@ class DesktopWidgetWindow : NSWindow {
     }
 }
 
+extension String {
+    
+   func sizeOfString(usingFont font: NSFont) -> NSSize  {
+        let fontAttributes = [NSAttributedString.Key.font: font]
+        let size = self.size(withAttributes: fontAttributes)
+        return size
+    }
+}
+
+extension NSText {
+    func resizeFrame(windowSize: NSSize) {
+        self.frame = NSRect(x: 0, y: (windowSize.height - self.fittingSize.height) / 2,
+                            width: windowSize.width, height: self.fittingSize.height)
+    }
+}
+
 extension NSWindow {
     
     func makeTextView(widget: WidgetInfo) {
-        let textView = NSHostingView(rootView: TextLayerView(info: widget.info.text!))
+        let textView = NSHostingView(rootView: TextLayerView(size: self.frame.size, info: widget.info.text!))
         let size = textView.fittingSize
-        let frame = self.frame
-        textView.frame = NSRect(x: (frame.width - size.width) / 2, y: (frame.height - size.height) / 2, width: size.width, height: size.height)
+        textView.frame = NSRect(x: (self.frame.width - size.width) / 2,
+                                y: (self.frame.height - size.height) / 2,
+                                width: size.width, height: size.height)
         textView.translatesAutoresizingMaskIntoConstraints = true
         textView.autoresizesSubviews = true
         textView.autoresizingMask = [.minXMargin, .minYMargin, .maxXMargin, .maxYMargin]
@@ -384,7 +401,6 @@ class EditTextWidget: WidgetNSWindow {
         super.init(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
         self.makeTextView(widget: widget)
     }
-
 }
 
 class TextWidget: DesktopWidgetWindow {
@@ -420,7 +436,10 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
                 break;
             case WidgetInfo.types.text:
                 window = EditTextWidget(widget: widget, displayDesktop: displayDesktop, store: store)
-                break
+                super.init(window: window)
+                self.window?.makeKeyAndOrderFront(self)
+                self.window?.delegate = self
+                return
             default:
                 window = WidgetNSWindow(widgetInfo: widget, widgetStore: store, displayDesktop: displayDesktop)
         }
