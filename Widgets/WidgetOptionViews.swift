@@ -8,21 +8,49 @@
 import Foundation
 import SwiftUI
 
-func ImageOrGifView() -> SuperView {
-    return SuperView(title: "Image or Gif", type: WidgetInfo.types.image)
+struct ScreenSaverView: View {
+    @EnvironmentObject var store : WidgetStore
+    @State var fileName : [URL] = []
+    @State var backButtonPressed = false
+    @State var info = WidgetTypeInfo(opacity: 1)
+   
+    var body: some View {
+        if backButtonPressed {
+            ContentView()
+        } else {
+            ScrollView {
+                VStack(alignment: .leading) {
+                    WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Screen Saver")
+                    VStack(alignment: .center) {
+                        HStack {
+                            Text("Opacity of Screen Saver: ").font(.title).padding()
+                            TextField("Enter your score", value: $info.screenSaverOpacity, format: .number)
+                                            .textFieldStyle(.roundedBorder)
+                                            .padding()
+                        }.frame(width: 600)
+                    }.frame(width: 1200)
+                    HStack {
+                        FilePicker(files: $fileName)
+                        Spacer(minLength: 40)
+                        WidgetMenu(type: WidgetInfo.types.desktop, info: $info, fileNames: $fileName)
+                    }.padding()
+                }
+            }.frame(width: 1200, height: 700)
+        }
+    }
 }
 
-func ScreenSaverView() -> SuperView {
-    return SuperView(title: "Desktop Background", type: WidgetInfo.types.desktop)
+struct ScreenSaver_Providers: PreviewProvider {
+    static var previews: some View {
+        ScreenSaverView()
+    }
 }
 
-struct SuperView: View {
+struct ImageOrGifView: View {
     @EnvironmentObject var store : WidgetStore
     @State var fileName : [URL] = []
     @State var backButtonPressed = false
     @State var info = WidgetTypeInfo()
-    var title : String
-    var type : WidgetInfo.types
     
     var body : some View {
         if backButtonPressed {
@@ -30,12 +58,12 @@ struct SuperView: View {
         } else {
             ScrollView {
                 VStack(alignment: .leading) {
-                    WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: title)
+                    WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Image or Gif")
                     Spacer().frame(height: 30)
                     HStack {
                         FilePicker(files: $fileName)
                         Spacer(minLength: 40)
-                        WidgetMenu(type: type, info: $info, fileNames: $fileName)
+                        WidgetMenu(type: WidgetInfo.types.image, info: $info, fileNames: $fileName)
                     }.padding()
                 }.padding()
                  .frame(width: 1200)

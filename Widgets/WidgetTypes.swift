@@ -82,13 +82,15 @@ struct WidgetTypeInfo : Codable {
     var countdown : CountdownInfo?
     var weatherType : String?
     var text : TextInfo?
+    var screenSaverOpacity : Float?
     
     init(calendarType: CalendarSizes.types? = nil, countdown : CountdownInfo? = nil,
-         weatherType: String? = nil, text: TextInfo? = nil) {
+         weatherType: String? = nil, text: TextInfo? = nil, opacity: Float? = nil) {
         self.calendarType = calendarType
         self.countdown = countdown
         self.weatherType = weatherType
         self.text = text
+        self.screenSaverOpacity = opacity
     }
 }
 
@@ -704,12 +706,12 @@ struct TextLayerView: View {
             .frame(maxWidth: size.width, maxHeight: size.height)
     }
 }
-
-struct TextLayerView_Providers: PreviewProvider {
-    static var previews: some View {
-        TextLayerView(size: NSSize(width: 300, height: 300), info: TextInfo(text: "SDHFSJDFSDJFDISJFBDSIJFBDSIFIJSBFJSBJFSKJFBSKBDF", font: "Arial"))
-    }
-}
+//
+//struct TextLayerView_Providers: PreviewProvider {
+//    static var previews: some View {
+//        TextLayerView(size: NSSize(width: 300, height: 300), info: TextInfo(text: "SDHFSJDFSDJFDISJFBDSIJFBDSIFIJSBFJSBJFSKJFBSKBDF", font: "Arial"))
+//    }
+//}
 
 
 //struct Countdown_Providers: PreviewProvider {

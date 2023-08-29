@@ -353,11 +353,11 @@ class EditCalendarWidget: WidgetNSWindow {
 class ScreenSaverWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
-        print("Screen saver widget NOT edit mode")
         super.init(widgetInfo: widget)
         self.contentView?.layer?.cornerRadius = 0
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
         self.ignoresMouseEvents = true
+        self.contentView!.layer?.opacity = widget.info.screenSaverOpacity!
     }
 
 }
