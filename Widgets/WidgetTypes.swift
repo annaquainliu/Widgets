@@ -62,6 +62,19 @@ class WidgetInfo : Codable, Hashable {
     func getID() -> UUID {
         return self.id
     }
+    
+    func stringifyTrigger() -> String {
+        switch triggerType {
+            case Triggers.always:
+                return "Always"
+            case Triggers.staticTimeFrame:
+                return staticTimeFrame!.stringify()
+            case Triggers.timeFrame:
+                return timeFrame!.stringify()
+            default:
+                return "When it is \(weather!)"
+        }
+    }
 }
 
 struct WidgetTypeInfo : Codable {
@@ -211,6 +224,10 @@ struct Triggers {
 struct StaticTimeFrame : Codable {
     var timeStart : Date
     var timeEnd : Date
+    
+    func stringify() -> String {
+        return "Start Time: \(timeStart), End Time: \(timeEnd) \n";
+    }
 }
 
 struct TimeFrame {
@@ -255,6 +272,7 @@ struct TimeFrame {
 
 protocol TimeFrameCodable : Codable {
     func nowWithinTimeRange() -> Bool
+    func stringify() -> String
 }
 
 struct HourTimeFrame : TimeFrameCodable {
@@ -294,6 +312,10 @@ struct HourTimeFrame : TimeFrameCodable {
             return timeEnd.get(.hour) < current.get(.hour)
         }
     }
+    
+    func stringify() -> String {
+        return "Start Hour: \(timeStart), End Hour: \(timeEnd) \n"
+    }
 }
 
 struct WeekdayTimeFrame : TimeFrameCodable {
@@ -329,6 +351,10 @@ struct WeekdayTimeFrame : TimeFrameCodable {
         comps.weekday = TimeFrame.getWeekdayIndex(weekday: timeEnd)
         return cal.nextDate(after: Date(), matching: comps, matchingPolicy: .nextTimePreservingSmallerComponents)!
     }
+    
+    func stringify() -> String {
+        return "Start Day: \(timeStart), End Day: \(timeEnd) \n"
+    }
 }
 
 struct DateTimeFrame : TimeFrameCodable {
@@ -346,6 +372,10 @@ struct DateTimeFrame : TimeFrameCodable {
     
     func getTimeEnd() -> Int {
         return timeEnd + 1
+    }
+    
+    func stringify() -> String {
+        return "Date Start: \(timeStart), Date End: \(timeEnd) \n"
     }
 }
 
@@ -368,6 +398,10 @@ struct MonthTimeFrame : TimeFrameCodable {
             return currMonth >= monthStart && currMonth <= monthEnd
         }
     }
+    
+    func stringify() -> String {
+        return "Month Start: \(timeStart), Month End: \(timeEnd) \n"
+    }
 }
 
 struct TimeFrameInfo : Codable {
@@ -382,8 +416,17 @@ struct TimeFrameInfo : Codable {
         self.date = Date
         self.Month = Month
     }
-    // invariant for everything: EVERYTHING must repeat if selected!!
     
+    func stringify() -> String {
+        let timeFrames : [TimeFrameCodable?] = [Hour, Weekday, date, Month]
+        var result = ""
+        for i in 0..<timeFrames.count {
+            if timeFrames[i] != nil {
+                result += timeFrames[i]!.stringify()
+            }
+        }
+        return result
+    }
     // Invariant: Will be called outside of range (before or after)
     func getStartingTime() -> Date {
         let currentDate = Date()

@@ -53,6 +53,19 @@ struct FileTools : View {
     }
 }
 
+extension URL {
+    func isValidURL() -> Bool {
+        let valid = ["Pictures", "Downloads", "Movies", "Music"]
+        let username = NSUserName()
+        for i in 0..<valid.count {
+            if self.absoluteString.contains("file:///Users/\(username)/\(valid[i])/") {
+                return true
+            }
+        }
+        return false
+    }
+}
+
 struct ImportFile : View, Hashable {
     static func == (lhs: ImportFile, rhs: ImportFile) -> Bool {
         return lhs.id == rhs.id
@@ -95,14 +108,15 @@ struct ImportFile : View, Hashable {
             let panel = NSOpenPanel()
             panel.allowsMultipleSelection = false
             panel.canChooseDirectories = false
-            panel.directoryURL = URL.picturesDirectory
+            panel.directoryURL = URL.downloadsDirectory
             panel.allowedContentTypes = [.gif, .png, .jpeg, .heic]
             if panel.runModal() == .OK {
-                self.filename = panel.url ?? nil
-                if filename != nil && filename!.absoluteString.contains("file:///Users/\(NSUserName())/Documents/") {
-                    _ = alertMessage(question: "Your file cannot be from your Documents folder", text: "")
+                let checkFileName = panel.url ?? nil
+                if checkFileName == nil || !checkFileName!.isValidURL() {
+                    _ = alertMessage(question: "Your image must come from your Downloads, Pictures, Movies, or Music directory", text: "")
                     return
                 }
+                self.filename = checkFileName
                 if fileSelected {
                     files[index] = filename!
                 }

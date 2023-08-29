@@ -29,13 +29,12 @@ struct WidgetsApp: App {
             }.environmentObject(store)
              .environmentObject(displayDesktopWidget)
         }
-        MenuBarExtra("App", systemImage: "app.gift.fill") {
-            Button {
-                exit(0)
-            } label: {
-                Text("Close App")
-            }
-
-        }
+//        MenuBarExtra("App", systemImage: "app.gift.fill") {
+//            Button {
+//                exit(0)
+//            } label: {
+//                Text("Close App")
+//            }
+//        }
     }
 }
