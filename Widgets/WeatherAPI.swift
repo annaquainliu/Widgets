@@ -16,9 +16,22 @@ struct WeatherApi : Codable {
      var timezone: String?
      var tzoffset: Double?
      var description: String?
-     var alerts: [String]?
+     var alerts: [Alert]?
      var stations: StationMap?
      var currentConditions: CurrentConditions?
+}
+
+struct Alert: Codable {
+    var event: String
+    var headline: String
+    var ends: String
+    var endsEpoch: Int
+    var onset: String
+    var onsetEpoch: Int
+    var id: String
+    var language: String
+    var link: String
+    var description: String
 }
 
 struct DayWeather : Codable {
