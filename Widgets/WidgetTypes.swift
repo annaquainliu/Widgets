@@ -314,7 +314,11 @@ struct HourTimeFrame : TimeFrameCodable {
     }
     
     func stringify() -> String {
-        return "Start Hour: \(timeStart), End Hour: \(timeEnd) \n"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HH:mm"
+        let startFormatted = dateFormatter.string(from: timeStart)
+        let endFormatted = dateFormatter.string(from: timeEnd)
+        return "Start Time: \(startFormatted), End Time: \(endFormatted)\n"
     }
 }
 

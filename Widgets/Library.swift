@@ -29,8 +29,7 @@ struct LibraryView : View {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 50, height: 50)
                                 Spacer()
-                                Text(widget.triggerType).font(.title2)
-                                
+                                Text(widget.stringifyTrigger()).font(.title2)
                                 Spacer()
                                 switch widget.type {
                                     case WidgetInfo.types.calendar:
