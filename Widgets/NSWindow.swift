@@ -57,7 +57,7 @@ class WidgetNSWindow : NSWindow {
                    defer: true)
         if widgetInfo.imageURLs.count > 0 {
             self.contentView = NSView(frame: bounds)
-            self.setMediaToFillWindow(url: widgetInfo.imageURLs[0])
+            self.setMediaToFillWindow(url: widgetInfo.imageURLs[0], radius: 13)
         }
         self.adjustWidgetWindow()
     }
@@ -166,7 +166,8 @@ class DesktopWidgetWindow : NSWindow {
             self.close()
             return
         }
-        self.setMediaToFillWindow(url: widgetInfo.imageURLs[index])
+        let cornerRadius = widgetInfo.type == WidgetInfo.types.desktop ? 0 : 13
+        self.setMediaToFillWindow(url: widgetInfo.imageURLs[index], radius: cornerRadius)
     }
     
     override var canBecomeKey: Bool {
@@ -208,10 +209,10 @@ extension NSWindow {
         self.contentView?.addSubview(textView)
     }
     
-    func setMediaToFillWindow(url: URL) {
+    func setMediaToFillWindow(url: URL, radius: Int) {
         self.contentView?.wantsLayer = true
         self.contentView!.layer = CALayer()
-        self.contentView!.layer?.cornerRadius = 13
+        self.contentView!.layer?.cornerRadius = CGFloat(radius)
         self.contentView!.layer?.contentsGravity = .resizeAspectFill
         if url.pathExtension == "gif" {
             self.startGifAnimation(with: url, in: self.contentView!.layer)
@@ -354,7 +355,6 @@ class ScreenSaverWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
         super.init(widgetInfo: widget)
-        self.contentView?.layer?.cornerRadius = 0
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
         self.ignoresMouseEvents = true
         self.contentView!.layer?.opacity = widget.info.screenSaverOpacity!
