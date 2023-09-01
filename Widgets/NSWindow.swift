@@ -4,11 +4,10 @@
 //
 //  Created by Anna Liu on 7/30/23.
 //
-
+import AVFoundation
 import Foundation
 import AppKit
 import SwiftUI
-import AVFoundation
 
 extension NSImage {
     func calcMaxRatio(windowSize: NSSize) -> NSSize {

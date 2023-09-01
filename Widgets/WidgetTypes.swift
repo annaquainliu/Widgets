@@ -140,6 +140,7 @@ class WeatherManager {
     static var currentConditions : CurrentConditions? = nil
     
     static func fetchWeather() async {
+        print("fetching weather")
         if LocationManager.lastKnownLocation == nil {
             print("location manager last known location is null")
             return
@@ -523,22 +524,13 @@ struct TimeFrameInfo : Codable {
     func getEndingTime() -> Date {
         let currentDate = Date()
         var dateComponents = DateComponents()
-        var endHour: Int; var endMinute: Int; var endDate : Int; var endMonth: Int
-        // if the start month is not specified, use current month
-        if Month == nil {
-            endMonth = currentDate.get(.month)
-        } else {
-            if Month!.nowWithinTimeRange() {
-                endMonth = currentDate.get(.month)
-            } else {
-                endMonth = TimeFrame.getMonthIndex(month: Month!.timeEnd)
-            }
-        }
-        let endYear = endMonth < currentDate.get(.month) ? currentDate.get(.year) + 1 : currentDate.get(.year)
+        var endHour: Int; var endMinute: Int; var endDate : Int; var endMonth: Int; var endYear: Int
         // if hour is specified, day must repeat
         if Hour == nil {
             endHour = 23
             endMinute = 59
+            endMonth = Month == nil ? currentDate.get(.month) : TimeFrame.getMonthIndex(month: Month!.timeEnd)
+            endYear = endMonth < currentDate.get(.month) ? currentDate.get(.year) + 1 : currentDate.get(.year)
             endDate = date == nil ? currentDate.endOfMonth(month: endMonth).get(.day) : date!.getTimeEnd()
             if Weekday != nil {
                 // make the date of the current start year, month, and date
@@ -559,6 +551,8 @@ struct TimeFrameInfo : Codable {
                 }
             }
         } else {
+            endMonth = currentDate.get(.month)
+            endYear = currentDate.get(.year)
             endHour = Hour!.timeEnd.get(.hour)
             endMinute = Hour!.timeEnd.get(.minute)
             endDate = currentDate.get(.day)

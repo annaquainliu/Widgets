@@ -97,10 +97,10 @@ class DisplayDesktopWidgets: ObservableObject {
         let start = widget.staticTimeFrame!.timeStart
         let end = widget.staticTimeFrame!.timeEnd
         let current = Date()
-        if (start...end).contains(current) {
-            makeWindowController(widget: widget)
-            let diffs = Calendar.current.dateComponents([.day], from: current, to: end)
-            if diffs.day! <= 5 {
+        let diffs = Calendar.current.dateComponents([.day], from: current, to: end)
+        if diffs.day! <= 5 {
+            if (start...end).contains(current) {
+                makeWindowController(widget: widget)
                 let timeOut = Timer(fireAt: end,
                                     interval: 0,
                                     target: self,
@@ -108,10 +108,7 @@ class DisplayDesktopWidgets: ObservableObject {
                                     userInfo: widget.getID(),
                                     repeats: false)
                 RunLoop.main.add(timeOut, forMode: .common)
-            }
-        } else if start > current {
-            let diffs = Calendar.current.dateComponents([.day], from: current, to: start)
-            if diffs.day! <= 5 {
+            } else if start > current {
                 let timer = Timer(fireAt: start,
                                   interval: 0,
                                   target: self,
@@ -119,10 +116,10 @@ class DisplayDesktopWidgets: ObservableObject {
                                   userInfo: widget,
                                   repeats: false)
                 RunLoop.main.add(timer, forMode: .common)
-            }
-        } else {
-            Task {
-                await self.store!.deleteWidget(id: widget.getID())
+            } else {
+                Task {
+                    await self.store!.deleteWidget(id: widget.getID())
+                }
             }
         }
     }
@@ -134,6 +131,7 @@ class DisplayDesktopWidgets: ObservableObject {
         }
         if !setWeatherInterval {
             setWeatherInterval = true
+            print("setting timer")
             let timer = Timer(timeInterval: 1800, repeats: true) { Timer in
                 Task {
                     await WeatherManager.fetchWeather()
@@ -186,6 +184,7 @@ class DisplayDesktopWidgets: ObservableObject {
             let endingDate = widget.timeFrame!.getEndingTime()
             print("ending date is: \(endingDate)")
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: endingDate)
+            print("days: ", diffs.day!)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: endingDate,
                                   interval: 0,
@@ -199,6 +198,7 @@ class DisplayDesktopWidgets: ObservableObject {
             let startingDate = widget.timeFrame!.getStartingTime()
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: startingDate)
             print("starting date is: \(startingDate)")
+            print("days: ", diffs.day!)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: startingDate,
                                   interval: 0,
