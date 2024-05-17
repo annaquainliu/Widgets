@@ -23,34 +23,21 @@ class WidgetInfo : Codable, Hashable {
     }
     
     var type : WidgetInfo.types
-    var info : WidgetTypeInfo
-    var triggerType : String
-    var weather : String?
-    var timeFrame : TimeFrameInfo?
-    var staticTimeFrame : StaticTimeFrame?
+    var trigger : Triggers
     var xCoord : Double = 0
     var yCoord : Double = 0
-    var widgetSize : NSSize
+    var widgetSize : NSSize = NSSize()
     var imageURLs : [URL]
-    var slideshow : SlideshowInfo?
     private var id = UUID()
     
     enum types : Int, Codable {
         case image, calendar, desktop, text, countdown
     }
     
-    init(triggerType: String, weather: String?, timeFrame: TimeFrameInfo?,
-         staticTimeFrame: StaticTimeFrame?, imageName: [URL], type: WidgetInfo.types,
-         info: WidgetTypeInfo, slideshow : SlideshowInfo?) {
-        self.triggerType = triggerType
-        self.weather = weather
-        self.timeFrame = timeFrame
-        self.staticTimeFrame = staticTimeFrame
-        self.imageURLs = imageName
+    init(trigger : Triggers, imageURLs: [URL], type: WidgetInfo.types) {
+        self.imageURLs = imageURLs
         self.type = type
-        self.widgetSize = NSSize()
-        self.info = info
-        self.slideshow = slideshow
+        self.trigger = trigger
     }
     
     func initCoordsAndSize(xCoord : Double, yCoord : Double, size : NSSize) {
@@ -63,8 +50,69 @@ class WidgetInfo : Codable, Hashable {
         return self.id
     }
     
+}
+
+class CalendarWidgetInfo : WidgetInfo {
+    
+    var calendarType : CalendarSizes.types
+    
+    init(calendarType : CalendarSizes.types, trigger : Triggers, imageURLs: [URL]) {
+        super.init(trigger : trigger, imageURLs: imageURLs, type: WidgetInfo.types.calendar)
+        self.calendarType = calendarType
+    }
+}
+
+class CountDownWidgetInfo : WidgetInfo {
+    var time : Date
+    var desc : String
+    
+    init(time: Date, desc: String, trigger : Triggers, imageURLs: [URL]) {
+        super.init(trigger: trigger, trigger: trigger, imageURLs: [URL], type: WidgetInfo.types.countdown)
+        self.time = time
+        self.desc = desc
+    }
+}
+
+class TextWidgetInfo : WidgetInfo {
+    
+    var text : String
+    var font : String
+    
+    init(text: String, font: String, trigger : Triggers, imageURLs: [URL]) {
+        super.init(trigger: trigger, imageURLs: imageURLs, type: WidgetInfo.types.text)
+        self.text = text
+        self.font = font
+    }
+}
+
+class ScreenWidgetInfo : WidgetInfo {
+    
+    var opacity : Float
+    
+    init(opacity: Float, trigger : Triggers, imageURLs : [URL]) {
+        super.init(trigger: trigger, imageURLs: imageURLs, type: WidgetInfo.types.desktop)
+        self.opacity = opacity
+    }
+}
+
+struct SlideshowInfo : Codable {
+    var interval : Int
+}
+
+class Triggers : Codable {
+    
+    var type : Triggers.types
+    
+    enum types : String, Codable {
+        case always, weather, timeFrame, staticTimeFrame
+    }
+    
+    init(type: Triggers.types) {
+        self.type = type
+    }
+    
     func stringifyTrigger() -> String {
-        switch triggerType {
+        switch type {
             case Triggers.always:
                 return "Always"
             case Triggers.staticTimeFrame:
@@ -77,38 +125,6 @@ class WidgetInfo : Codable, Hashable {
     }
 }
 
-// class that stores the information of a specific widget type
-struct WidgetTypeInfo : Codable {
-    var calendarType : CalendarSizes.types?
-    var countdown : CountdownInfo?
-    var weatherType : String?
-    var text : TextInfo?
-    var screenSaverOpacity : Float?
-    
-    init(calendarType: CalendarSizes.types? = nil, countdown : CountdownInfo? = nil,
-         weatherType: String? = nil, text: TextInfo? = nil, opacity: Float? = nil) {
-        self.calendarType = calendarType
-        self.countdown = countdown
-        self.weatherType = weatherType
-        self.text = text
-        self.screenSaverOpacity = opacity
-    }
-}
-
-struct TextInfo : Codable {
-    var text: String
-    var font: String
-}
-
-struct CountdownInfo : Codable {
-    var time : Date
-    var desc : String
-}
-
-struct SlideshowInfo : Codable {
-    var interval : Int
-}
-
 struct WeatherOptionInfo : Hashable {
     var title : String;
     var systemImage : String;
@@ -118,14 +134,14 @@ struct WeatherOptionInfo : Hashable {
     }
 }
 
-struct WeatherTrigger {
+// specific Weather information
+class WeatherTrigger : Triggers {
+
+    var weather : WeatherTrigger.types
     
-    static var sunny = "sunny"
-    static var cloudy = "cloudy"
-    static var raining = "raining"
-    static var windy = "windy"
-    static var snowing = "snowing"
-    static var thunder = "thundering"
+    enum types : String, Codable {
+        case sunny, cloudy, raining, windy, snowing, thunder
+    }
     
     static var weatherOptions = [
         WeatherOptionInfo(title: WeatherTrigger.sunny, systemImage: "sun.min.fill"),
@@ -134,6 +150,11 @@ struct WeatherTrigger {
         WeatherOptionInfo(title: WeatherTrigger.windy, systemImage: "wind.circle"),
         WeatherOptionInfo(title: WeatherTrigger.snowing, systemImage: "cloud.snow.fill"),
         WeatherOptionInfo(title: WeatherTrigger.thunder, systemImage: "cloud.bolt.rain")]
+    
+    init(weather: WeatherTrigger.types) {
+        super.init(type: Triggers.types.weather)
+        self.weather = weather
+    }
 }
 
 class WeatherManager {
@@ -216,21 +237,18 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 }
 
-
-struct Triggers {
-    
-    static var always = "Always"
-    static var weather = "Weather"
-    static var timeFrame = "TimeFrame"
-    static var staticTimeFrame = "staticTimeFrame"
-}
-
-struct StaticTimeFrame : Codable {
+class StaticTimeFrame : Triggers {
     var timeStart : Date
     var timeEnd : Date
     
     func stringify() -> String {
         return "Start Time: \(timeStart), End Time: \(timeEnd) \n";
+    }
+    
+    init(timeStart: Date, timeEnd: Date) {
+        super.init(type: Triggers.types.staticTimeFrame)
+        self.timeStart = timeStart
+        self.timeEnd = timeEnd
     }
 }
 
@@ -412,13 +430,14 @@ struct MonthTimeFrame : TimeFrameCodable {
     }
 }
 
-struct TimeFrameInfo : Codable {
+class TimeFrameInfo : Triggers {
     var Hour : HourTimeFrame?
     var Weekday : WeekdayTimeFrame?
     var date : DateTimeFrame?
     var Month : MonthTimeFrame?
     
     init(Hour: HourTimeFrame? = nil, Weekday: WeekdayTimeFrame? = nil, Date: DateTimeFrame? = nil, Month: MonthTimeFrame? = nil) {
+        super.init(type: Triggers.types.timeFrame)
         self.Hour = Hour
         self.Weekday = Weekday
         self.date = Date
