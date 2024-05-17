@@ -14,9 +14,9 @@ struct Alerts {
     var nullFileName = false
     var invalidInterval = false
 }
-
+ 
 struct TriggersView : View {
-    @Binding var triggerSelection : String
+    @Binding var triggerSelection : Triggers.types
     @Binding var weatherSelection : WeatherOptionInfo
     @Binding var staticTimeFrame : StaticTimeFrame
     @Binding var hourSelection : HourTimeFrame
@@ -43,25 +43,25 @@ struct TriggersView : View {
         VStack(alignment: .leading) {
             Picker(selection: $triggerSelection, label: Text("")) {
                 makeRadioOption(
-                    title: Triggers.always,
+                    title: Triggers.types.always.rawValue,
                     view: HStack {
-                        TriggerCategoryText(text: Triggers.always)},
+                        TriggerCategoryText(text: "Always")},
                     selection: triggerSelection)
                 makeRadioOption(
-                    title: Triggers.weather,
+                    title: Triggers.types.weather.rawValue,
                     view: HStack {
                         TriggerCategoryText(text: "Weather")
                         Picker("", selection: $weatherSelection) {
                             ForEach(WeatherTrigger.weatherOptions, id: \.self) { item in
                                 HStack {
-                                    Text("Whenever it is " + item.title)
+                                    Text("Whenever it is " + item.title.rawValue)
                                     Image(systemName: item.systemImage)
                                 }
                             }
                         }.pickerStyle(.menu)
                     },
                     selection: triggerSelection)
-                makeRadioOption(title: Triggers.staticTimeFrame,
+                makeRadioOption(title: Triggers.types.staticTimeFrame.rawValue,
                                 view: HStack {
                                 VStack(alignment: .leading) {
                                     TriggerCategoryText(text: "Time Frame")
@@ -72,7 +72,7 @@ struct TriggersView : View {
                                 },
                                 selection: triggerSelection)
                 makeRadioOption(
-                    title: Triggers.timeFrame,
+                    title: Triggers.types.timeFrame.rawValue,
                     view: HStack {
                         VStack(alignment: .leading) {
                             TriggerCategoryText(text: "Time Frame")
@@ -147,10 +147,9 @@ struct TriggersView : View {
     }
 }
 
-struct WidgetMenu : View {
-    var type : WidgetInfo.types
-    @State private var triggerSelection = Triggers.always
-    @State var weatherSelection =  WeatherOptionInfo(title: WeatherTrigger.sunny, systemImage: "sun.min.fill")
+struct WidgetMenu< T : WidgetTypeInfo> : View {
+    @State private var triggerSelection = Triggers.types.always
+    @State var weatherSelection = WeatherOptionInfo(title: WeatherTrigger.types.sunny, systemImage: "sun.min.fill")
     @State var timeFrameSelection = Set<String>()
     @State var hourSelection = HourTimeFrame()
     @State var daySelection = WeekdayTimeFrame()
@@ -160,7 +159,7 @@ struct WidgetMenu : View {
     @State private var alerts = Alerts()
     @State private var slideshowOptions = SlideshowInfo(interval: 1)
     
-    @Binding var info : WidgetTypeInfo
+    @Binding var info : T
     @Binding var fileNames : [URL]
     
     @EnvironmentObject var store : WidgetStore
@@ -182,7 +181,7 @@ struct WidgetMenu : View {
                 HStack {
                     Spacer()
                     Button("Create Widget") {
-                        if triggerSelection == Triggers.staticTimeFrame &&
+                        if triggerSelection == Triggers.types.staticTimeFrame &&
                             staticTimeFrame.timeStart > staticTimeFrame.timeEnd {
                             alerts.alertInvalidTimeFrame = true
                             return
@@ -195,23 +194,25 @@ struct WidgetMenu : View {
                             alerts.invalidInterval = true
                             return
                         }
-                        var timeFrame : TimeFrameInfo? = nil
-                        if triggerSelection == Triggers.timeFrame {
+                        var trigger : Triggers;
+                        if triggerSelection == Triggers.types.timeFrame {
                             let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
                             let dayParam = timeFrameSelection.contains(TimeFrame.dayOfTheWeek) ? daySelection : nil
                             let dateParam = timeFrameSelection.contains(TimeFrame.dayOfTheMonth) ? dateSelection : nil
                             let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
-                            timeFrame = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
+                            trigger = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
                         }
-                        
-                        let widgetInfo = WidgetInfo(triggerType: triggerSelection,
-                                                    weather:  triggerSelection == Triggers.weather ? weatherSelection.title : nil,
-                                                    timeFrame: timeFrame,
-                                                    staticTimeFrame: triggerSelection == Triggers.staticTimeFrame ? staticTimeFrame : nil,
-                                                    imageName: fileNames,
-                                                    type: type,
-                                                    info: info,
-                                                    slideshow: fileNames.count > 1 ? slideshowOptions : nil)
+                        else if triggerSelection == Triggers.types.weather {
+                            trigger = WeatherTrigger(weather: weatherSelection.title)
+                        }
+                        else if triggerSelection == Triggers.types.staticTimeFrame {
+                            trigger = staticTimeFrame
+                        }
+                        else {
+                            trigger = Triggers(type: Triggers.types.always)
+                        }
+                        let widgetInfo = WidgetInfo(info: info, trigger: trigger, imageURLs: fileNames,
+                                                    slideshow: slideshowOptions)
                         _ = ScreenWindowController(widget: widgetInfo, displayDesktop: displayDesktop, store: store)
                         alerts.alertInstructions = true
                     }

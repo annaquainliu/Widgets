@@ -36,15 +36,15 @@ class DisplayDesktopWidgets: ObservableObject {
     }
     
     func displayWidget(widget: WidgetInfo) {
-        switch widget.triggerType {
-            case Triggers.always:
+        switch widget.trigger.type {
+            case Triggers.types.always:
                 print("always")
                 makeWindowController(widget: widget)
                 break
-            case Triggers.timeFrame:
+            case Triggers.types.timeFrame:
                 displayTimeFrameWidget(widget: widget)
                 break
-            case Triggers.weather:
+            case Triggers.types.weather:
                 displayWeatherWidget(widget: widget)
                 break
             default:

@@ -68,8 +68,8 @@ func TriggerCategoryText(text : String) -> some View {
                 .padding(5)
 }
 
-func makeRadioOption(title : String, view : some View, selection : String) -> some View {
-    return view.tag(title).disabled(selection != title)
+func makeRadioOption(title : String, view : some View, selection : Triggers.types) -> some View {
+    return view.tag(title).disabled(selection.rawValue != title)
 }
 
 extension Date {

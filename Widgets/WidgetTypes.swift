@@ -18,26 +18,24 @@ class WidgetInfo : Codable, Hashable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
-        hasher.combine(type)
-        hasher.combine(triggerType)
+        hasher.combine(info.type)
+        hasher.combine(trigger.type)
     }
     
-    var type : WidgetInfo.types
+    var info : WidgetTypeInfo
     var trigger : Triggers
     var xCoord : Double = 0
-    var yCoord : Double = 0
+    var yCoord : Double = 0 
     var widgetSize : NSSize = NSSize()
+    var slideshow : SlideshowInfo
     var imageURLs : [URL]
     private var id = UUID()
     
-    enum types : Int, Codable {
-        case image, calendar, desktop, text, countdown
-    }
-    
-    init(trigger : Triggers, imageURLs: [URL], type: WidgetInfo.types) {
+    init(info: WidgetTypeInfo, trigger : Triggers, imageURLs: [URL], slideshow : SlideshowInfo) {
+        self.info = info;
         self.imageURLs = imageURLs
-        self.type = type
         self.trigger = trigger
+        self.slideshow = slideshow
     }
     
     func initCoordsAndSize(xCoord : Double, yCoord : Double, size : NSSize) {
@@ -52,51 +50,69 @@ class WidgetInfo : Codable, Hashable {
     
 }
 
-class CalendarWidgetInfo : WidgetInfo {
+struct SlideshowInfo {
+    var interval : Int
+}
+
+class WidgetTypeInfo : Codable {
+    
+    var type : WidgetTypeInfo.types
+    
+    enum types : Int, Codable {
+        case image, calendar, desktop, text, countdown
+    }
+    
+    init(type: WidgetTypeInfo.types) {
+        self.type = type
+    }
+}
+
+class CalendarInfo : WidgetTypeInfo {
     
     var calendarType : CalendarSizes.types
     
-    init(calendarType : CalendarSizes.types, trigger : Triggers, imageURLs: [URL]) {
-        super.init(trigger : trigger, imageURLs: imageURLs, type: WidgetInfo.types.calendar)
+    init(calendarType : CalendarSizes.types) {
+        super.init(type: WidgetTypeInfo.types.calendar)
         self.calendarType = calendarType
     }
+  
 }
 
-class CountDownWidgetInfo : WidgetInfo {
+class CountDownWidgetInfo : WidgetTypeInfo {
     var time : Date
     var desc : String
     
-    init(time: Date, desc: String, trigger : Triggers, imageURLs: [URL]) {
-        super.init(trigger: trigger, trigger: trigger, imageURLs: [URL], type: WidgetInfo.types.countdown)
+    init(time: Date, desc: String) {
+        super.init(type: WidgetTypeInfo.types.countdown)
         self.time = time
         self.desc = desc
     }
+    
+   
+
 }
 
-class TextWidgetInfo : WidgetInfo {
+class TextWidgetInfo : WidgetTypeInfo {
     
     var text : String
     var font : String
     
-    init(text: String, font: String, trigger : Triggers, imageURLs: [URL]) {
-        super.init(trigger: trigger, imageURLs: imageURLs, type: WidgetInfo.types.text)
+    init(text: String, font: String) {
+        super.init(type: WidgetTypeInfo.types.text)
         self.text = text
         self.font = font
     }
+    
 }
 
-class ScreenWidgetInfo : WidgetInfo {
+class ScreenWidgetInfo : WidgetTypeInfo {
     
     var opacity : Float
     
-    init(opacity: Float, trigger : Triggers, imageURLs : [URL]) {
-        super.init(trigger: trigger, imageURLs: imageURLs, type: WidgetInfo.types.desktop)
+    init(opacity: Float) {
+        super.init(type: WidgetTypeInfo.types.desktop)
         self.opacity = opacity
     }
-}
-
-struct SlideshowInfo : Codable {
-    var interval : Int
 }
 
 class Triggers : Codable {
@@ -104,7 +120,10 @@ class Triggers : Codable {
     var type : Triggers.types
     
     enum types : String, Codable {
-        case always, weather, timeFrame, staticTimeFrame
+        case always = "Always"
+        case weather = "Weather"
+        case timeFrame = "timeFrame"
+        case staticTimeFrame = "staticTimeFrame"
     }
     
     init(type: Triggers.types) {
@@ -112,21 +131,12 @@ class Triggers : Codable {
     }
     
     func stringifyTrigger() -> String {
-        switch type {
-            case Triggers.always:
-                return "Always"
-            case Triggers.staticTimeFrame:
-                return staticTimeFrame!.stringify()
-            case Triggers.timeFrame:
-                return timeFrame!.stringify()
-            default:
-                return "When it is \(weather!)"
-        }
+        return "Always"
     }
 }
 
 struct WeatherOptionInfo : Hashable {
-    var title : String;
+    var title : WeatherTrigger.types;
     var systemImage : String;
     
     static func none() -> String {
@@ -144,12 +154,12 @@ class WeatherTrigger : Triggers {
     }
     
     static var weatherOptions = [
-        WeatherOptionInfo(title: WeatherTrigger.sunny, systemImage: "sun.min.fill"),
-        WeatherOptionInfo(title: WeatherTrigger.cloudy, systemImage: "cloud.fill"),
-        WeatherOptionInfo(title: WeatherTrigger.raining, systemImage:  "cloud.heavyrain.fill"),
-        WeatherOptionInfo(title: WeatherTrigger.windy, systemImage: "wind.circle"),
-        WeatherOptionInfo(title: WeatherTrigger.snowing, systemImage: "cloud.snow.fill"),
-        WeatherOptionInfo(title: WeatherTrigger.thunder, systemImage: "cloud.bolt.rain")]
+        WeatherOptionInfo(title: WeatherTrigger.types.sunny, systemImage: "sun.min.fill"),
+        WeatherOptionInfo(title: WeatherTrigger.types.cloudy, systemImage: "cloud.fill"),
+        WeatherOptionInfo(title: WeatherTrigger.types.raining, systemImage:  "cloud.heavyrain.fill"),
+        WeatherOptionInfo(title: WeatherTrigger.types.windy, systemImage: "wind.circle"),
+        WeatherOptionInfo(title: WeatherTrigger.types.snowing, systemImage: "cloud.snow.fill"),
+        WeatherOptionInfo(title: WeatherTrigger.types.thunder, systemImage: "cloud.bolt.rain")]
     
     init(weather: WeatherTrigger.types) {
         super.init(type: Triggers.types.weather)
@@ -185,31 +195,6 @@ class WeatherManager {
         
     }
     
-    static func shouldWidgetBeOn(widget: WidgetInfo) -> Bool {
-        if WeatherManager.currentConditions == nil {
-            print("called shouldWidgetBeOn when current conditions is nil error")
-            return false
-        }
-        let weatherType = widget.weather!
-        if WeatherManager.currentConditions!.precipprob > 0.2 {
-            if weatherType == WeatherTrigger.snowing {
-                return WeatherManager.currentConditions?.preciptype == "snow"
-            }
-            else if weatherType == WeatherTrigger.raining {
-                return WeatherManager.currentConditions?.preciptype == "rain"
-            }
-        }
-        switch weatherType {
-            case WeatherTrigger.cloudy:
-                return WeatherManager.currentConditions!.cloudcover > 0.4
-            case WeatherTrigger.windy:
-                return WeatherManager.currentConditions!.windspeed > 20
-            case WeatherTrigger.sunny:
-                return WeatherManager.currentConditions!.solarradiation > 600
-            default:
-                return false
-        }
-    }
 }
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
@@ -241,7 +226,7 @@ class StaticTimeFrame : Triggers {
     var timeStart : Date
     var timeEnd : Date
     
-    func stringify() -> String {
+    override func stringifyTrigger() -> String {
         return "Start Time: \(timeStart), End Time: \(timeEnd) \n";
     }
     
@@ -250,6 +235,7 @@ class StaticTimeFrame : Triggers {
         self.timeStart = timeStart
         self.timeEnd = timeEnd
     }
+    
 }
 
 struct TimeFrame {
@@ -444,7 +430,7 @@ class TimeFrameInfo : Triggers {
         self.Month = Month
     }
     
-    func stringify() -> String {
+    override func stringifyTrigger() -> String {
         let timeFrames : [TimeFrameCodable?] = [Hour, Weekday, date, Month]
         var result = ""
         for i in 0..<timeFrames.count {
@@ -454,6 +440,7 @@ class TimeFrameInfo : Triggers {
         }
         return result
     }
+    
     // Invariant: Will be called outside of range (before or after)
     func getStartingTime() -> Date {
         let currentDate = Date()
@@ -710,7 +697,7 @@ struct Countdown : View {
 
 struct TextLayerView: View {
     var size: NSSize
-    var info : TextInfo
+    var info : TextWidgetInfo
     var body: some View {
         Text(info.text)
             .font(.custom(info.font, size: 20))
