@@ -26,12 +26,56 @@ class WidgetStore: ObservableObject {
             guard let data = try? Data(contentsOf: fileURL) else {
                 return []
             }
-            let dailyWidgets = try JSONDecoder().decode([WidgetInfo].self, from: data)
+            let dailyWidgets = JSONSerialization.jsonObject(with: data)
             return dailyWidgets
         }
         // await the promise, receive the file information
-        let widgets = try await task.value
-        self.widgets = widgets
+        let jsonObject = try await task.value
+        
+        // parsing json object
+        for obj in jsonObject {
+            let infoObj = obj["info"]
+            let widgetType = WidgetTypeInfo.types(rawValue: infoObj["type"])
+            let triggerObj = obj["trigger"]
+            let triggerType =  Triggers.types(rawValue: triggerObj["type"])
+            
+            let info : WidgetTypeInfo;
+            if widgetType == WidgetTypeInfo.types.calendar {
+                info = CalendarInfo(calendarType: CalendarSizes.types(rawValue: infoObj["calendarType"]))
+            }
+            else if widgetType == WidgetTypeInfo.types.countdown {
+                info = CountDownWidgetInfo(time: infoObj["time"], desc: infoObj["desc"])
+            }
+            else if widgetType == WidgetTypeInfo.types.desktop {
+                info = ScreenWidgetInfo(opacity: infoObj["opacity"])
+            }
+            else if widgetType == WidgetTypeInfo.types.image {
+                info = WidgetTypeInfo(type: WidgetTypeInfo.types.image)
+            }
+            else {
+                info = TextWidgetInfo(text: infoObj["text"], font: infoObj["font"])
+            }
+            let trigger : Triggers;
+            if triggerType == Triggers.types.always {
+                trigger = Triggers(type: Triggers.types.always)
+            }
+            else if triggerType == Triggers.types.staticTimeFrame {
+                trigger = StaticTimeFrame(timeStart: triggerObj["timeStart"], timeEnd: triggerObj["timeEnd"])
+            }
+            else if triggerType == Triggers.types.timeFrame {
+                trigger = TimeFrameInfo(Hour: triggerObj["Hour"], Weekday: triggerObj["Weekday"], date: triggerObj["date"], Month: triggerObj["Month"])
+            }
+            else {
+                trigger = WeatherTrigger(weather: WeatherTrigger.types(rawValue: triggerObj["weather"]))
+            }
+            let urls = obj["imageURLs"]
+            let imageURLs = []
+            for url in urls {
+                imageURLs.append(URL(string: url))
+            }
+            self.widgets.append(WidgetInfo(info: info, trigger: trigger,
+                            imageURLs: imageURLs, slideshow: SlideshowInfo(interval: obj["slideshow"]["interval"])))
+        }
     }
     
     
