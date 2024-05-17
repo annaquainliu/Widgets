@@ -13,6 +13,7 @@ struct LibraryView : View {
     @EnvironmentObject var store : WidgetStore
     @EnvironmentObject var displayDesktopWidgets : DisplayDesktopWidgets
     @State var deleted : [UUID] = []
+
     
     var body: some View {
         if backButtonPressed {
@@ -66,3 +67,10 @@ struct LibraryView : View {
     }
 }
 
+struct LibraryView_Providers: PreviewProvider {
+    
+    static var previews: some View {
+        LibraryView()
+            .environmentObject(WidgetStore())
+    }
+}

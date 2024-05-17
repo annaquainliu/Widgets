@@ -21,10 +21,9 @@ struct ScreenSaverView: View {
             ScrollView {
                 VStack(alignment: .leading) {
                     WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Screen Saver")
-                    Spacer(minLength: 20)
                     HStack {
                         FilePicker(files: $fileName)
-                        Spacer(minLength: 20)
+                        Spacer(minLength: 40)
                         VStack(alignment: .leading) {
                             HStack {
                                 Text("Opacity: ").font(.title).padding()
@@ -33,11 +32,11 @@ struct ScreenSaverView: View {
                                                 .padding()
                             }
                             WidgetMenu(type: WidgetInfo.types.desktop, info: $info, fileNames: $fileName)
-                        }.frame(width: 800)
+                        }
                     }
-                }
-            }.frame(height: 700)
-             .padding()
+                }.padding()
+            }.frame(width: 1200, height: 700)
+             
         }
     }
 }
