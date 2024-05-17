@@ -21,21 +21,23 @@ struct ScreenSaverView: View {
             ScrollView {
                 VStack(alignment: .leading) {
                     WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Screen Saver")
-                    VStack(alignment: .center) {
-                        HStack {
-                            Text("Opacity of Screen Saver: ").font(.title).padding()
-                            TextField("Enter your score", value: $info.screenSaverOpacity, format: .number)
-                                            .textFieldStyle(.roundedBorder)
-                                            .padding()
-                        }.frame(width: 600)
-                    }.frame(width: 1200)
+                    Spacer(minLength: 20)
                     HStack {
                         FilePicker(files: $fileName)
-                        Spacer(minLength: 40)
-                        WidgetMenu(type: WidgetInfo.types.desktop, info: $info, fileNames: $fileName)
-                    }.padding()
+                        Spacer(minLength: 20)
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Opacity: ").font(.title).padding()
+                                TextField("Enter opacity", value: $info.screenSaverOpacity, format: .number)
+                                                .textFieldStyle(.roundedBorder)
+                                                .padding()
+                            }
+                            WidgetMenu(type: WidgetInfo.types.desktop, info: $info, fileNames: $fileName)
+                        }.frame(width: 800)
+                    }
                 }
-            }.frame(width: 1200, height: 700)
+            }.frame(height: 700)
+             .padding()
         }
     }
 }
