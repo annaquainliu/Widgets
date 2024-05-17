@@ -66,11 +66,17 @@ class DisplayDesktopWidgets: ObservableObject {
     
     private func makeWindowController(widget: WidgetInfo) {
         print("making controller")
-        let controller = ScreenWindowController(widget: widget)
+        let controller : ScreenWindowController;
+        do {
+            controller = ScreenWindowController(widget: widget)
+        }
+        catch let error {
+            return;
+        }
         self.currentWidgets[widget.getID()] = controller
     }
     
-    // removes widget view from desktop, it does not delete from storach
+    // removes widget view from desktop, it does not delete from storage
     private func removeWidget(id: UUID) {
         if self.currentWidgets[id] == nil {
             return

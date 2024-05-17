@@ -163,6 +163,7 @@ class DesktopWidgetWindow : NSWindow {
         if !FileManager.default.fileExists(atPath: relativePath) {
             _ = alertMessage(question: "\(relativePath) does not exist.", text: "")
             self.close()
+            NSException(name:NSExceptionName(rawValue: "FileNotFound"), reason:"File does not exist", userInfo:nil).raise()
             return
         }
         let cornerRadius = widgetInfo.type == WidgetInfo.types.desktop ? 0 : 13

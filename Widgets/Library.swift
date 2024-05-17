@@ -18,7 +18,7 @@ struct LibraryView : View {
         if backButtonPressed {
             ContentView()
         } else {
-            VStack(alignment: .leading) {#imageLiteral(resourceName: "Screenshot 2024-05-13 at 9.23.58 PM.png")
+            VStack(alignment: .leading) {
                 WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Library")
                 List {
                     ForEach(store.widgets, id: \.self) { widget in
