@@ -88,8 +88,6 @@ class CountDownWidgetInfo : WidgetTypeInfo {
         self.desc = desc
     }
     
-   
-
 }
 
 class TextWidgetInfo : WidgetTypeInfo {
@@ -193,6 +191,33 @@ class WeatherManager {
             fatalError(error.localizedDescription)
         }
         
+    }
+    
+    static func shouldWidgetBeOn(widget: WidgetInfo) -> Bool {
+        if WeatherManager.currentConditions == nil {
+            print("called shouldWidgetBeOn when current conditions is nil error")
+            return false
+        }
+        let trigger = widget.trigger as WeatherTrigger
+        let weatherType = trigger.weather
+        if WeatherManager.currentConditions!.precipprob > 0.2 {
+            if weatherType == WeatherTrigger.types.snowing {
+                return WeatherManager.currentConditions?.preciptype == "snow"
+            }
+            else if weatherType == WeatherTrigger.types.raining {
+                return WeatherManager.currentConditions?.preciptype == "rain"
+            }
+        }
+        switch weatherType {
+            case WeatherTrigger.types.cloudy:
+                return WeatherManager.currentConditions!.cloudcover > 0.4
+            case WeatherTrigger.types.windy:
+                return WeatherManager.currentConditions!.windspeed > 20
+            case WeatherTrigger.types.sunny:
+                return WeatherManager.currentConditions!.solarradiation > 600
+            default:
+                return false
+        }
     }
     
 }

@@ -100,8 +100,9 @@ class DisplayDesktopWidgets: ObservableObject {
     }
     
     private func displayStaticTimeWidget(widget: WidgetInfo) {
-        let start = widget.staticTimeFrame!.timeStart
-        let end = widget.staticTimeFrame!.timeEnd
+        let trigger = widget.trigger as StaticTimeFrame
+        let start = trigger.timeStart
+        let end = trigger.timeEnd
         let current = Date()
         let diffs = Calendar.current.dateComponents([.day], from: current, to: end)
         if diffs.day! <= 5 {
@@ -178,7 +179,8 @@ class DisplayDesktopWidgets: ObservableObject {
     private func displayTimeFrameWidget(widget: WidgetInfo) {
         var validTimeFrame = true
 //         the time frame must be valid for all widgets
-        let timeFrames : [TimeFrameCodable?] = [widget.timeFrame!.date, widget.timeFrame!.Hour, widget.timeFrame!.Month, widget.timeFrame!.Weekday]
+        let trigger = widget.trigger as TimeFrameInfo
+        let timeFrames : [TimeFrameCodable?] = [trigger.date, trigger.Hour, trigger.Month, trigger.Weekday]
         for timeFrame in timeFrames {
             if timeFrame != nil && !timeFrame!.nowWithinTimeRange() {
                 validTimeFrame = false
