@@ -73,8 +73,11 @@ class WidgetStore: ObservableObject {
             for url in urls {
                 imageURLs.append(URL(string: url))
             }
-            self.widgets.append(WidgetInfo(info: info, trigger: trigger,
-                            imageURLs: imageURLs, slideshow: SlideshowInfo(interval: obj["slideshow"]["interval"])))
+            let widget = WidgetInfo(info: info, trigger: trigger,
+                                    imageURLs: imageURLs, slideshow: SlideshowInfo(interval: obj["slideshow"]["interval"]))
+            let encodedSize = obj["widgetSize"] as! NSCoder
+            widget.initCoordsAndSize(xCoord: obj["xCoord"], yCoord: obj["yCoord"], size: encodedSize.decodeSize())
+            self.widgets.append()
         }
     }
     
