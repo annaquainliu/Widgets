@@ -70,7 +70,7 @@ class DisplayDesktopWidgets: ObservableObject {
         do {
             controller = ScreenWindowController(widget: widget)
         }
-        catch let error {
+        catch _ {
             return;
         }
         self.currentWidgets[widget.getID()] = controller
@@ -100,7 +100,7 @@ class DisplayDesktopWidgets: ObservableObject {
     }
     
     private func displayStaticTimeWidget(widget: WidgetInfo) {
-        let trigger = widget.trigger as StaticTimeFrame
+        let trigger = widget.trigger as! StaticTimeFrame
         let start = trigger.timeStart
         let end = trigger.timeEnd
         let current = Date()
@@ -179,7 +179,7 @@ class DisplayDesktopWidgets: ObservableObject {
     private func displayTimeFrameWidget(widget: WidgetInfo) {
         var validTimeFrame = true
 //         the time frame must be valid for all widgets
-        let trigger = widget.trigger as TimeFrameInfo
+        let trigger = widget.trigger as! TimeFrameInfo
         let timeFrames : [TimeFrameCodable?] = [trigger.date, trigger.Hour, trigger.Month, trigger.Weekday]
         for timeFrame in timeFrames {
             if timeFrame != nil && !timeFrame!.nowWithinTimeRange() {
@@ -188,9 +188,9 @@ class DisplayDesktopWidgets: ObservableObject {
             }
         }
         if validTimeFrame {
-            print(widget.timeFrame!, " is valid!")
+            print(trigger, " is valid!")
             makeWindowController(widget: widget)
-            let endingDate = widget.timeFrame!.getEndingTime()
+            let endingDate = trigger.getEndingTime()
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: endingDate)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: endingDate,
@@ -202,8 +202,8 @@ class DisplayDesktopWidgets: ObservableObject {
                 RunLoop.main.add(timer, forMode: .common)
             }
         } else {
-            print(widget.timeFrame!.Hour as Any, " is not valid!")
-            let startingDate = widget.timeFrame!.getStartingTime()
+            print(trigger.Hour as Any, " is not valid!")
+            let startingDate = trigger.getStartingTime()
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: startingDate)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: startingDate,

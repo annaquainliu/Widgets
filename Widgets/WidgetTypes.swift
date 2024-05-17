@@ -50,7 +50,7 @@ class WidgetInfo : Codable, Hashable {
     
 }
 
-struct SlideshowInfo {
+struct SlideshowInfo : Codable {
     var interval : Int
 }
 
@@ -71,11 +71,26 @@ class CalendarInfo : WidgetTypeInfo {
     
     var calendarType : CalendarSizes.types
     
-    init(calendarType : CalendarSizes.types) {
-        super.init(type: WidgetTypeInfo.types.calendar)
-        self.calendarType = calendarType
+    enum CodingKeys: String, CodingKey {
+        case calendarType
     }
-  
+    
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
+    }
+    
+    init(calendarType : CalendarSizes.types) {
+        self.calendarType = calendarType
+        super.init(type: WidgetTypeInfo.types.calendar)
+    }
+    
+//    required init(from decoder: Decoder) throws {
+//        let values = try decoder.container(keyedBy: CodingKeys.self)
+//        self.calendarType = try values.decode(CalendarSizes.types.self, forKey: .calendarType)
+    //        super.init(from: decoder)
+//    }
+    
 }
 
 class CountDownWidgetInfo : WidgetTypeInfo {
@@ -83,9 +98,13 @@ class CountDownWidgetInfo : WidgetTypeInfo {
     var desc : String
     
     init(time: Date, desc: String) {
-        super.init(type: WidgetTypeInfo.types.countdown)
         self.time = time
         self.desc = desc
+        super.init(type: WidgetTypeInfo.types.countdown)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
     }
     
 }
@@ -96,9 +115,13 @@ class TextWidgetInfo : WidgetTypeInfo {
     var font : String
     
     init(text: String, font: String) {
-        super.init(type: WidgetTypeInfo.types.text)
         self.text = text
         self.font = font
+        super.init(type: WidgetTypeInfo.types.countdown)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
     }
     
 }
@@ -108,8 +131,12 @@ class ScreenWidgetInfo : WidgetTypeInfo {
     var opacity : Float
     
     init(opacity: Float) {
-        super.init(type: WidgetTypeInfo.types.desktop)
         self.opacity = opacity
+        super.init(type: WidgetTypeInfo.types.desktop)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
     }
 }
 
@@ -160,8 +187,12 @@ class WeatherTrigger : Triggers {
         WeatherOptionInfo(title: WeatherTrigger.types.thunder, systemImage: "cloud.bolt.rain")]
     
     init(weather: WeatherTrigger.types) {
-        super.init(type: Triggers.types.weather)
         self.weather = weather
+        super.init(type: Triggers.types.weather)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
     }
 }
 
@@ -198,7 +229,7 @@ class WeatherManager {
             print("called shouldWidgetBeOn when current conditions is nil error")
             return false
         }
-        let trigger = widget.trigger as WeatherTrigger
+        let trigger = widget.trigger as! WeatherTrigger
         let weatherType = trigger.weather
         if WeatherManager.currentConditions!.precipprob > 0.2 {
             if weatherType == WeatherTrigger.types.snowing {
@@ -256,9 +287,13 @@ class StaticTimeFrame : Triggers {
     }
     
     init(timeStart: Date, timeEnd: Date) {
-        super.init(type: Triggers.types.staticTimeFrame)
         self.timeStart = timeStart
         self.timeEnd = timeEnd
+        super.init(type: Triggers.types.staticTimeFrame)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
     }
     
 }
@@ -453,6 +488,10 @@ class TimeFrameInfo : Triggers {
         self.Weekday = Weekday
         self.date = Date
         self.Month = Month
+    }
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
     }
     
     override func stringifyTrigger() -> String {

@@ -140,7 +140,7 @@ class DesktopWidgetWindow : NSWindow {
         let count = widgetInfo.imageURLs.count
         var index = 0
         if count > 1 {
-            let interval = Double(widgetInfo.slideshow!.interval * 60)
+            let interval = Double(widgetInfo.slideshow.interval * 60)
             let timer = Timer(timeInterval: interval, repeats: true) { timer in
                 index = (index + 1) % count
                 self.setImageBackground(index: index)
@@ -166,7 +166,7 @@ class DesktopWidgetWindow : NSWindow {
             NSException(name:NSExceptionName(rawValue: "FileNotFound"), reason:"File does not exist", userInfo:nil).raise()
             return
         }
-        let cornerRadius = widgetInfo.type == WidgetInfo.types.desktop ? 0 : 13
+        let cornerRadius = widgetInfo.info.type == WidgetTypeInfo.types.desktop ? 0 : 13
         self.setMediaToFillWindow(url: widgetInfo.imageURLs[index], radius: cornerRadius)
     }
     
@@ -198,14 +198,18 @@ extension NSText {
 extension NSWindow {
     
     func makeTextView(widget: WidgetInfo) {
-        let textView = NSHostingView(rootView: TextLayerView(size: self.frame.size, info: widget.info.text!))
+        let textinfo = widget.info as! TextWidgetInfo
+        let textView = NSHostingView(rootView: TextLayerView(size: self.frame.size, info: textinfo))
         let size = textView.fittingSize
         textView.frame = NSRect(x: (self.frame.width - size.width) / 2,
                                 y: (self.frame.height - size.height) / 2,
                                 width: size.width, height: size.height)
         textView.translatesAutoresizingMaskIntoConstraints = true
         textView.autoresizesSubviews = true
-        textView.autoresizingMask = [.minXMargin, .minYMargin, .maxXMargin, .maxYMargin]
+        textView.autoresizingMask = [NSView.AutoresizingMask.minXMargin,
+                                    NSView.AutoresizingMask.minYMargin,
+                                     NSView.AutoresizingMask.maxXMargin,
+                                     NSView.AutoresizingMask.maxYMargin]
         self.contentView?.addSubview(textView)
     }
     
@@ -334,17 +338,19 @@ class CalendarWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
         super.init(widgetInfo: widget)
-        self.makeCalendarView(type: widget.info.calendarType!)
+        let calendar = widget.info as! CalendarInfo
+        self.makeCalendarView(type: calendar.calendarType)
     }
 }
 
 class EditCalendarWidget: WidgetNSWindow {
     
     init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
-        let size = CalendarSizes.makeCalendarSize(type: widget.info.calendarType!)
+        let calendar = widget.info as! CalendarInfo
+        let size = CalendarSizes.makeCalendarSize(type: calendar.calendarType)
         super.init(widgetInfo: widget, widgetStore: store,
                    displayDesktop: displayDesktop, windowSize: size)
-        self.makeCalendarView(type: widget.info.calendarType!)
+        self.makeCalendarView(type: calendar.calendarType)
         let amnt = self.contentView!.subviews.count
         self.contentView?.subviews[amnt - 1].frame.origin.y += 10
         self.contentView?.addSubview(WidgetNSWindow.makeButton())
@@ -357,7 +363,8 @@ class ScreenSaverWidget: DesktopWidgetWindow {
         super.init(widgetInfo: widget)
         self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopWindow)))
         self.ignoresMouseEvents = true
-        self.contentView!.layer?.opacity = widget.info.screenSaverOpacity!
+        let desktop = widget.info as! ScreenWidgetInfo
+        self.contentView!.layer?.opacity = desktop.opacity
     }
 
 }
@@ -381,7 +388,8 @@ class EditCountdownWidget : WidgetNSWindow {
         super.init(widgetInfo: widget, widgetStore: store,
                    displayDesktop: displayDesktop,
                    windowSize: NSSize(width: Countdown.width, height: Countdown.height))
-        let view = NSHostingView(rootView: Countdown(end: widget.info.countdown!.time, desc: widget.info.countdown!.desc))
+        let countdown = widget.info as! CountDownWidgetInfo
+        let view = NSHostingView(rootView: Countdown(end: countdown.time, desc: countdown.desc))
         view.frame = NSRect(x: 0, y: 0, width: Countdown.width, height: Countdown.height)
         self.contentView?.addSubview(view)
         self.contentView?.addSubview(WidgetNSWindow.makeButton())
@@ -392,7 +400,8 @@ class CountdownWidget: DesktopWidgetWindow {
     
     init(widget: WidgetInfo) {
         super.init(widgetInfo: widget)
-        let view = NSHostingView(rootView: Countdown(end: widget.info.countdown!.time, desc: widget.info.countdown!.desc))
+        let countdown = widget.info as! CountDownWidgetInfo
+        let view = NSHostingView(rootView: Countdown(end: countdown.time, desc: countdown.desc))
         view.frame = NSRect(x: 0, y: 0, width: Countdown.width, height: Countdown.height)
         self.contentView?.addSubview(view)
     }
@@ -423,20 +432,20 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
     init(widget: WidgetInfo, displayDesktop: DisplayDesktopWidgets, store: WidgetStore) {
         var window : NSWindow
         
-        switch widget.type {
-            case WidgetInfo.types.calendar:
+        switch widget.info.type {
+            case WidgetTypeInfo.types.calendar:
                 window = EditCalendarWidget(widget: widget, displayDesktop: displayDesktop, store: store)
                 break;
-            case WidgetInfo.types.desktop:
+            case WidgetTypeInfo.types.desktop:
                 _ = EditScreenWidget(widget: widget, displayDesktop: displayDesktop, store: store)
                 window = NSWindow()
                 super.init(window: window)
                 self.window?.close()
                 return
-            case WidgetInfo.types.countdown:
+            case WidgetTypeInfo.types.countdown:
                 window = EditCountdownWidget(widget: widget, displayDesktop: displayDesktop, store: store)
                 break;
-            case WidgetInfo.types.text:
+            case WidgetTypeInfo.types.text:
                 window = EditTextWidget(widget: widget, displayDesktop: displayDesktop, store: store)
                 super.init(window: window)
                 self.window?.makeKeyAndOrderFront(self)
@@ -453,17 +462,17 @@ class ScreenWindowController : NSWindowController, NSWindowDelegate {
     init(widget: WidgetInfo) {
         var window: NSWindow
         
-        switch widget.type {
-            case WidgetInfo.types.calendar:
+        switch widget.info.type {
+            case WidgetTypeInfo.types.calendar:
                 window = CalendarWidget(widget: widget)
                 break
-            case WidgetInfo.types.desktop:
+            case WidgetTypeInfo.types.desktop:
                 window = ScreenSaverWidget(widget: widget)
                 break;
-            case WidgetInfo.types.countdown:
+            case WidgetTypeInfo.types.countdown:
                 window = CountdownWidget(widget: widget)
                 break;
-            case WidgetInfo.types.text:
+            case WidgetTypeInfo.types.text:
                 window = TextWidget(widget: widget)
                 break;
             default:

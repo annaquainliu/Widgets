@@ -38,16 +38,16 @@ struct LibraryView : View {
                                         .frame(width: 50, height: 50)
                                 }
                                 Spacer()
-                                Text(widget.stringifyTrigger()).font(.title2)
+                                Text(widget.trigger.stringifyTrigger()).font(.title2)
                                 Spacer()
-                                switch widget.type {
-                                    case WidgetInfo.types.calendar:
+                                switch widget.info.type {
+                                    case WidgetTypeInfo.types.calendar:
                                         Text("Calendar Widget").font(.title2)
-                                    case WidgetInfo.types.countdown:
+                                    case WidgetTypeInfo.types.countdown:
                                         Text("Countdown Widget").font(.title2)
-                                    case WidgetInfo.types.image:
+                                    case WidgetTypeInfo.types.image:
                                         Text("Image/Gif Widget").font(.title2)
-                                    case WidgetInfo.types.desktop:
+                                    case WidgetTypeInfo.types.desktop:
                                         Text("Desktop ScreenSaver").font(.title2)
                                     default:
                                         Text("Text Widget").font(.title2)
