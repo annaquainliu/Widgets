@@ -10,7 +10,7 @@ import SwiftUI
 import CoreLocation
 import Quartz
 
-
+// class that stores information for all widgets
 class WidgetInfo : Codable, Hashable {
     static func == (lhs: WidgetInfo, rhs: WidgetInfo) -> Bool {
         return lhs.getID() == rhs.getID()
@@ -77,6 +77,7 @@ class WidgetInfo : Codable, Hashable {
     }
 }
 
+// class that stores the information of a specific widget type
 struct WidgetTypeInfo : Codable {
     var calendarType : CalendarSizes.types?
     var countdown : CountdownInfo?

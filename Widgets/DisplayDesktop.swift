@@ -124,7 +124,7 @@ class DisplayDesktopWidgets: ObservableObject {
         }
     }
     
-    private func displayWeatherWidget(widget: WidgetInfo) {
+    private func displayWeatherWidget(widget: WidgetInfo) { 
         if LocationManager.lastKnownLocation == nil {
             _ = alertMessage(question: "Please enable location services to create a weather widget", text: "")
            return
@@ -180,11 +180,10 @@ class DisplayDesktopWidgets: ObservableObject {
             }
         }
         if validTimeFrame {
+            print(widget.timeFrame!, " is valid!")
             makeWindowController(widget: widget)
             let endingDate = widget.timeFrame!.getEndingTime()
-            print("ending date is: \(endingDate)")
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: endingDate)
-            print("days: ", diffs.day!)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: endingDate,
                                   interval: 0,
@@ -195,10 +194,9 @@ class DisplayDesktopWidgets: ObservableObject {
                 RunLoop.main.add(timer, forMode: .common)
             }
         } else {
+            print(widget.timeFrame!.Hour as Any, " is not valid!")
             let startingDate = widget.timeFrame!.getStartingTime()
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: startingDate)
-            print("starting date is: \(startingDate)")
-            print("days: ", diffs.day!)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: startingDate,
                                   interval: 0,

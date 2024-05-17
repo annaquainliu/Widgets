@@ -18,16 +18,24 @@ struct LibraryView : View {
         if backButtonPressed {
             ContentView()
         } else {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading) {#imageLiteral(resourceName: "Screenshot 2024-05-13 at 9.23.58 PM.png")
                 WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Library")
                 List {
                     ForEach(store.widgets, id: \.self) { widget in
                         if !deleted.contains(widget.getID()) {
                             HStack {
-                                Image(nsImage: NSImage(contentsOf: widget.imageURLs[0])!)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 50, height: 50)
+                                // thumbnail of widget in library
+                                if FileManager.default.fileExists(atPath: widget.imageURLs[0].relativePath) {
+                                    Image(nsImage: NSImage(contentsOf: widget.imageURLs[0])!)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 50, height: 50)
+                                } else {
+                                    Image(systemName: "xmark")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 50, height: 50)
+                                }
                                 Spacer()
                                 Text(widget.stringifyTrigger()).font(.title2)
                                 Spacer()
