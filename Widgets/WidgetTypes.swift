@@ -94,7 +94,7 @@ class WidgetInfo : Codable, Hashable {
                                  yCoord: obj["yCoord"] as! Double,
                                  size: obj["widgetSize"] as! NSSize)
         
-        self.widgets.append(widget)
+        return widget
     }
     
 }
