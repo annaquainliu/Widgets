@@ -48,10 +48,63 @@ class WidgetInfo : Codable, Hashable {
         return self.id
     }
     
+    static func decode(obj : [String : Any]) {
+        let infoObj = obj["info"] as! [String : Any]
+        let widgetType = WidgetTypeInfo.types(rawValue: infoObj["type"] as! Int)
+        let triggerObj = obj["trigger"] as! [String : Any]
+        let triggerType =  Triggers.types(rawValue: triggerObj["type"] as! String)
+        
+        let info : WidgetTypeInfo;
+        if widgetType == WidgetTypeInfo.types.calendar {
+            info = CalendarInfo(calendarType: CalendarSizes.types(rawValue: infoObj["calendarType"] as! Int)!)
+        }
+        else if widgetType == WidgetTypeInfo.types.countdown {
+            info = CountDownWidgetInfo(time: infoObj["time"] as! Date,
+                                       desc: infoObj["desc"] as! String)
+        }
+        else if widgetType == WidgetTypeInfo.types.desktop {
+            info = ScreenWidgetInfo(opacity: infoObj["opacity"] as! Float)
+        }
+        else if widgetType == WidgetTypeInfo.types.image {
+            info = WidgetTypeInfo(type: WidgetTypeInfo.types.image)
+        }
+        else {
+            info = TextWidgetInfo(text: infoObj["text"] as! String,
+                                  font: infoObj["font"] as! String)
+        }
+        let trigger : Triggers;
+        if triggerType == Triggers.types.always {
+            trigger = Triggers.decode(triggerObj: triggerObj)
+        }
+        else if triggerType == Triggers.types.staticTimeFrame {
+            trigger = StaticTimeFrame.decode(triggerObj: triggerObj)
+        }
+        else if triggerType == Triggers.types.timeFrame {
+            trigger = TimeFrameInfo.decode(triggerObj: triggerObj)
+        }
+        else {
+            trigger = WeatherTrigger.decode(triggerObj: triggerObj)
+        }
+        let urls = obj["imageURLs"] as! [URL]
+        let widget = WidgetInfo(info: info, trigger: trigger,
+                                imageURLs: urls,
+                                slideshow: SlideshowInfo.decode(obj: obj["slideshow"] as! [String : Any]))
+        
+        widget.initCoordsAndSize(xCoord: obj["xCoord"] as! Double,
+                                 yCoord: obj["yCoord"] as! Double,
+                                 size: obj["widgetSize"] as! NSSize)
+        
+        self.widgets.append(widget)
+    }
+    
 }
 
 struct SlideshowInfo : Codable {
     var interval : Int
+    
+    static func decode(obj : [String : Any]) {
+        return SlideshowInfo(interval: obj["interval"] as! Int)
+    }
 }
 
 class WidgetTypeInfo : Codable {
@@ -158,6 +211,10 @@ class Triggers : Codable {
     func stringifyTrigger() -> String {
         return "Always"
     }
+    
+    static func decode(triggerObj : [String : Any]) {
+        return Triggers(type: Triggers.always)
+    }
 }
 
 struct WeatherOptionInfo : Hashable {
@@ -193,6 +250,10 @@ class WeatherTrigger : Triggers {
     
     required init(from decoder: Decoder) throws {
         fatalError("init(from:) has not been implemented")
+    }
+    
+    static func decode(triggerObj : [String : Any]) {
+        return WeatherTrigger(weather: triggerObj["weather"] as! WeatherTrigger.types)
     }
 }
 
@@ -296,6 +357,11 @@ class StaticTimeFrame : Triggers {
         fatalError("init(from:) has not been implemented")
     }
     
+    static func decode(triggerObj : [String : Any]) {
+        return StaticTimeFrame(timeStart: triggerObj["timeStart"] as! Date,
+                               timeEnd: triggerObj["timeEnd"] as! Date)
+    }
+    
 }
 
 struct TimeFrame {
@@ -341,12 +407,23 @@ struct TimeFrame {
 protocol TimeFrameCodable : Codable {
     func nowWithinTimeRange() -> Bool
     func stringify() -> String
+    
+    private static func decode(_ : [String : Any]?) -> TimeFrameCodable?
 }
 
 struct HourTimeFrame : TimeFrameCodable {
     var selected : Bool = false
     var timeStart : Date = Date.now
     var timeEnd : Date = Date.now
+    
+    private static func decode(hourObj : [String : Any]?) {
+        if (hourObj == nil) {
+            return nil;
+        }
+        return HourTimeFrame(selected: hourObj["selected"] as! Bool,
+                             timeStart: hourObj["timeStart"] as! Date,
+                             timeEnd: hourObj["timeEnd"] as! Date)
+    }
     
     func nowWithinTimeRange() -> Bool {
         let current = Date()
@@ -395,6 +472,15 @@ struct WeekdayTimeFrame : TimeFrameCodable {
     var timeStart : String = TimeFrame.weekdays[0]
     var timeEnd : String = TimeFrame.weekdays[0]
     
+    private static func decode(hourObj : [String : Any]?) {
+        if (hourObj == nil) {
+            return nil;
+        }
+        return HourTimeFrame(selected: hourObj["selected"] as! Bool,
+                             timeStart: hourObj["timeStart"] as! String,
+                             timeEnd: hourObj["timeEnd"] as! String)
+    }
+    
     func nowWithinTimeRange() -> Bool {
         let now = Date()
         let startingIndex = TimeFrame.getWeekdayIndex(weekday: timeStart)
@@ -434,6 +520,15 @@ struct DateTimeFrame : TimeFrameCodable {
     var timeStart : Int = 0
     var timeEnd : Int = 0
     
+    private static func decode(hourObj : [String : Any]?) {
+        if (hourObj == nil) {
+            return nil;
+        }
+        return HourTimeFrame(selected: hourObj["selected"] as! Bool,
+                             timeStart: hourObj["timeStart"] as! Int,
+                             timeEnd: hourObj["timeEnd"] as! Int)
+    }
+    
     func nowWithinTimeRange() -> Bool {
         return Date().get(.day) >= timeStart + 1 && Date().get(.day) <= timeEnd + 1
     }
@@ -456,6 +551,15 @@ struct MonthTimeFrame : TimeFrameCodable {
     var timeStart : String = TimeFrame.months[0]
     var timeEnd : String = TimeFrame.months[0]
     
+    private static func decode(hourObj : [String : Any]?) {
+        if (hourObj == nil) {
+            return nil;
+        }
+        return HourTimeFrame(selected: hourObj["selected"] as! Bool,
+                             timeStart: hourObj["timeStart"] as! String,
+                             timeEnd: hourObj["timeEnd"] as! String)
+    }
+    
     func nowWithinTimeRange() -> Bool {
         let currMonth = Date().get(.month)
         let monthStart = TimeFrame.getMonthIndex(month: timeStart)
@@ -477,10 +581,10 @@ struct MonthTimeFrame : TimeFrameCodable {
 }
 
 class TimeFrameInfo : Triggers {
-    var Hour : HourTimeFrame?
-    var Weekday : WeekdayTimeFrame?
-    var date : DateTimeFrame?
-    var Month : MonthTimeFrame?
+    @CodableExplicitNull var Hour : HourTimeFrame?
+    @CodableExplicitNull var Weekday : WeekdayTimeFrame?
+    @CodableExplicitNull var date : DateTimeFrame?
+    @CodableExplicitNull var Month : MonthTimeFrame?
     
     init(Hour: HourTimeFrame? = nil, Weekday: WeekdayTimeFrame? = nil, Date: DateTimeFrame? = nil, Month: MonthTimeFrame? = nil) {
         super.init(type: Triggers.types.timeFrame)
@@ -488,6 +592,14 @@ class TimeFrameInfo : Triggers {
         self.Weekday = Weekday
         self.date = Date
         self.Month = Month
+    }
+    
+    static func decode(triggerObj : [String : Any]) {
+        let hour = HourTimeFrame.decodeToObj(obj: triggerObj["Hour"] as? [String : Any])
+        let weekday = WeekdayTimeFrame.decodeToObj(obj: triggerObj["Weekday"] as? [String : Any])
+        let date = DateTimeFrame.decodeToObj(obj: triggerObj["date"] as? [String : Any])
+        let month = MonthTimeFrame.decodeToObj(obj: triggerObj["Month"] as? [String : Any])
+        return TimeFrameInfo(Hour: hour, Weekday: weekday, date: date, Month: month)
     }
     
     required init(from decoder: Decoder) throws {
