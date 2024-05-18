@@ -37,7 +37,7 @@ class WidgetStore: ObservableObject {
         
         // parsing json object
         for obj in jsonObject {
-            self.widgets.append(WidgetInfo.decode(obj: obj as! [String : Any]))
+            self.widgets.append(WidgetInfo.decode(obj: obj))
         }
     }
     

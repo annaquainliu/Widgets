@@ -28,7 +28,7 @@ class DisplayDesktopWidgets: ObservableObject {
         if store == nil || self.loaded {
             return
         }
-        print("loading widgets!!")
+        print(store!.widgets)
         for widget in store!.widgets {
             displayWidget(widget: widget)
         }
