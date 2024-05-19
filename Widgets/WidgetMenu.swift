@@ -18,7 +18,7 @@ struct Alerts {
 struct TriggersView : View {
     @Binding var triggerSelection : String
     @Binding var weatherSelection : WeatherOptionInfo
-    @Binding var staticTimeFrame : StaticTimeFrame
+    @ObservedObject var staticTimeFrame : StaticTimeFrame
     @Binding var hourSelection : HourTimeFrame
     @Binding var daySelection : WeekdayTimeFrame
     @Binding var dateSelection : DateTimeFrame
@@ -155,7 +155,7 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
     @State var daySelection = WeekdayTimeFrame()
     @State var dateSelection = DateTimeFrame()
     @State var monthSelection = MonthTimeFrame()
-    @State var staticTimeFrame = StaticTimeFrame(timeStart: Date(), timeEnd: Date())
+    @StateObject var staticTimeFrame = StaticTimeFrame(timeStart: Date(), timeEnd: Date())
     @State private var alerts = Alerts()
     @State private var slideshowOptions = SlideshowInfo(interval: 1)
     
@@ -174,7 +174,7 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
                 Text("Triggers").font(.title).padding()
                 Text("*When should the widget be visible?*").font(.title3)
             }
-            TriggersView(triggerSelection: $triggerSelection, weatherSelection: $weatherSelection, staticTimeFrame: $staticTimeFrame,
+            TriggersView(triggerSelection: $triggerSelection, weatherSelection: $weatherSelection, staticTimeFrame: staticTimeFrame,
                          hourSelection: $hourSelection, daySelection: $daySelection, dateSelection: $dateSelection, monthSelection: $monthSelection, timeFrameSelection: $timeFrameSelection)
             VStack {
                 Spacer().frame(height: 4)

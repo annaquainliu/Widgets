@@ -403,9 +403,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 }
 
-class StaticTimeFrame : Triggers {
-    var timeStart : Date
-    var timeEnd : Date
+class StaticTimeFrame : Triggers, ObservableObject {
+    @Published var timeStart : Date
+    @Published var timeEnd : Date
     
     override func stringifyTrigger() -> String {
         return "Start Time: \(timeStart), End Time: \(timeEnd) \n";

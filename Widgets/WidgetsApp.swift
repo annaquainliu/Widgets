@@ -13,9 +13,11 @@ struct WidgetsApp: App {
     @StateObject var store = WidgetStore()
     @StateObject var displayDesktopWidget = DisplayDesktopWidgets()
     var locationManager = LocationManager()
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.controlActiveState) var controlActiveState
     
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "main") {
             ContentView().task {
                 NSApp.setActivationPolicy(.accessory)
                 do {
@@ -35,6 +37,20 @@ struct WidgetsApp: App {
             } label: {
                 Text("Close App")
             }
+            Button {
+                let windows = NSApplication.shared.windows
+                for window in windows {
+                    if let id = window.identifier {
+                        if id.rawValue == "main-AppWindow-1" {
+                            return;
+                        }
+                    }
+                }
+                openWindow(id: "main")
+            } label: {
+                Text("Open App")
+            }
         }
+        
     }
 }
