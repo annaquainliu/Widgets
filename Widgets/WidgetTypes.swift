@@ -31,7 +31,7 @@ class WidgetInfo : Codable, Hashable {
     var imageURLs : [URL]
     private var id : UUID;
     
-    init(info: WidgetTypeInfo, trigger : Triggers, imageURLs: [URL], slideshow : SlideshowInfo, id: UUID? = nil) {
+    init(info: WidgetTypeInfo, trigger : Triggers, imageURLs: [URL], slideshow : SlideshowInfo, id: UUID? = nil)  {
         self.info = info;
         self.imageURLs = imageURLs
         self.trigger = trigger
@@ -41,6 +41,17 @@ class WidgetInfo : Codable, Hashable {
         }
         else {
             self.id = id!;
+        }
+        
+        if self.trigger is WeatherTrigger {
+            do {
+                let weatherTrigger = self.trigger as! WeatherTrigger
+                let data = try JSONEncoder().encode(weatherTrigger)
+                try data.write(to: URL(filePath: "/Users/annaliu/Library/Containers/Klymene.Widgets/Data/Documents/test.txt"))
+            }
+            catch {
+                print(error.localizedDescription)
+            }
         }
     }
     
@@ -87,7 +98,7 @@ class WidgetInfo : Codable, Hashable {
         }
         else if triggerType == Triggers.types.timeFrame {
             trigger = TimeFrameInfo.decode(triggerObj: triggerObj)
-        }
+        } 
         else {
             trigger = WeatherTrigger.decode(triggerObj: triggerObj)
         }
@@ -111,12 +122,14 @@ class WidgetInfo : Codable, Hashable {
     
 }
 
+
 struct SlideshowInfo : Codable {
     var interval : Int
     
     static func decode(obj : [String : Any]) -> SlideshowInfo {
         return SlideshowInfo(interval: obj["interval"] as! Int)
     }
+    
 }
 
 class WidgetTypeInfo : Codable {
@@ -130,6 +143,7 @@ class WidgetTypeInfo : Codable {
     init(type: WidgetTypeInfo.types) {
         self.type = type
     }
+
 }
 
 class CalendarInfo : WidgetTypeInfo {
@@ -218,6 +232,15 @@ class Triggers : Codable {
         return "Always"
     }
     
+    enum CodingKeys: String, CodingKey {
+        case type
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.type, forKey: .type)
+    }
+    
 }
 
 struct WeatherOptionInfo : Hashable {
@@ -258,6 +281,17 @@ class WeatherTrigger : Triggers {
     static func decode(triggerObj : [String : Any]) -> WeatherTrigger {
         return WeatherTrigger(weather: WeatherTrigger.types(rawValue: triggerObj["weather"] as! String)!)
     }
+    
+    enum CodingKeys: String, CodingKey {
+        case weather
+    }
+    
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.weather, forKey: .weather)
+    }
+
 }
 
 class WeatherManager {
@@ -365,6 +399,17 @@ class StaticTimeFrame : Triggers {
                                timeEnd: triggerObj["timeEnd"] as! Date)
     }
     
+    enum CodingKeys: String, CodingKey {
+        case timeStart
+        case timeEnd
+    }
+    
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.timeStart, forKey: .timeStart)
+        try container.encode(self.timeEnd, forKey: .timeEnd)
+    }
 }
 
 struct TimeFrame {
@@ -596,12 +641,29 @@ class TimeFrameInfo : Triggers {
         self.Month = Month
     }
     
+   
     static func decode(triggerObj : [String : Any]) -> TimeFrameInfo {
         let hour = HourTimeFrame.decode(hourObj: triggerObj["Hour"] as? [String : Any])
         let weekday = WeekdayTimeFrame.decode(hourObj: triggerObj["Weekday"] as? [String : Any])
         let date = DateTimeFrame.decode(hourObj: triggerObj["date"] as? [String : Any])
         let month = MonthTimeFrame.decode(hourObj: triggerObj["Month"] as? [String : Any])
         return TimeFrameInfo(Hour: hour, Weekday: weekday, Date: date, Month: month)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case Hour
+        case Weekday
+        case date
+        case Month
+    }
+    
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.Hour, forKey: .Hour)
+        try container.encode(self.Weekday, forKey: .Weekday)
+        try container.encode(self.date, forKey: .date)
+        try container.encode(self.Month, forKey: .Month)
     }
     
     required init(from decoder: Decoder) throws {

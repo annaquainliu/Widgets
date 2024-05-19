@@ -70,7 +70,7 @@ class DisplayDesktopWidgets: ObservableObject {
         do {
             controller = ScreenWindowController(widget: widget)
         }
-        catch _ {
+        catch _ { 
             return;
         }
         self.currentWidgets[widget.getID()] = controller

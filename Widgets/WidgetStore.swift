@@ -19,8 +19,7 @@ class WidgetStore: ObservableObject {
         .appendingPathComponent("widgets.data")
     }
     
-    func load() async throws {
-        // promise that either returns no widgets or the widgets in the file
+    func getJSON() async throws -> [[String : Any]] {
         let task = Task<[[String : Any]], Error> {
             let fileURL = try Self.fileURL()
             guard let data = try? Data(contentsOf: fileURL) else {
@@ -33,20 +32,29 @@ class WidgetStore: ObservableObject {
             return dailyWidgets
         }
         // await the promise, receive the file information
-        let jsonObject = try await task.value
+        return try await task.value
         
+    }
+    
+    func load() async throws {
+        // await the promise, receive the file information
+        let jsonObject = try await getJSON()
         // parsing json object
         for obj in jsonObject {
             self.widgets.append(WidgetInfo.decode(obj: obj))
         }
     }
     
-    
+    /*
+            save : [WidgetInfo] -> ()
+            
+            Takes in an array of widgets and REPLACES the json file with
+            the array of widgets
+     */
     func save(newWidgets: [WidgetInfo]) async throws {
         let task = Task {
             let data = try JSONEncoder().encode(newWidgets)
             let outfile = try Self.fileURL()
-            print(outfile)
             try data.write(to: outfile)
         }
         _ = try await task.value

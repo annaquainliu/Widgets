@@ -16,7 +16,7 @@ struct Alerts {
 }
  
 struct TriggersView : View {
-    @Binding var triggerSelection : Triggers.types
+    @Binding var triggerSelection : String
     @Binding var weatherSelection : WeatherOptionInfo
     @Binding var staticTimeFrame : StaticTimeFrame
     @Binding var hourSelection : HourTimeFrame
@@ -39,7 +39,7 @@ struct TriggersView : View {
         }.buttonStyle(.borderless)
     }
     
-    var body: some View {
+    var body: some View { 
         VStack(alignment: .leading) {
             Picker(selection: $triggerSelection, label: Text("")) {
                 makeRadioOption(
@@ -148,7 +148,7 @@ struct TriggersView : View {
 }
 
 struct WidgetMenu< T : WidgetTypeInfo> : View {
-    @State private var triggerSelection = Triggers.types.always
+    @State private var triggerSelection = Triggers.types.always.rawValue
     @State var weatherSelection = WeatherOptionInfo(title: WeatherTrigger.types.sunny, systemImage: "sun.min.fill")
     @State var timeFrameSelection = Set<String>()
     @State var hourSelection = HourTimeFrame()
@@ -181,7 +181,7 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
                 HStack {
                     Spacer()
                     Button("Create Widget") {
-                        if triggerSelection == Triggers.types.staticTimeFrame &&
+                        if triggerSelection == Triggers.types.staticTimeFrame.rawValue &&
                             staticTimeFrame.timeStart > staticTimeFrame.timeEnd {
                             alerts.alertInvalidTimeFrame = true
                             return
@@ -195,17 +195,17 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
                             return
                         }
                         var trigger : Triggers;
-                        if triggerSelection == Triggers.types.timeFrame {
+                        if triggerSelection == Triggers.types.timeFrame.rawValue {
                             let hourParam = timeFrameSelection.contains(TimeFrame.hour) ? hourSelection : nil
                             let dayParam = timeFrameSelection.contains(TimeFrame.dayOfTheWeek) ? daySelection : nil
                             let dateParam = timeFrameSelection.contains(TimeFrame.dayOfTheMonth) ? dateSelection : nil
                             let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
                             trigger = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
                         }
-                        else if triggerSelection == Triggers.types.weather {
+                        else if triggerSelection == Triggers.types.weather.rawValue {
                             trigger = WeatherTrigger(weather: weatherSelection.title)
                         }
-                        else if triggerSelection == Triggers.types.staticTimeFrame {
+                        else if triggerSelection == Triggers.types.staticTimeFrame.rawValue {
                             trigger = staticTimeFrame
                         }
                         else {
