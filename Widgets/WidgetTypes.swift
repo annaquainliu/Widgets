@@ -43,16 +43,16 @@ class WidgetInfo : Codable, Hashable {
             self.id = id!;
         }
         
-        if self.trigger is WeatherTrigger {
-            do {
-                let weatherTrigger = self.trigger as! WeatherTrigger
-                let data = try JSONEncoder().encode(weatherTrigger)
-                try data.write(to: URL(filePath: "/Users/annaliu/Library/Containers/Klymene.Widgets/Data/Documents/test.txt"))
-            }
-            catch {
-                print(error.localizedDescription)
-            }
-        }
+//        if self.trigger is WeatherTrigger {
+//            do {
+//                let weatherTrigger = self.trigger as! WeatherTrigger
+//                let data = try JSONEncoder().encode(weatherTrigger)
+//                try data.write(to: URL(filePath: "/Users/annaliu/Library/Containers/Klymene.Widgets/Data/Documents/test.txt"))
+//            }
+//            catch {
+//                print(error.localizedDescription)
+//            }
+//        }
     }
     
     func initCoordsAndSize(xCoord : Double, yCoord : Double, size : NSSize) {
@@ -65,6 +65,48 @@ class WidgetInfo : Codable, Hashable {
         return self.id
     }
     
+    enum CodingKeys: String, CodingKey {
+        case info, trigger, xCoord, yCoord, widgetSize, slideshow, imageURLs, id
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let infoValue = try values.nestedContainer(keyedBy: WidgetTypeInfo.CodingKeys.self,
+                                                    forKey: .info)
+        let infoType = try infoValue.decode(WidgetTypeInfo.types.self, forKey: WidgetTypeInfo.CodingKeys.type)
+        switch infoType {
+            case WidgetTypeInfo.types.image:
+                self.info = try values.decode(WidgetTypeInfo.self, forKey: .info)
+            case WidgetTypeInfo.types.text:
+                self.info = try values.decode(TextWidgetInfo.self, forKey: .info)
+            case WidgetTypeInfo.types.calendar:
+                self.info = try values.decode(CalendarInfo.self, forKey: .info)
+            case WidgetTypeInfo.types.countdown:
+                self.info = try values.decode(CountDownWidgetInfo.self, forKey: .info)
+            default:
+                self.info = try values.decode(ScreenWidgetInfo.self, forKey: .info)
+        }
+        let triggerValue = try values.nestedContainer(keyedBy: Triggers.CodingKeys.self, forKey: .trigger)
+        let triggerType = try triggerValue.decode(Triggers.types.self, forKey: Triggers.CodingKeys.type)
+        switch triggerType {
+            case Triggers.types.always:
+                self.trigger = try values.decode(Triggers.self, forKey: .trigger)
+            case Triggers.types.staticTimeFrame:
+                self.trigger = try values.decode(StaticTimeFrame.self, forKey: .trigger)
+            case Triggers.types.timeFrame:
+                self.trigger = try values.decode(TimeFrameInfo.self, forKey: .trigger)
+            default:
+                self.trigger = try values.decode(WeatherTrigger.self, forKey: .trigger)
+        }
+        self.xCoord = try values.decode(Double.self, forKey: .xCoord)
+        self.yCoord = try values.decode(Double.self, forKey: .yCoord)
+        self.widgetSize = try values.decode(NSSize.self, forKey: .widgetSize)
+        self.slideshow = try values.decode(SlideshowInfo.self, forKey: .slideshow)
+        self.imageURLs = try values.decode([URL].self, forKey: .imageURLs)
+        self.id = try values.decode(UUID.self, forKey: .id)
+    }
+    
+    /*
     static func decode(obj : [String : Any]) -> WidgetInfo {
         let infoObj = obj["info"] as! [String : Any]
         let widgetType = WidgetTypeInfo.types(rawValue: infoObj["type"] as! Int)
@@ -119,6 +161,8 @@ class WidgetInfo : Codable, Hashable {
         
         return widget
     }
+    */
+    
     
 }
 
@@ -126,10 +170,9 @@ class WidgetInfo : Codable, Hashable {
 struct SlideshowInfo : Codable {
     var interval : Int
     
-    static func decode(obj : [String : Any]) -> SlideshowInfo {
-        return SlideshowInfo(interval: obj["interval"] as! Int)
-    }
-    
+//    static func decode(obj : [String : Any]) -> SlideshowInfo {
+//        return SlideshowInfo(interval: obj["interval"] as! Int)
+//    }
 }
 
 class WidgetTypeInfo : Codable {
@@ -138,6 +181,10 @@ class WidgetTypeInfo : Codable {
     
     enum types : Int, Codable {
         case image, calendar, desktop, text, countdown
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case type
     }
     
     init(type: WidgetTypeInfo.types) {
@@ -154,11 +201,12 @@ class CalendarInfo : WidgetTypeInfo {
         case calendarType
     }
     
-    
     required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.calendarType = try values.decode(CalendarSizes.types.self, forKey: .calendarType)
+        try super.init(from: decoder)
     }
-    
+
     init(calendarType : CalendarSizes.types) {
         self.calendarType = calendarType
         super.init(type: WidgetTypeInfo.types.calendar)
@@ -176,8 +224,15 @@ class CountDownWidgetInfo : WidgetTypeInfo {
         super.init(type: WidgetTypeInfo.types.countdown)
     }
     
+    enum CodingKeys: String, CodingKey {
+        case time, desc
+    }
+    
     required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.time = try values.decode(Date.self, forKey: .time)
+        self.desc = try values.decode(String.self, forKey: .desc)
+        try super.init(from: decoder)
     }
     
 }
@@ -193,10 +248,17 @@ class TextWidgetInfo : WidgetTypeInfo {
         super.init(type: WidgetTypeInfo.types.countdown)
     }
     
-    required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+    enum CodingKeys: String, CodingKey {
+        case text, font
     }
     
+    required init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.text = try values.decode(String.self, forKey: .text)
+        self.font = try values.decode(String.self, forKey: .font)
+        try super.init(from: decoder)
+    }
+
 }
 
 class ScreenWidgetInfo : WidgetTypeInfo {
@@ -208,8 +270,14 @@ class ScreenWidgetInfo : WidgetTypeInfo {
         super.init(type: WidgetTypeInfo.types.desktop)
     }
     
+    enum CodingKeys: String, CodingKey {
+        case opacity
+    }
+    
     required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.opacity = try values.decode(Float.self, forKey: .opacity)
+        try super.init(from: decoder)
     }
 }
 
@@ -275,12 +343,14 @@ class WeatherTrigger : Triggers {
     }
     
     required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.weather = try values.decode(WeatherTrigger.types.self, forKey: .weather)
+        try super.init(from: decoder)
     }
     
-    static func decode(triggerObj : [String : Any]) -> WeatherTrigger {
-        return WeatherTrigger(weather: WeatherTrigger.types(rawValue: triggerObj["weather"] as! String)!)
-    }
+//    static func decode(triggerObj : [String : Any]) -> WeatherTrigger {
+//        return WeatherTrigger(weather: WeatherTrigger.types(rawValue: triggerObj["weather"] as! String)!)
+//    }
     
     enum CodingKeys: String, CodingKey {
         case weather
@@ -391,13 +461,12 @@ class StaticTimeFrame : Triggers {
     }
     
     required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.timeStart = try values.decode(Date.self, forKey: .timeStart)
+        self.timeEnd = try values.decode(Date.self, forKey: .timeEnd)
+        try super.init(from: decoder)
     }
     
-    static func decode(triggerObj : [String : Any]) -> StaticTimeFrame {
-        return StaticTimeFrame(timeStart: triggerObj["timeStart"] as! Date,
-                               timeEnd: triggerObj["timeEnd"] as! Date)
-    }
     
     enum CodingKeys: String, CodingKey {
         case timeStart
@@ -641,14 +710,14 @@ class TimeFrameInfo : Triggers {
         self.Month = Month
     }
     
-   
-    static func decode(triggerObj : [String : Any]) -> TimeFrameInfo {
-        let hour = HourTimeFrame.decode(hourObj: triggerObj["Hour"] as? [String : Any])
-        let weekday = WeekdayTimeFrame.decode(hourObj: triggerObj["Weekday"] as? [String : Any])
-        let date = DateTimeFrame.decode(hourObj: triggerObj["date"] as? [String : Any])
-        let month = MonthTimeFrame.decode(hourObj: triggerObj["Month"] as? [String : Any])
-        return TimeFrameInfo(Hour: hour, Weekday: weekday, Date: date, Month: month)
-    }
+//
+//    static func decode(triggerObj : [String : Any]) -> TimeFrameInfo {
+//        let hour = HourTimeFrame.decode(hourObj: triggerObj["Hour"] as? [String : Any])
+//        let weekday = WeekdayTimeFrame.decode(hourObj: triggerObj["Weekday"] as? [String : Any])
+//        let date = DateTimeFrame.decode(hourObj: triggerObj["date"] as? [String : Any])
+//        let month = MonthTimeFrame.decode(hourObj: triggerObj["Month"] as? [String : Any])
+//        return TimeFrameInfo(Hour: hour, Weekday: weekday, Date: date, Month: month)
+//    }
     
     enum CodingKeys: String, CodingKey {
         case Hour
@@ -667,7 +736,12 @@ class TimeFrameInfo : Triggers {
     }
     
     required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        try super.init(from: decoder)
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.Hour = try values.decode(HourTimeFrame?.self, forKey: .Hour)
+        self.Weekday = try values.decode(WeekdayTimeFrame?.self, forKey: .Weekday)
+        self.date = try values.decode(DateTimeFrame?.self, forKey: .date)
+        self.Month = try values.decode(MonthTimeFrame?.self, forKey: .Month)
     }
     
     override func stringifyTrigger() -> String {

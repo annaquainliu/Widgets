@@ -19,30 +19,18 @@ class WidgetStore: ObservableObject {
         .appendingPathComponent("widgets.data")
     }
     
-    func getJSON() async throws -> [[String : Any]] {
-        let task = Task<[[String : Any]], Error> {
+    func load() async throws {
+        let task = Task<[WidgetInfo], Error> {
             let fileURL = try Self.fileURL()
             guard let data = try? Data(contentsOf: fileURL) else {
                 return []
             }
-            guard let dailyWidgets = try? JSONSerialization.jsonObject(with: data)
-                    as? [[String : Any]] else {
+            guard let dailyWidgets = try? JSONDecoder().decode([WidgetInfo].self, from: data) else {
                 return []
             }
             return dailyWidgets
         }
-        // await the promise, receive the file information
-        return try await task.value
-        
-    }
-    
-    func load() async throws {
-        // await the promise, receive the file information
-        let jsonObject = try await getJSON()
-        // parsing json object
-        for obj in jsonObject {
-            self.widgets.append(WidgetInfo.decode(obj: obj))
-        }
+        self.widgets = try await task.value
     }
     
     /*
