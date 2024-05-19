@@ -159,7 +159,7 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
     @State private var alerts = Alerts()
     @State private var slideshowOptions = SlideshowInfo(interval: 1)
     
-    @Binding var info : T
+    @ObservedObject var info : T
     @Binding var fileNames : [URL]
     
     @EnvironmentObject var store : WidgetStore

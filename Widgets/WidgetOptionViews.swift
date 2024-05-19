@@ -12,7 +12,7 @@ struct ScreenSaverView: View {
     @EnvironmentObject var store : WidgetStore
     @State var fileName : [URL] = []
     @State var backButtonPressed = false
-    @State var info = ScreenWidgetInfo(opacity: 1)
+    @StateObject var info = ScreenWidgetInfo(opacity: 1)
    
     var body: some View {
         if backButtonPressed {
@@ -28,10 +28,10 @@ struct ScreenSaverView: View {
                             HStack {
                                 Text("Opacity: ").font(.title).padding()
                                 TextField("Enter opacity", value: $info.opacity, format: .number)
-                                                .textFieldStyle(.roundedBorder)
-                                                .padding()
+                                        .textFieldStyle(.roundedBorder)
+                                        .padding()
                             }
-                            WidgetMenu(info: $info, fileNames: $fileName)
+                            WidgetMenu(info: info, fileNames: $fileName)
                         }
                     }
                 }.padding()
@@ -41,17 +41,17 @@ struct ScreenSaverView: View {
     }
 }
 
-struct ScreenSaver_Providers: PreviewProvider {
-    static var previews: some View {
-        ScreenSaverView()
-    }
-}
+//struct ScreenSaver_Providers: PreviewProvider {
+//    static var previews: some View {
+//        ScreenSaverView()
+//    }
+//}
 
 struct ImageOrGifView: View {
     @EnvironmentObject var store : WidgetStore
     @State var fileName : [URL] = []
     @State var backButtonPressed = false
-    @State var info = WidgetTypeInfo(type: WidgetTypeInfo.types.image)
+    @StateObject var info = WidgetTypeInfo(type: WidgetTypeInfo.types.image)
     
     var body : some View {
         if backButtonPressed {
@@ -64,7 +64,7 @@ struct ImageOrGifView: View {
                     HStack {
                         FilePicker(files: $fileName)
                         Spacer(minLength: 40)
-                        WidgetMenu(info: $info, fileNames: $fileName)
+                        WidgetMenu(info: info, fileNames: $fileName)
                     }.padding()
                 }.padding()
                  .frame(width: 1200)
@@ -78,7 +78,7 @@ struct CalendarView : View {
     @State var fileName : [URL] = []
     @State var selection : Date = Date()
     @State var backButtonPressed : Bool = false
-    @State var info = CalendarInfo(calendarType: CalendarSizes.types.calendar)
+    @StateObject var info = CalendarInfo(calendarType: CalendarSizes.types.calendar)
     let width : CGFloat = 1100
     let height : CGFloat = 700
     
@@ -102,7 +102,7 @@ struct CalendarView : View {
                     Spacer().frame(height: 30)
                     HStack {
                         FilePicker(files: $fileName)
-                        WidgetMenu(info: $info, fileNames: $fileName)
+                        WidgetMenu(info: info, fileNames: $fileName)
                     }.padding()
                 }.padding()
             }.frame(width: width, height: height)
@@ -127,7 +127,7 @@ struct CountdownView : View {
     @EnvironmentObject var store : WidgetStore
     @State var fileNames : [URL] = []
     @State var backButtonPressed : Bool = false
-    @State var info = CountDownWidgetInfo(time: Date(), desc: "")
+    @StateObject var info = CountDownWidgetInfo(time: Date(), desc: "")
     let width : CGFloat = 1100
     let height : CGFloat = 700
     
@@ -158,7 +158,7 @@ struct CountdownView : View {
                         Spacer(minLength: 30)
                         HStack {
                             FilePicker(files: $fileNames)
-                            WidgetMenu(info: $info, fileNames: $fileNames)
+                            WidgetMenu(info: info, fileNames: $fileNames)
                         }
                     }.padding()
                 }
@@ -174,7 +174,7 @@ struct TextWidgetView : View {
     let width : CGFloat = 1100
     let height : CGFloat = 700
     @State var backButtonPressed : Bool = false
-    @State var info = TextWidgetInfo(text: "", font: "Arial")
+    @StateObject var info = TextWidgetInfo(text: "", font: "Arial")
     
     var body: some View {
         if backButtonPressed {
@@ -198,7 +198,7 @@ struct TextWidgetView : View {
                         Spacer(minLength: 30)
                         HStack {
                             FilePicker(files: $fileNames)
-                            WidgetMenu(info: $info, fileNames: $fileNames)
+                            WidgetMenu(info: info, fileNames: $fileNames)
                         }
                     }
                 }.padding()
@@ -225,11 +225,11 @@ struct TextWidgetView : View {
 //}
 
 //
-//struct CalendarView_Previews : PreviewProvider {
-//    static var previews: some View {
-//        CalendarView()
-//    }
-//}
+struct CalendarView_Previews : PreviewProvider {
+    static var previews: some View {
+        CalendarView()
+    }
+}
 //
 //struct WidgetOption_Providers: PreviewProvider {
 //    static var previews: some View {

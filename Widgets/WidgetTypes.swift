@@ -10,6 +10,8 @@ import SwiftUI
 import CoreLocation
 import Quartz
 
+
+
 // class that stores information for all widgets
 class WidgetInfo : Codable, Hashable {
     static func == (lhs: WidgetInfo, rhs: WidgetInfo) -> Bool {
@@ -42,17 +44,6 @@ class WidgetInfo : Codable, Hashable {
         else {
             self.id = id!;
         }
-        
-//        if self.trigger is WeatherTrigger {
-//            do {
-//                let weatherTrigger = self.trigger as! WeatherTrigger
-//                let data = try JSONEncoder().encode(weatherTrigger)
-//                try data.write(to: URL(filePath: "/Users/annaliu/Library/Containers/Klymene.Widgets/Data/Documents/test.txt"))
-//            }
-//            catch {
-//                print(error.localizedDescription)
-//            }
-//        }
     }
     
     func initCoordsAndSize(xCoord : Double, yCoord : Double, size : NSSize) {
@@ -112,10 +103,9 @@ class WidgetInfo : Codable, Hashable {
 
 struct SlideshowInfo : Codable {
     var interval : Int
-
 }
 
-class WidgetTypeInfo : Codable {
+class WidgetTypeInfo : Codable, ObservableObject {
     
     var type : WidgetTypeInfo.types
     
@@ -135,7 +125,7 @@ class WidgetTypeInfo : Codable {
 
 class CalendarInfo : WidgetTypeInfo {
     
-    var calendarType : CalendarSizes.types
+    @Published var calendarType : CalendarSizes.types
     
     enum CodingKeys: String, CodingKey {
         case calendarType
@@ -161,8 +151,8 @@ class CalendarInfo : WidgetTypeInfo {
 }
 
 class CountDownWidgetInfo : WidgetTypeInfo {
-    var time : Date
-    var desc : String
+    @Published var time : Date
+    @Published var desc : String
     
     init(time: Date, desc: String) {
         self.time = time
@@ -192,8 +182,8 @@ class CountDownWidgetInfo : WidgetTypeInfo {
 
 class TextWidgetInfo : WidgetTypeInfo {
     
-    var text : String
-    var font : String
+    @Published var text : String
+    @Published var font : String
     
     init(text: String, font: String) {
         self.text = text
@@ -224,7 +214,7 @@ class TextWidgetInfo : WidgetTypeInfo {
 
 class ScreenWidgetInfo : WidgetTypeInfo {
     
-    var opacity : Float
+    @Published var opacity : Float
     
     init(opacity: Float) {
         self.opacity = opacity
