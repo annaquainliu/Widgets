@@ -106,73 +106,13 @@ class WidgetInfo : Codable, Hashable {
         self.id = try values.decode(UUID.self, forKey: .id)
     }
     
-    /*
-    static func decode(obj : [String : Any]) -> WidgetInfo {
-        let infoObj = obj["info"] as! [String : Any]
-        let widgetType = WidgetTypeInfo.types(rawValue: infoObj["type"] as! Int)
-        let triggerObj = obj["trigger"] as! [String : Any]
-        let triggerType =  Triggers.types(rawValue: triggerObj["type"] as! String)
-        
-        let info : WidgetTypeInfo;
-        if widgetType == WidgetTypeInfo.types.calendar {
-            info = CalendarInfo(calendarType: CalendarSizes.types(rawValue: infoObj["calendarType"] as! Int)!)
-        }
-        else if widgetType == WidgetTypeInfo.types.countdown {
-            info = CountDownWidgetInfo(time: infoObj["time"] as! Date,
-                                       desc: infoObj["desc"] as! String)
-        }
-        else if widgetType == WidgetTypeInfo.types.desktop {
-            info = ScreenWidgetInfo(opacity: infoObj["opacity"] as! Float)
-        }
-        else if widgetType == WidgetTypeInfo.types.image {
-            info = WidgetTypeInfo(type: WidgetTypeInfo.types.image)
-        }
-        else {
-            info = TextWidgetInfo(text: infoObj["text"] as! String,
-                                  font: infoObj["font"] as! String)
-        }
-        let trigger : Triggers;
-        if triggerType == Triggers.types.always {
-            trigger = Triggers(type: Triggers.types.always)
-        }
-        else if triggerType == Triggers.types.staticTimeFrame {
-            trigger = StaticTimeFrame.decode(triggerObj: triggerObj)
-        }
-        else if triggerType == Triggers.types.timeFrame {
-            trigger = TimeFrameInfo.decode(triggerObj: triggerObj)
-        } 
-        else {
-            trigger = WeatherTrigger.decode(triggerObj: triggerObj)
-        }
-        let urls = obj["imageURLs"] as! [String]
-        var imageURLs : [URL] = []
-        for urlString in urls {
-            let urlObj = URL(string: urlString)!
-            imageURLs.append(urlObj)
-        }
-        let widget = WidgetInfo(info: info, trigger: trigger,
-                                imageURLs: imageURLs,
-                                slideshow: SlideshowInfo.decode(obj: obj["slideshow"] as! [String : Any]),
-                                id: UUID(uuidString: obj["id"] as! String))
-        let dimensions = obj["widgetSize"] as! [Double]
-        widget.initCoordsAndSize(xCoord: obj["xCoord"] as! Double,
-                                 yCoord: obj["yCoord"] as! Double,
-                                 size: NSSize(width: dimensions[0], height: dimensions[1]))
-        
-        return widget
-    }
-    */
-    
     
 }
 
 
 struct SlideshowInfo : Codable {
     var interval : Int
-    
-//    static func decode(obj : [String : Any]) -> SlideshowInfo {
-//        return SlideshowInfo(interval: obj["interval"] as! Int)
-//    }
+
 }
 
 class WidgetTypeInfo : Codable {
@@ -206,6 +146,12 @@ class CalendarInfo : WidgetTypeInfo {
         self.calendarType = try values.decode(CalendarSizes.types.self, forKey: .calendarType)
         try super.init(from: decoder)
     }
+    
+    override func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.calendarType, forKey: .calendarType)
+        try super.encode(to: encoder)
+    }
 
     init(calendarType : CalendarSizes.types) {
         self.calendarType = calendarType
@@ -235,6 +181,13 @@ class CountDownWidgetInfo : WidgetTypeInfo {
         try super.init(from: decoder)
     }
     
+    override func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.time, forKey: .time)
+        try container.encode(self.desc, forKey: .desc)
+        try super.encode(to: encoder)
+    }
+    
 }
 
 class TextWidgetInfo : WidgetTypeInfo {
@@ -245,7 +198,7 @@ class TextWidgetInfo : WidgetTypeInfo {
     init(text: String, font: String) {
         self.text = text
         self.font = font
-        super.init(type: WidgetTypeInfo.types.countdown)
+        super.init(type: WidgetTypeInfo.types.text)
     }
     
     enum CodingKeys: String, CodingKey {
@@ -258,6 +211,14 @@ class TextWidgetInfo : WidgetTypeInfo {
         self.font = try values.decode(String.self, forKey: .font)
         try super.init(from: decoder)
     }
+    
+    override func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.text, forKey: .text)
+        try container.encode(self.font, forKey: .font)
+        try super.encode(to: encoder)
+    }
+    
 
 }
 
@@ -278,6 +239,12 @@ class ScreenWidgetInfo : WidgetTypeInfo {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.opacity = try values.decode(Float.self, forKey: .opacity)
         try super.init(from: decoder)
+    }
+    
+    override func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.opacity, forKey: .opacity)
+        try super.encode(to: encoder)
     }
 }
 
@@ -347,11 +314,7 @@ class WeatherTrigger : Triggers {
         self.weather = try values.decode(WeatherTrigger.types.self, forKey: .weather)
         try super.init(from: decoder)
     }
-    
-//    static func decode(triggerObj : [String : Any]) -> WeatherTrigger {
-//        return WeatherTrigger(weather: WeatherTrigger.types(rawValue: triggerObj["weather"] as! String)!)
-//    }
-    
+
     enum CodingKeys: String, CodingKey {
         case weather
     }
@@ -360,6 +323,10 @@ class WeatherTrigger : Triggers {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.weather, forKey: .weather)
+    }
+    
+    override func stringifyTrigger() -> String {
+        return "When it is \(self.weather.rawValue)"
     }
 
 }
@@ -532,15 +499,6 @@ struct HourTimeFrame : TimeFrameCodable {
     var timeStart : Date = Date.now
     var timeEnd : Date = Date.now
     
-    static func decode(hourObj : [String : Any]?) -> HourTimeFrame? {
-        if (hourObj == nil) {
-            return nil;
-        }
-        return HourTimeFrame(selected: hourObj!["selected"] as! Bool,
-                             timeStart: hourObj!["timeStart"] as! Date,
-                             timeEnd: hourObj!["timeEnd"] as! Date)
-    }
-    
     func nowWithinTimeRange() -> Bool {
         let current = Date()
         let timeStartDate = TimeFrame.makeDate(year: current.get(.year), month: current.get(.month),
@@ -588,15 +546,6 @@ struct WeekdayTimeFrame : TimeFrameCodable {
     var timeStart : String = TimeFrame.weekdays[0]
     var timeEnd : String = TimeFrame.weekdays[0]
     
-    static func decode(hourObj : [String : Any]?) -> WeekdayTimeFrame? {
-        if (hourObj == nil) {
-            return nil;
-        }
-        return WeekdayTimeFrame(selected: hourObj!["selected"] as! Bool,
-                                timeStart: hourObj!["timeStart"] as! String,
-                                timeEnd: hourObj!["timeEnd"] as! String)
-    }
-    
     func nowWithinTimeRange() -> Bool {
         let now = Date()
         let startingIndex = TimeFrame.getWeekdayIndex(weekday: timeStart)
@@ -636,15 +585,6 @@ struct DateTimeFrame : TimeFrameCodable {
     var timeStart : Int = 0
     var timeEnd : Int = 0
     
-    static func decode(hourObj : [String : Any]?) -> DateTimeFrame? {
-        if (hourObj == nil) {
-            return nil;
-        }
-        return DateTimeFrame(selected: hourObj!["selected"] as! Bool,
-                             timeStart: hourObj!["timeStart"] as! Int,
-                             timeEnd: hourObj!["timeEnd"] as! Int)
-    }
-    
     func nowWithinTimeRange() -> Bool {
         return Date().get(.day) >= timeStart + 1 && Date().get(.day) <= timeEnd + 1
     }
@@ -666,15 +606,6 @@ struct MonthTimeFrame : TimeFrameCodable {
     var selected : Bool = false
     var timeStart : String = TimeFrame.months[0]
     var timeEnd : String = TimeFrame.months[0]
-    
-    static func decode(hourObj : [String : Any]?) -> MonthTimeFrame?  {
-        if (hourObj == nil) {
-            return nil;
-        }
-        return MonthTimeFrame(selected: hourObj!["selected"] as! Bool,
-                             timeStart: hourObj!["timeStart"] as! String,
-                             timeEnd: hourObj!["timeEnd"] as! String)
-    }
     
     func nowWithinTimeRange() -> Bool {
         let currMonth = Date().get(.month)
@@ -709,15 +640,6 @@ class TimeFrameInfo : Triggers {
         self.date = Date
         self.Month = Month
     }
-    
-//
-//    static func decode(triggerObj : [String : Any]) -> TimeFrameInfo {
-//        let hour = HourTimeFrame.decode(hourObj: triggerObj["Hour"] as? [String : Any])
-//        let weekday = WeekdayTimeFrame.decode(hourObj: triggerObj["Weekday"] as? [String : Any])
-//        let date = DateTimeFrame.decode(hourObj: triggerObj["date"] as? [String : Any])
-//        let month = MonthTimeFrame.decode(hourObj: triggerObj["Month"] as? [String : Any])
-//        return TimeFrameInfo(Hour: hour, Weekday: weekday, Date: date, Month: month)
-//    }
     
     enum CodingKeys: String, CodingKey {
         case Hour
