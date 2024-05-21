@@ -9,51 +9,58 @@ import SwiftUI
 
 struct ContentView: View {
     @State var tab: String = "Menu"
-    @EnvironmentObject var store : WidgetStore
     
     var body: some View {
-        if tab == "Menu" {
-            VStack(alignment : .center) {
-                HStack {
-                    Spacer()
-                    Button {
-                       tab = "Library"
-                    } label: {
-                        Text("My Library")
-                    }.padding([.top, .trailing], 20)
-                }
-                TitleText(text: "MacWidgets")
-                Text("Make your own widgets appear based on **triggers**!").padding([.bottom, .leading], 20)
-                Spacer().frame(maxHeight: 10)
-                VStack {
-                    HStack {
-                        MenuButton(title: "Image/GIF", ImageName: "photo.fill", parent:self)
-                        MenuButton(title: "Desktop", ImageName:"desktopcomputer", parent:self)
-                        MenuButton(title: "Countdown", ImageName: "calendar.badge.clock", parent: self)
-                    }
-                    HStack {
-                        MenuButton(title : "Text", ImageName:
-                                    "textformat", parent:self)
-                        MenuButton(title: "Calendar", ImageName: "calendar", parent:self)
-                    }
-                }.padding(30)
-            }.padding([.top, .bottom], 30)
-        } else {
-            switch tab {
-                case "Calendar":
-                    CalendarView()
-                case "Desktop":
-                    ScreenSaverView()
-                case "Countdown":
-                    CountdownView()
-                case "Text":
-                    TextWidgetView()
-                case "Library":
-                    LibraryView()
-                default:
-                    ImageOrGifView()
-            }
+        switch tab {
+            case "Menu":
+                MainMenu(tab: $tab)
+            case "Calendar":
+                CalendarView()
+            case "Desktop":
+                ScreenSaverView()
+            case "Countdown":
+                CountdownView()
+            case "Text":
+                TextWidgetView()
+            case "Library":
+                LibraryView()
+            default:
+                ImageOrGifView()
         }
+    }
+}
+
+struct MainMenu : View {
+
+    @EnvironmentObject var store : WidgetStore
+    @Binding var tab : String
+    
+    var body : some View {
+        VStack(alignment : .center) {
+            HStack {
+                Spacer()
+                Button {
+                   tab = "Library"
+                } label: {
+                    Text("My Library")
+                }.padding([.top, .trailing])
+            }
+            TitleText(text: "MacWidgets")
+            Text("Make your own widgets appear based on **triggers**!").padding([.bottom, .leading], 20)
+            Spacer().frame(maxHeight: 10)
+            VStack {
+                HStack {
+                    MenuButton(title: "Image/GIF", ImageName: "photo.fill", tab: $tab)
+                    MenuButton(title: "Desktop", ImageName:"desktopcomputer", tab: $tab)
+                    MenuButton(title: "Countdown", ImageName: "calendar.badge.clock", tab: $tab)
+                }
+                HStack {
+                    MenuButton(title : "Text", ImageName:
+                                "textformat", tab: $tab)
+                    MenuButton(title: "Calendar", ImageName: "calendar", tab: $tab)
+                }
+            }.padding(30)
+        }.padding([.top, .bottom], 30)
     }
 }
 
@@ -61,7 +68,7 @@ struct MenuButton : View {
     
     var title : String
     var ImageName : String
-    var parent : ContentView
+    @Binding var tab : String
     
     var body : some View {
         VStack {
@@ -77,7 +84,7 @@ struct MenuButton : View {
          .background()
          .cornerRadius(16)
          .onTapGesture {
-             parent.tab = title
+            tab = title
          }
         
     }
