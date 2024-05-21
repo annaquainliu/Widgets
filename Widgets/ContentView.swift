@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+let textColor = Color(hue: 0.5, saturation: 1, brightness: 0.7)
+
+func TitleText(text : String) -> some View {
+    return Text(text)
+        .bold()
+        .padding(20)
+        .font(.system(size: 60)
+            .weight(.bold))
+        .foregroundColor(.white)
+}
+
 struct ContentView: View {
     @State var tab: String = "Menu"
     
@@ -32,7 +43,6 @@ struct ContentView: View {
 
 struct MainMenu : View {
 
-    @EnvironmentObject var store : WidgetStore
     @Binding var tab : String
     
     var body : some View {
@@ -43,24 +53,27 @@ struct MainMenu : View {
                    tab = "Library"
                 } label: {
                     Text("My Library")
-                }.padding([.top, .trailing])
+                }
+                .padding([.top, .trailing])
             }
             TitleText(text: "MacWidgets")
             Text("Make your own widgets appear based on **triggers**!").padding([.bottom, .leading], 20)
-            Spacer().frame(maxHeight: 10)
-            VStack {
-                HStack {
+                .foregroundColor(.white)
+            ScrollView {
                     MenuButton(title: "Image/GIF", ImageName: "photo.fill", tab: $tab)
                     MenuButton(title: "Desktop", ImageName:"desktopcomputer", tab: $tab)
                     MenuButton(title: "Countdown", ImageName: "calendar.badge.clock", tab: $tab)
-                }
-                HStack {
                     MenuButton(title : "Text", ImageName:
                                 "textformat", tab: $tab)
                     MenuButton(title: "Calendar", ImageName: "calendar", tab: $tab)
-                }
-            }.padding(30)
-        }.padding([.top, .bottom], 30)
+            }
+            .frame(minHeight: 200)
+            .padding(10)
+        }.padding([.top, .leading, .trailing], 10)
+        .frame(minHeight: 500)
+        .background(
+            AngularGradient(gradient: Gradient(colors: [.green, .blue]), center: .bottomTrailing)
+        )
     }
 }
 
@@ -71,22 +84,29 @@ struct MenuButton : View {
     @Binding var tab : String
     
     var body : some View {
-        VStack {
-            Text(title).font(.headline)
-            Image(systemName: ImageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 32.0, height: 32.0)
-        }.frame(width: 150, height: 150)
-         .overlay(RoundedRectangle(cornerRadius: 16)
-                    .stroke(.white, lineWidth: 2))
-         .contentShape(RoundedRectangle(cornerRadius: 16))
-         .background()
+        HStack {
+            VStack(alignment: .leading) {
+                Text(title)
+                    .font(.title2)
+                    .foregroundColor(textColor)
+                    .fontWeight(.light)
+                Spacer().frame(height: 20)
+                Image(systemName: ImageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60.0)
+                // rgba(120, 176, 190, 0.95)
+                    .foregroundColor(textColor)
+            }.padding()
+
+        }.frame(width: 600, height: 150, alignment:.leading)
+         .background(.white)
          .cornerRadius(16)
+         .padding([.top, .leading, .trailing], 20)
+         .shadow(color: Color(nsColor: NSColor(deviceRed: 0.1, green: 0.2, blue: 0.2, alpha: 0.25)), radius: 10, x: 0, y: 5)
          .onTapGesture {
             tab = title
          }
-        
     }
 }
 

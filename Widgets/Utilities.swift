@@ -8,14 +8,6 @@
 import Foundation
 import SwiftUI
 
-func TitleText(text : String) -> some View {
-    return Text(text)
-        .bold()
-        .padding()
-        .font(.system(size: 50, design: .rounded)
-            .weight(.heavy))
-}
-
 struct WidgetTypeTab : View {
     @Binding var backButtonPressed : Bool
     var titleText : String
