@@ -54,26 +54,27 @@ struct MainMenu : View {
                 } label: {
                     Text("My Library")
                 }
-                .padding([.top, .trailing])
+                .padding([.trailing], 10)
             }
             TitleText(text: "MacWidgets")
             Text("Make your own widgets appear based on **triggers**!").padding([.bottom, .leading], 20)
                 .foregroundColor(.white)
-            ScrollView {
-                    MenuButton(title: "Image/GIF", ImageName: "photo.fill", tab: $tab)
-                    MenuButton(title: "Desktop", ImageName:"desktopcomputer", tab: $tab)
-                    MenuButton(title: "Countdown", ImageName: "calendar.badge.clock", tab: $tab)
-                    MenuButton(title : "Text", ImageName:
-                                "textformat", tab: $tab)
-                    MenuButton(title: "Calendar", ImageName: "calendar", tab: $tab)
+            HStack() {
+                MenuButton(title: "Image/GIF", ImageName: "photo.fill", tab: $tab)
+                MenuButton(title: "Desktop", ImageName:"desktopcomputer", tab: $tab)
+                MenuButton(title: "Countdown", ImageName: "calendar.badge.clock", tab: $tab)
             }
-            .frame(minHeight: 200)
-            .padding(10)
-        }.padding([.top, .leading, .trailing], 10)
-        .frame(minHeight: 500)
+            HStack() {
+                MenuButton(title : "Text", ImageName:
+                            "textformat", tab: $tab)
+                MenuButton(title: "Calendar", ImageName: "calendar", tab: $tab)
+            }
+        }
+        .frame(maxHeight: .infinity)
         .background(
-            AngularGradient(gradient: Gradient(colors: [.green, .blue]), center: .bottomTrailing)
+            AngularGradient(gradient: Gradient(colors: [.red, .blue]), center: .bottomTrailing)
         )
+        .ignoresSafeArea(.all)
     }
 }
 
@@ -85,7 +86,7 @@ struct MenuButton : View {
     
     var body : some View {
         HStack {
-            VStack(alignment: .leading) {
+            VStack(alignment: .center) {
                 Text(title)
                     .font(.title2)
                     .foregroundColor(textColor)
@@ -95,11 +96,10 @@ struct MenuButton : View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 60.0)
-                // rgba(120, 176, 190, 0.95)
                     .foregroundColor(textColor)
             }.padding()
 
-        }.frame(width: 600, height: 150, alignment:.leading)
+        }.frame(width: 150, height: 150, alignment:.center)
          .background(.white)
          .cornerRadius(16)
          .padding([.top, .leading, .trailing], 20)

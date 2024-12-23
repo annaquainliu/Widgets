@@ -13,6 +13,7 @@ struct Alerts {
     var alertInstructions = false
     var nullFileName = false
     var invalidInterval = false
+    var invalidTimeFrame = false
 }
  
 struct TriggersView : View {
@@ -37,6 +38,13 @@ struct TriggersView : View {
             Image(systemName: selected.wrappedValue ? "checkmark.square" : "square")
                 .font(.system(size: 30))
         }.buttonStyle(.borderless)
+    }
+    
+    func makeSelection(list: [String]) -> some View {
+        ForEach(0..<list.count, id: \.self) { index in
+            Text(list[index])
+                .tag(index + 1)
+        }
     }
     
     var body: some View { 
@@ -93,16 +101,11 @@ struct TriggersView : View {
                                 HStack {
                                     Text("Day").padding()
                                     Picker("From", selection: $daySelection.timeStart) {
-                                        ForEach(TimeFrame.weekdays, id: \.self) {item in
-                                            Text(item)
-                                        }
+                                        makeSelection(list: TimeFrame.weekdays)
                                     }.pickerStyle(.menu)
                                     Picker("To", selection: $daySelection.timeEnd) {
-                                        ForEach(TimeFrame.weekdays, id: \.self) {item in
-                                            Text(item)
-                                        }
+                                        makeSelection(list: TimeFrame.weekdays)
                                     }.pickerStyle(.menu)
-                                 
                                 }.disabled(!daySelection.selected)
                             }
                             HStack {
@@ -127,14 +130,10 @@ struct TriggersView : View {
                                 HStack {
                                     Text("Month").padding()
                                     Picker("From", selection: $monthSelection.timeStart) {
-                                        ForEach(TimeFrame.months, id: \.self) {item in
-                                            Text(item)
-                                        }
+                                        makeSelection(list: TimeFrame.months)
                                     }.pickerStyle(.menu)
                                     Picker("To", selection: $monthSelection.timeEnd) {
-                                        ForEach(TimeFrame.months, id: \.self) {item in
-                                            Text(item)
-                                        }
+                                        makeSelection(list: TimeFrame.months)
                                     }.pickerStyle(.menu)
                                     
                                 }.disabled(!monthSelection.selected)
@@ -164,6 +163,7 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
     
     @EnvironmentObject var store : WidgetStore
     @EnvironmentObject var displayDesktop: DisplayDesktopWidgets
+
     
     var body : some View {
         VStack(alignment: .leading) {
@@ -200,7 +200,12 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
                             let dayParam = timeFrameSelection.contains(TimeFrame.dayOfTheWeek) ? daySelection : nil
                             let dateParam = timeFrameSelection.contains(TimeFrame.dayOfTheMonth) ? dateSelection : nil
                             let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
-                            trigger = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
+                            let timeFrame = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
+                            if timeFrame.getEndingTime() == nil || timeFrame.getStartingTime() == nil {
+                                alerts.invalidTimeFrame = true
+                                return
+                            }
+                            trigger = timeFrame
                         }
                         else if triggerSelection == Triggers.types.weather.rawValue {
                             trigger = WeatherTrigger(weather: weatherSelection.title)
@@ -227,6 +232,9 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
                         Button("OK", role: .cancel) { }
                     }
                     .alert("The interval cannot be 0.", isPresented: $alerts.invalidInterval) {
+                        Button("OK", role: .cancel) {}
+                    }
+                    .alert("The time intervals are invalid.", isPresented: $alerts.invalidTimeFrame) {
                         Button("OK", role: .cancel) {}
                     }
                 }

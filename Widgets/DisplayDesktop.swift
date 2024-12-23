@@ -190,7 +190,7 @@ class DisplayDesktopWidgets: ObservableObject {
         if validTimeFrame {
             print(trigger, " is valid!")
             makeWindowController(widget: widget)
-            let endingDate = trigger.getEndingTime()
+            let endingDate = trigger.getEndingTime()!
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: endingDate)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: endingDate,
@@ -203,7 +203,7 @@ class DisplayDesktopWidgets: ObservableObject {
             }
         } else {
             print(trigger.Hour as Any, " is not valid!")
-            let startingDate = trigger.getStartingTime()
+            let startingDate = trigger.getStartingTime()!
             let diffs = Calendar.current.dateComponents([.day], from: Date(), to: startingDate)
             if diffs.day! <= 5 {
                 let timer = Timer(fireAt: startingDate,

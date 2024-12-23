@@ -79,8 +79,6 @@ struct CalendarView : View {
     @State var selection : Date = Date()
     @State var backButtonPressed : Bool = false
     @StateObject var info = CalendarInfo(calendarType: CalendarSizes.types.calendar)
-    let width : CGFloat = 1100
-    let height : CGFloat = 700
     
     var body: some View {
         if backButtonPressed {
@@ -89,23 +87,25 @@ struct CalendarView : View {
             ScrollView {
                 VStack(alignment: .leading) {
                     WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Calendar")
-                    HStack {
-                        VStack(alignment: .center) {
-                            Text("Choose Your Type").font(.title)
-                            HStack {
-                                makeCalendarButton(view: Image(systemName: "calendar").font(.system(size: 90)), type: CalendarSizes.types.calendar)
-                               makeCalendarButton(view: Image(systemName: "clock.fill").font(.system(size: 90)), type: CalendarSizes.types.clock)
-                                makeCalendarButton(view: Image(systemName: "textformat").font(.system(size: 90)), type: CalendarSizes.types.text)
-                            }
+                    VStack(alignment: .center) {
+                        Text("Choose Your Type").font(.title)
+                        HStack {
+                            makeCalendarButton(view: Image(systemName: "calendar").font(.system(size: 90)), type: CalendarSizes.types.calendar)
+                           makeCalendarButton(view: Image(systemName: "clock.fill").font(.system(size: 90)), type: CalendarSizes.types.clock)
+                            makeCalendarButton(view: Image(systemName: "textformat").font(.system(size: 90)), type: CalendarSizes.types.text)
                         }
-                    }.frame(width: width)
+                    }.frame(maxWidth: .infinity)
                     Spacer().frame(height: 30)
                     HStack {
                         FilePicker(files: $fileName)
                         WidgetMenu(info: info, fileNames: $fileName)
                     }.padding()
                 }.padding()
-            }.frame(width: width, height: height)
+            }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                AngularGradient(gradient: Gradient(colors: [.red, .blue]), center: .bottomTrailing)
+            )
+            .ignoresSafeArea(.all)
         }
     }
     
