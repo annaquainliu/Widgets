@@ -8,6 +8,16 @@
 import Foundation
 import SwiftUI
 
+func WidgetOptionView(view: some View) -> some View {
+    
+    return ScrollView {view}
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                AngularGradient(gradient: Gradient(colors: [.red, .blue]), center: .bottomTrailing)
+            )
+            .ignoresSafeArea(.all)
+}
+
 struct ScreenSaverView: View {
     @EnvironmentObject var store : WidgetStore
     @State var fileName : [URL] = []
@@ -16,9 +26,11 @@ struct ScreenSaverView: View {
    
     var body: some View {
         if backButtonPressed {
-            ContentView()
-        } else {
-            ScrollView {
+             ContentView()
+        }
+        else {
+            WidgetOptionView(
+                view:
                 VStack(alignment: .leading) {
                     WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Screen Saver")
                     HStack {
@@ -35,17 +47,10 @@ struct ScreenSaverView: View {
                         }
                     }
                 }.padding()
-            }.frame(width: 1200, height: 700)
-             
+            )
         }
     }
 }
-
-//struct ScreenSaver_Providers: PreviewProvider {
-//    static var previews: some View {
-//        ScreenSaverView()
-//    }
-//}
 
 struct ImageOrGifView: View {
     @EnvironmentObject var store : WidgetStore
@@ -56,19 +61,20 @@ struct ImageOrGifView: View {
     var body : some View {
         if backButtonPressed {
             ContentView()
-        } else {
-            ScrollView {
-                VStack(alignment: .leading) {
-                    WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Image or Gif")
-                    Spacer().frame(height: 30)
-                    HStack {
-                        FilePicker(files: $fileName)
-                        Spacer(minLength: 40)
-                        WidgetMenu(info: info, fileNames: $fileName)
+        }
+        else {
+            WidgetOptionView(
+                view:
+                    VStack(alignment: .leading) {
+                        WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Image or Gif")
+                        Spacer().frame(height: 30)
+                        HStack {
+                            FilePicker(files: $fileName)
+                            Spacer(minLength: 40)
+                            WidgetMenu(info: info, fileNames: $fileName)
+                        }.padding()
                     }.padding()
-                }.padding()
-                 .frame(width: 1200)
-            }.frame(height: 700)
+            )
         }
     }
 }
@@ -82,16 +88,18 @@ struct CalendarView : View {
     
     var body: some View {
         if backButtonPressed {
-            ContentView()
-        } else {
-            ScrollView {
+             ContentView()
+        }
+        else {
+            WidgetOptionView(
+                view:
                 VStack(alignment: .leading) {
                     WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Calendar")
                     VStack(alignment: .center) {
                         Text("Choose Your Type").font(.title)
                         HStack {
                             makeCalendarButton(view: Image(systemName: "calendar").font(.system(size: 90)), type: CalendarSizes.types.calendar)
-                           makeCalendarButton(view: Image(systemName: "clock.fill").font(.system(size: 90)), type: CalendarSizes.types.clock)
+                            makeCalendarButton(view: Image(systemName: "clock.fill").font(.system(size: 90)), type: CalendarSizes.types.clock)
                             makeCalendarButton(view: Image(systemName: "textformat").font(.system(size: 90)), type: CalendarSizes.types.text)
                         }
                     }.frame(maxWidth: .infinity)
@@ -101,11 +109,7 @@ struct CalendarView : View {
                         WidgetMenu(info: info, fileNames: $fileName)
                     }.padding()
                 }.padding()
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                AngularGradient(gradient: Gradient(colors: [.red, .blue]), center: .bottomTrailing)
             )
-            .ignoresSafeArea(.all)
         }
     }
     
@@ -133,9 +137,11 @@ struct CountdownView : View {
     
     var body: some View {
         if backButtonPressed {
-            ContentView()
-        } else {
-            ScrollView {
+             ContentView()
+        }
+        else {
+            WidgetOptionView(
+                view:
                 VStack(alignment: .leading) {
                     WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Countdown")
                     VStack {
@@ -147,7 +153,7 @@ struct CountdownView : View {
                                     selection: Binding<Date>(get: {self.info.time }, set: {self.info.time = $0}),
                                     displayedComponents: [.date]
                                 ).font(.title)
-                                .padding()
+                                    .padding()
                             }
                             HStack {
                                 Text("Description").font(.title2).padding()
@@ -158,12 +164,12 @@ struct CountdownView : View {
                         Spacer(minLength: 30)
                         HStack {
                             FilePicker(files: $fileNames)
+                            Spacer(minLength: 40)
                             WidgetMenu(info: info, fileNames: $fileNames)
                         }
-                    }.padding()
-                }
-            }.frame(width: width, height: height)
-            
+                    }
+                }.padding()
+            )
         }
     }
 }
@@ -178,31 +184,32 @@ struct TextWidgetView : View {
     
     var body: some View {
         if backButtonPressed {
-            ContentView()
+             ContentView()
         }
         else {
-            ScrollView {
+            WidgetOptionView(
+                view:
                 VStack(alignment: .leading) {
                     WidgetTypeTab(backButtonPressed: $backButtonPressed, titleText: "Text")
-                    VStack {
-                        HStack {
-                            Text("Text: ").font(.title2)
-                            TextField(text: Binding<String>(get: {info.text}, set: {info.text = $0}), prompt: Text("Your Text")) {
-                            }.padding()
+                    HStack {
+                        FilePicker(files: $fileNames)
+                        VStack {
+                            HStack {
+                                Text("Text: ").font(.title2)
+                                TextField(text: Binding<String>(get: {info.text}, set: {info.text = $0}), prompt: Text("Your Text")) {
+                                }.padding()
+                            }
                             Picker("Font: ", selection: Binding<String>(get: {info.font}, set: {info.font = $0})) {
                                 ForEach(getAllFonts(), id: \.self) {
                                     Text($0).font(.custom($0, size: 12))
                                 }
                             }.font(.title2)
-                        }.frame(width: 700)
-                        Spacer(minLength: 30)
-                        HStack {
-                            FilePicker(files: $fileNames)
                             WidgetMenu(info: info, fileNames: $fileNames)
-                        }
+                        }.padding()
                     }
+                
                 }.padding()
-            }.frame(width: width, height: height)
+            )
         }
     }
     
@@ -225,14 +232,20 @@ struct TextWidgetView : View {
 //}
 
 //
-struct CalendarView_Previews : PreviewProvider {
-    static var previews: some View {
-        CalendarView()
-    }
-}
+//struct CalendarView_Previews : PreviewProvider {
+//    static var previews: some View {
+//        CalendarView()
+//    }
+//}
 //
 //struct WidgetOption_Providers: PreviewProvider {
 //    static var previews: some View {
 //        ImageOrGifView()
 //    }
 //}
+
+struct View_Providers : PreviewProvider {
+    static var previews: some View {
+        CountdownView()
+    }
+}

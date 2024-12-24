@@ -73,7 +73,7 @@ struct TriggersView : View {
                                 view: HStack {
                                 VStack(alignment: .leading) {
                                     TriggerCategoryText(text: "Time Frame")
-                                    Text("(Static)").foregroundColor(.gray).padding(.bottom)
+                                    Text("(Static)").foregroundColor(.white).padding(.bottom)
                                 }
                                  DatePicker("From", selection: $staticTimeFrame.timeStart, displayedComponents: [.hourAndMinute, .date])
                                 DatePicker("To", selection: $staticTimeFrame.timeEnd, displayedComponents: [.hourAndMinute, .date])
@@ -84,10 +84,10 @@ struct TriggersView : View {
                     view: HStack {
                         VStack(alignment: .leading) {
                             TriggerCategoryText(text: "Time Frame")
-                            Text("(Repeated)").foregroundColor(.gray).padding(.bottom)
+                            Text("(Repeated)").foregroundColor(.white).padding(.bottom)
                         }
                         List {
-                            Text("Note: All selected time frames will repeat.").foregroundColor(.gray)
+                            Text("Note: All selected time frames will repeat.").foregroundColor(.white)
                             HStack {
                                 makeToggle(selected: $hourSelection.selected, tag: TimeFrame.hour)
                                 HStack {
@@ -139,6 +139,11 @@ struct TriggersView : View {
                                 }.disabled(!monthSelection.selected)
                             }
                         }.frame(height: 200)
+                        .scrollContentBackground(.hidden)
+                        .background(
+                           AngularGradient(gradient: Gradient(colors: [.purple, .yellow]), center: .topTrailing)
+                        )
+                        .cornerRadius(16)
                     },
                     selection: triggerSelection)
             }.pickerStyle(RadioGroupPickerStyle())
@@ -201,6 +206,7 @@ struct WidgetMenu< T : WidgetTypeInfo> : View {
                             let dateParam = timeFrameSelection.contains(TimeFrame.dayOfTheMonth) ? dateSelection : nil
                             let monthParam = timeFrameSelection.contains(TimeFrame.month) ? monthSelection : nil
                             let timeFrame = TimeFrameInfo(Hour: hourParam, Weekday: dayParam, Date: dateParam, Month: monthParam)
+                            // If the time frames are invalid dates
                             if timeFrame.getEndingTime() == nil || timeFrame.getStartingTime() == nil {
                                 alerts.invalidTimeFrame = true
                                 return

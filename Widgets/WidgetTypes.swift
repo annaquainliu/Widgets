@@ -495,10 +495,10 @@ extension TimeFrameCodable {
         
         if timeStart > timeEnd {
             return (currTime >= timeStart && currTime <= maxRange)
-                || (currTime >= 1 && currTime <= timeEnd)
+                || (currTime >= 1 && currTime < timeEnd)
         }
         else {
-            return currTime >= timeStart && currTime <= timeEnd
+            return currTime >= timeStart && currTime < timeEnd
         }
     }
 }
@@ -519,7 +519,7 @@ struct HourTimeFrame : TimeFrameCodable {
         if timeEndDate < timeStartDate {
             timeEndDate = Calendar.current.date(byAdding: .day, value: 1, to: timeEndDate)!
         }
-        timeEndDate = Calendar.current.date(byAdding: .minute, value: 1, to: timeEndDate)!
+        timeEndDate = Calendar.current.date(byAdding: .minute, value: -1, to: timeEndDate)!
         return (timeStartDate...timeEndDate).contains(current)
     }
     
@@ -581,7 +581,8 @@ struct DateTimeFrame : TimeFrameCodable {
     var timeEnd : Int = 0
     
     func nowWithinTimeRange() -> Bool {
-        return Date().get(.day) >= timeStart + 1 && Date().get(.day) <= timeEnd + 1
+        // + 1 to adjust timeStart and timeEnd to be 1-based index 
+        return Date().get(.day) >= timeStart + 1 && Date().get(.day) < timeEnd + 1
     }
     
     func getTimeStart() -> Int {
@@ -703,6 +704,7 @@ class TimeFrameInfo : Triggers {
                            day: date == nil ? nil : date!.timeEnd,
                            month: Month == nil ? nil : Month!.timeEnd,
                            weekday: Weekday == nil ? nil : Weekday!.timeEnd);
+        
     }
     
 }

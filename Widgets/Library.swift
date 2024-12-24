@@ -62,7 +62,10 @@ struct LibraryView : View {
                         }
                     }
                 }
-            }
+                .scrollContentBackground(.hidden)
+            }.background(
+                AngularGradient(gradient: Gradient(colors: [.purple, .yellow]), center: .topTrailing)
+             )
         }
     }
 }

@@ -30,13 +30,16 @@ struct FilePicker: View {
                         }
                         importFiles.removeLast()
                     }
-                    print(files)
                 }
             }
-        }.frame(width: 190)
-          .task {
+        }.task {
               importFiles.insert(ImportFile(files: $files, index: files.count), at: importFiles.count)
          }
+         .frame(width: 185, height: 400)
+         .background(
+            AngularGradient(gradient: Gradient(colors: [.purple, .yellow]), center: .topTrailing)
+         )
+        .scrollContentBackground(.hidden)
         .cornerRadius(15)
     }
 }
@@ -57,6 +60,7 @@ extension URL {
     func isValidURL() -> Bool {
         let valid = ["Pictures", "Downloads", "Movies", "Music"]
         let username = NSUserName()
+        // A valid URL image will only come from the valid directories
         for i in 0..<valid.count {
             if self.absoluteString.contains("file:///Users/\(username)/\(valid[i])/") {
                 return true
@@ -109,7 +113,7 @@ struct ImportFile : View, Hashable {
             panel.allowsMultipleSelection = false
             panel.canChooseDirectories = false
             panel.directoryURL = URL.downloadsDirectory
-            panel.allowedContentTypes = [.gif, .png, .jpeg, .heic]
+            panel.allowedContentTypes = [.gif, .png, .jpeg]
             if panel.runModal() == .OK {
                 let checkFileName = panel.url ?? nil
                 if checkFileName == nil || !checkFileName!.isValidURL() {

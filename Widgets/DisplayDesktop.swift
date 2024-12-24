@@ -25,6 +25,7 @@ class DisplayDesktopWidgets: ObservableObject {
     
     // CAN ONLY BE CALLED ONCE!
     func loadWidgets() {
+        // Enforcing that this function can only be called once
         if store == nil || self.loaded {
             return
         }
@@ -38,7 +39,6 @@ class DisplayDesktopWidgets: ObservableObject {
     func displayWidget(widget: WidgetInfo) {
         switch widget.trigger.type {
             case Triggers.types.always:
-                print("always")
                 makeWindowController(widget: widget)
                 break
             case Triggers.types.timeFrame:
@@ -178,7 +178,8 @@ class DisplayDesktopWidgets: ObservableObject {
     
     private func displayTimeFrameWidget(widget: WidgetInfo) {
         var validTimeFrame = true
-//         the time frame must be valid for all widgets
+        
+        // Find if the widget should be currently displayed or not
         let trigger = widget.trigger as! TimeFrameInfo
         let timeFrames : [TimeFrameCodable?] = [trigger.date, trigger.Hour, trigger.Month, trigger.Weekday]
         for timeFrame in timeFrames {
@@ -187,33 +188,30 @@ class DisplayDesktopWidgets: ObservableObject {
                 break
             }
         }
+        
+        var selector : Selector;
+        var triggerTime : Date;
+        
         if validTimeFrame {
-            print(trigger, " is valid!")
             makeWindowController(widget: widget)
-            let endingDate = trigger.getEndingTime()!
-            let diffs = Calendar.current.dateComponents([.day], from: Date(), to: endingDate)
-            if diffs.day! <= 5 {
-                let timer = Timer(fireAt: endingDate,
-                                  interval: 0,
-                                  target: self,
-                                  selector: #selector(removeWidgetRepeat(sender:)),
-                                  userInfo: widget,
-                                  repeats: false)
-                RunLoop.main.add(timer, forMode: .common)
-            }
+            triggerTime = trigger.getEndingTime()!
+            selector = #selector(removeWidgetRepeat(sender:))
+            print("removing widget on ", triggerTime)
         } else {
-            print(trigger.Hour as Any, " is not valid!")
-            let startingDate = trigger.getStartingTime()!
-            let diffs = Calendar.current.dateComponents([.day], from: Date(), to: startingDate)
-            if diffs.day! <= 5 {
-                let timer = Timer(fireAt: startingDate,
-                                  interval: 0,
-                                  target: self,
-                                  selector: #selector(displayWidgetSelector(sender:)),
-                                  userInfo: widget,
-                                  repeats: false)
-                RunLoop.main.add(timer, forMode: .common)
-            }
+            triggerTime = trigger.getStartingTime()!
+            selector = #selector(displayWidgetSelector(sender:))
+            print("adding widget on ", triggerTime)
         }
+                                 
+         let diffs = Calendar.current.dateComponents([.day], from: Date(), to: triggerTime)
+         if diffs.day! <= 5 {
+             let timer = Timer(fireAt: triggerTime,
+                               interval: 0,
+                               target: self,
+                               selector: selector,
+                               userInfo: widget,
+                               repeats: false)
+             RunLoop.main.add(timer, forMode: .common)
+         }
     }
 }
